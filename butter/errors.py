@@ -1,6 +1,25 @@
 #!/usr/bin/env python
 """Basic libc error codes"""
 
+def get_error(val):
+	"""Returns a triplet that mapps to an error
+
+	val can be an error name or number"""
+	try:
+		num = int(val)
+		if num < 0:
+			num *= -1
+		name, msg = ERRNO[num]				
+	except ValueError:
+		name = val
+		try:
+			num, msg = ERRNAME[name]
+		except KeyError:
+			# try again with E in front for lazy programmers
+			num, msg = ERRNAME["E" + name]			
+
+	return (num, name, msg)	
+
 ERRNO = {
 1:("EPERM", "Operation not permitted"),
 2:("ENOENT", "No such file or directory"),
@@ -163,10 +182,5 @@ if __name__ == "__main__":
 			print "{0:3} {1}: {2}".format(num, name, msg)
 	else:
 		for val in argv[1:]:
-			try:
-				num = int(val)
-				name, msg = ERRNO[num]				
-			except ValueError:
-				name = val
-				num, msg = ERRNAME[name]
+			num, name, msg = get_error(val)
 			print "{0:3} {1}: {2}".format(num, name, msg)
