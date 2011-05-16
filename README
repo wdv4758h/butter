@@ -1,0 +1,22 @@
+========
+ Butter
+========
+Butter is a library to integrate some of linux's low level features into python
+eg signalfd, eventfd and timerfd. most of these functions are handy if you are 
+looking into creating non-blocking servers, anything using select/poll and 
+derivatives or writing server code
+
+Design
+-------
+where posible access to the raw calls has been made avalible as well as providing 
+a file like object that ahs been extended (hereby refered to as an "event like" 
+object. steps have been taken to preserve the current file like api calling
+conventions however be warned that doing partial reads using obj.read may cause
+issues for eventlike objects that work with constant sizes and as such the event
+functions should be called instead
+
+Event-like objects
++++++++++++++++++++
+eventlike objects have been extended in the following way:
+getevent() -> event
+getevents(count=1) -> [event, .....]
