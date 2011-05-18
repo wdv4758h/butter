@@ -4,9 +4,9 @@
 Normmaly used with poll/select to handle signal notifcation in the main loop
 instead of in callback functions
 """
-from errors import get_error
 from ctypes import c_ubyte, c_int, c_uint, c_ulong, c_ulonglong, c_void_p
 from ctypes.util import find_library
+import errors
 import ctypes
 import signal
 import sys
@@ -48,53 +48,65 @@ class sigset_t(ctypes.Structure):
 	"""A sigset_t structure for masking signals and marking them as blocked"""
 	## 32 chosen by calculating by hand the code in 
 	## /usr/include/bits/sigset.h
+	## unsigned long int assumed to be 64 bits
 	_fields_ = (("__val", c_ulong * 32),)
 
 libc = ctypes.CDLL(find_library("c"))
-_signalfd = ctypes.CFUNCTYPE(c_int, c_int, c_void_p, c_int)
+
+_signalfd = ctypes.CFUNCTYPE(c_int, c_int, ctypes.POINTER(sigset_t), c_int)
 __param_flags = ((0, "fd"), (0, "mask"), (0, "flags", 0))
 _signalfd = _signalfd(("signalfd", libc), __param_flags)
-#_signalfd = libc.signalfd
-#_signalfd.argtypes = (c_int, sigset_t, c_int)
-#_signalfd.restype = c_int
+_signalfd.restype = c_int
 
 # Taken from /usr/include/sys/signalfd.h
 SFD_CLOEXEC = 0x2000000
 SFD_NONBLOCK = 0x4000
 
-def signalfd(fd, mask, flags):
-	"""A wrapper for signalfd that handles pretty error printing"""
-	fd = _signalfd(fd, mask, flags)
-	if fd < 0:
-		errnum = c_int.in_dll(libc, "errno").value
-		raise SignalFDError(errnum)
+def signalfd(fd, signals, flags=0):
+	"""A wrapper for signalfd that handles pretty error printing
+
+	Note: it is recomended to use the SignalFD object instead of this
+	function
+	"""
+	# Make signals "Blocked"
+	sigset = make_sigset_t(signals)
+	libc.sigprocmask(0, sigset, None)
+
+	fd = _signalfd(fd, sigset, flags)
+	# Check for errors and raise SignalFDError on fd < 0
+	errors.check_error(fd, SignalFDError)
 	return fd
 
 def make_sigset_t(signals):
 	"""Add Signals to a sigset_t structure and return the new structure"""
 	sigset = sigset_t()
-	ad_sigset = ctypes.addressof(sigset)
-	libc.sigemptyset(ad_sigset)
+	libc.sigemptyset(sigset)
 
 	for sig in signals:
-		libc.sigaddset(ad_sigset, sig)
+		libc.sigaddset(sigset, sig)
 
 	return sigset
+
+sigprocmask = libc.sigprocmask
+sigprocmask.argtypes = [c_int, ctypes.POINTER(sigset_t), c_void_p]
+sigprocmask.restype = c_int
+
+sigemptyset = libc.sigemptyset
+sigemptyset.argtypes = [ctypes.POINTER(sigset_t)]
+sigemptyset.restype = c_int
+
+sigaddset = libc.sigaddset
+sigaddset.argtypes = [ctypes.POINTER(sigset_t), c_int]
+sigaddset.restype = c_int
 
 ######################
 # Event-like objects #
 ######################
-class SignalFDError(Exception):
+class SignalFDError(errors.CError):
 	"""Represents the return value from signalfd is val < 0
 
 	see "man 2 signalfd" for a more detailed version of error messages
 	"""
-	def __init__(self, value):
-		self.value, self.name, self.msg = get_error(value)
-
-	def __str__(self):
-		return "{0} {1}: {2}".format(self.value, self.name, self.msg)
-
 	def __repr__(self):
 		return "<SignalFDException err_num={0}>".format(self.name)
 
@@ -102,7 +114,7 @@ class SignalFD(file):
 	"""An Event like object that represents a file like object"""
 	closed = False
 	def __init__(self, mask, flags=0):
-		fd = self.fdopen(-1, mask=mask, flags=flags)
+		fd = self.fdopen(1, mask=mask, flags=flags)
 		self._fileno = fd
 		self.mask = mask
 
@@ -130,6 +142,8 @@ class SignalFD(file):
 		"""Retrive multiple events
 
 		the maximum ammount of events returned at once is given by ```count```
+
+		returns a list of signalfd_siginfo objects
 		"""
 		data = self.read(count * 128)
 
@@ -164,17 +178,19 @@ class SignalFD(file):
 		pass
 
 if __name__ == "__main__":
-	sigusr = signal.SIGUSR1
+	sigmask = (signal.SIGUSR1, signal.SIGUSR2)
 
-	signal.signal(sigusr, signal.SIG_IGN)
+	signal.signal(signal.SIGUSR1, signal.SIG_IGN)
+	signal.signal(signal.SIGUSR2, signal.SIG_IGN)
 
-	mask = make_sigset_t((sigusr,))
-	libc.sigprocmask(0, ctypes.byref(mask), None)
-	s = SignalFD(ctypes.byref(mask))
+	s = SignalFD(sigmask)
 
+	print "-------"
 	# test if we actually wait on fd or if signal module kicks in
-	os.kill(os.getpid(), sigusr)
-	print("Waiting on event:")
-	sig = s.getevent()
-	print("Event Recived: " + str(sig))
-	print(repr(sig))
+	for sig in (signal.SIGUSR1, signal.SIGUSR2):
+		os.kill(os.getpid(), sig)
+		print("Waiting on event:")
+		sig = s.getevent()
+		print("Event Recived: " + str(sig))
+		print(repr(sig))
+		print "-------"
