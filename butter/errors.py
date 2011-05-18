@@ -1,5 +1,21 @@
 #!/usr/bin/env python
 """Basic libc error codes"""
+import ctypes
+import ctypes.util
+
+libc = ctypes.CDLL(ctypes.util.find_library("c"))
+
+class CError(Exception):
+	"""Standard C Error
+	"""
+	def __init__(self, value, name, msg):
+		self.value, self.name, self.msg = value, name, msg
+
+	def __str__(self):
+		return "{0} {1}: {2}".format(self.value, self.name, self.msg)
+
+	def __repr__(self):
+		return "<CError err_num={0}>".format(self.name)
 
 def get_error(val):
 	"""Returns a triplet that mapps to an error
@@ -8,7 +24,7 @@ def get_error(val):
 	try:
 		num = int(val)
 		if num < 0:
-			num *= -1
+			num = -num
 		name, msg = ERRNO[num]				
 	except ValueError:
 		name = val
@@ -19,6 +35,13 @@ def get_error(val):
 			num, msg = ERRNAME["E" + name]			
 
 	return (num, name, msg)	
+
+def check_error(val, exp_obj=CError):
+	if val < 0:
+		errnum = ctypes.c_int.in_dll(libc, "errno").value
+		num, name, msg = get_error(errnum)
+		raise exp_obj(num, name, msg)
+
 
 ERRNO = {
 1:("EPERM", "Operation not permitted"),
