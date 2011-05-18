@@ -1,13 +1,22 @@
 #!/usr/bin/env pypy
+"""SignalFD: Recive signal notifcations over a file descriptor
 
+Normmaly used with poll/select to handle signal notifcation in the main loop
+instead of in callback functions
+"""
 from errors import get_error
 from ctypes import c_ubyte, c_int, c_uint, c_ulong, c_ulonglong, c_void_p
+from ctypes.util import find_library
 import ctypes
 import signal
 import sys
 import os
 
 class signalfd_siginfo(ctypes.Structure):
+	"""A signalfd_siginfo block as defined by the signalfd man page ("man 2 signalfd")
+
+	This is a 128 byte structure read from the file descriptor opened with signalfd
+	"""
 	_fields_ = (("ssi_signo", c_uint),
 				("ssi_errno", c_int),
 				("ssi_code", c_int),
@@ -24,19 +33,26 @@ class signalfd_siginfo(ctypes.Structure):
 				("ssi_utime", c_ulonglong),
 				("ssi_stime", c_ulonglong),
 				("ssi_addr", c_ulonglong),
+				# pad is used to pad the structure out to 128 bytes for future expansion
 				("pad", c_ubyte * (128-80)))
 
+	def __repr__(self):
+		return "<signalfd_siginfo signal={0}, pid={1}, uid={2}>".format(self.ssi_signo, self.ssi_pid, self.ssi_uid)
+
+	def __str__(self):
+		signal_names = [x for x in signal.__dict__ if x.startswith("SIG")]
+		signal_name = [x for x in signal_names if getattr(signal, x) == self.ssi_signo][0]
+		return signal_name
+
 class sigset_t(ctypes.Structure):
+	"""A sigset_t structure for masking signals and marking them as blocked"""
 	## 32 chosen by calculating by hand the code in 
 	## /usr/include/bits/sigset.h
 	_fields_ = (("__val", c_ulong * 32),)
 
-libc = ctypes.CDLL("libc.so.6")
-#_signalfd = ctypes.CFUNCTYPE(c_int, c_int, sigset_t, c_int, use_errno=True)
-_signalfd = ctypes.CFUNCTYPE(c_int, c_int, c_void_p, c_int, use_errno=True)
-#_signalfd = ctypes.CFUNCTYPE(c_int, c_int, c_void_p, c_int)
-#__param_flags = ((1, "fd", -1), (2, "mask"), (1, "flags", 0))
-__param_flags = ((0,), (0,), (0,))
+libc = ctypes.CDLL(find_library("c"))
+_signalfd = ctypes.CFUNCTYPE(c_int, c_int, c_void_p, c_int)
+__param_flags = ((0, "fd"), (0, "mask"), (0, "flags", 0))
 _signalfd = _signalfd(("signalfd", libc), __param_flags)
 #_signalfd = libc.signalfd
 #_signalfd.argtypes = (c_int, sigset_t, c_int)
@@ -47,6 +63,7 @@ SFD_CLOEXEC = 0x2000000
 SFD_NONBLOCK = 0x4000
 
 def signalfd(fd, mask, flags):
+	"""A wrapper for signalfd that handles pretty error printing"""
 	fd = _signalfd(fd, mask, flags)
 	if fd < 0:
 		errnum = c_int.in_dll(libc, "errno").value
@@ -54,6 +71,7 @@ def signalfd(fd, mask, flags):
 	return fd
 
 def make_sigset_t(signals):
+	"""Add Signals to a sigset_t structure and return the new structure"""
 	sigset = sigset_t()
 	ad_sigset = ctypes.addressof(sigset)
 	libc.sigemptyset(ad_sigset)
@@ -81,6 +99,7 @@ class SignalFDError(Exception):
 		return "<SignalFDException err_num={0}>".format(self.name)
 
 class SignalFD(file):
+	"""An Event like object that represents a file like object"""
 	closed = False
 	def __init__(self, mask, flags=0):
 		fd = self.fdopen(-1, mask=mask, flags=flags)
@@ -153,7 +172,9 @@ if __name__ == "__main__":
 	libc.sigprocmask(0, ctypes.byref(mask), None)
 	s = SignalFD(ctypes.byref(mask))
 
-#	os.kill(os.getpid(), sigusr)
+	# test if we actually wait on fd or if signal module kicks in
+	os.kill(os.getpid(), sigusr)
 	print("Waiting on event:")
-	s.getevent()
-	print("Event Recived")
+	sig = s.getevent()
+	print("Event Recived: " + str(sig))
+	print(repr(sig))
