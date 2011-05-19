@@ -114,7 +114,7 @@ class SignalFD(file):
 	"""An Event like object that represents a file like object"""
 	closed = False
 	def __init__(self, mask, flags=0):
-		fd = self.fdopen(1, mask=mask, flags=flags)
+		fd = self.fdopen(-1, mask=mask, flags=flags)
 		self._fileno = fd
 		self.mask = mask
 
