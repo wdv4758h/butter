@@ -12,15 +12,53 @@ from ctypes.util import find_library
 from ctypes import c_int, c_char c_void_p
 import cytpes
 
+_ARCH_SIGEV_PREAMBLE_SIZE(len(c_int) * 2 + len(sigval))
+_SIGEV_MAX_SIZE = 64
+_SIGEV_PAD_VALUE = (SIGEV_MAX_SIZE - ARCH_SIGEV_PREAMBLE_SIZE) / len(c_int)
+
+class sigval(ctypes.Union):
+	_fields_ = (("sigval_int", c_int),
+				("sigval_ptr", c_void_p))
+
+class sigevent_sigev_thread(ctypes.Union):
+	_fields_ = (("_function", c_void_p),
+				("_attribute", c_void_p))
+
+class sigevent_sigev_un(ctypes.Union):
+	_fields_ = (("_pad", c_int * _SIGEV_PAD_VALUE), # Dont ask
+				("_tid", c_int),
+				("_sigev_thread", sigevent_sigev_thread)
+
+#class sigevent(ctypes.Structure):
+#	"""man sigevent"""
+#	_fields_ = (("sigev_notify", c_int),
+#				("sigev_signo", c_int),
+#				("sigev_value", sigval), # see above union
+#				# These map onto sigevent_sigev_un
+#				("sigev_notify_function", c_void_p), # maps to sigevent_sigev_un._sigev_thread._function
+#				("sigev_notify_attributes", c_void_p), # maps to same as above but _attribute
+#				("sigev_notify_thread_id", c_int)) # maps to _tid in sigevent_sigev_un
+
+class sigevent(ctypes.Structure):
+	_fields_ = (("sigev_value", sigval), 
+				("sigev_signo", c_int),
+				("sigev_notfiy", c_int),
+				("_sigev_un", sigevent_sigev_un))
+
+# Taken from /usr/include/asm-generic/siginfo.h
+SIGEV_NONE = 0
+SIGEV_SIGNAL = 1
+SIGEV_THREAD = 2
+SIGEV_THREAD_ID = 4
 
 
 class aiocb(cytpes.Structure):
 	_fields_ = (("aio_fildes", c_int),
 				("aio_lio_opcode", c_int),
 				("aio_reqprio", c_int),
-				("aio_buf",) # volitile mutable buffer
+				("aio_buf", c_void_p) # volitile mutable buffer
 				("aio_nbytes", c_int),
-				("aio_sigevent",) #sigevent struct
+				("aio_sigevent", sigevent) # sigevent struct
 				# Kernel internal accounting
 				("__next_prio", c_void_p)#pointer to next block
 				("__abs_prio", c_int),
@@ -28,7 +66,7 @@ class aiocb(cytpes.Structure):
 				("__error_code", c_int),
 				("__return_value", )#__size_t
 				("aio_offset",)#__off_t (or __off_t64)
-				# padding
+				# Padding
 				("__unused", c_char * 32))
 
 class aioinit(ctypes.Structure):
@@ -40,7 +78,6 @@ class aioinit(ctypes.Structure):
 				("aio_numusers", c_int), # Unused
 				("aio_idle_time", c_int), # number of seconds before idle thread
 				("aio_reserved", c_int)) # for future use
-
 
 libc = ctypes.CDLL(find_library("c"))
 
