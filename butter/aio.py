@@ -2,35 +2,38 @@
 """AIO implementation for POSIX OSs
 
 TODO:
-fill in fields in Structures
-struure for sigevent
 work out wtf a size_t is
-# detect and handle xxx64 func calls and padding
+detect and handle xxx64 func calls and padding
 """
 
 from ctypes.util import find_library
 from ctypes import c_int, c_char c_void_p
 import cytpes
 
+# Calculated in /usr/include/asm-generic/siginfo.h
 _ARCH_SIGEV_PREAMBLE_SIZE(len(c_int) * 2 + len(sigval))
 _SIGEV_MAX_SIZE = 64
 _SIGEV_PAD_VALUE = (SIGEV_MAX_SIZE - ARCH_SIGEV_PREAMBLE_SIZE) / len(c_int)
 
 class sigval(ctypes.Union):
+	_defined = "/usr/include/asm-generic/siginfo.h"
 	_fields_ = (("sigval_int", c_int),
 				("sigval_ptr", c_void_p))
 
 class sigevent_sigev_thread(ctypes.Union):
+	_defined = "/usr/include/asm-generic/siginfo.h"
 	_fields_ = (("_function", c_void_p),
 				("_attribute", c_void_p))
 
 class sigevent_sigev_un(ctypes.Union):
+	_defined = "/usr/include/asm-generic/siginfo.h"
 	_fields_ = (("_pad", c_int * _SIGEV_PAD_VALUE), # Dont ask
 				("_tid", c_int),
 				("_sigev_thread", sigevent_sigev_thread)
 
 #class sigevent(ctypes.Structure):
 #	"""man sigevent"""
+#	_defined = "/usr/include/asm-generic/siginfo.h"
 #	_fields_ = (("sigev_notify", c_int),
 #				("sigev_signo", c_int),
 #				("sigev_value", sigval), # see above union
@@ -40,6 +43,7 @@ class sigevent_sigev_un(ctypes.Union):
 #				("sigev_notify_thread_id", c_int)) # maps to _tid in sigevent_sigev_un
 
 class sigevent(ctypes.Structure):
+	_defined = "/usr/include/asm-generic/siginfo.h"
 	_fields_ = (("sigev_value", sigval), 
 				("sigev_signo", c_int),
 				("sigev_notfiy", c_int),
