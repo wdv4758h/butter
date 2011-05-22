@@ -62,6 +62,11 @@ _signalfd.restype = c_int
 SFD_CLOEXEC = 0x2000000
 SFD_NONBLOCK = 0x4000
 
+def signalfd_error(val, func, args):
+	"""Error wrapper for signalfd"""
+	errors.check_error(val)	
+_signalfd.errcheck = signalfd_error
+
 def signalfd(fd, signals, flags=0):
 	"""A wrapper for signalfd that handles pretty error printing
 
@@ -73,8 +78,6 @@ def signalfd(fd, signals, flags=0):
 	libc.sigprocmask(0, sigset, None)
 
 	fd = _signalfd(fd, sigset, flags)
-	# Check for errors and raise SignalFDError on fd < 0
-	errors.check_error(fd, SignalFDError)
 	return fd
 
 def make_sigset_t(signals):
@@ -114,7 +117,7 @@ class SignalFD(file):
 	"""An Event like object that represents a file like object"""
 	closed = False
 	def __init__(self, mask, flags=0):
-		fd = self.fdopen(-1, mask=mask, flags=flags)
+		fd = self.fdopen(1, mask=mask, flags=flags)
 		self._fileno = fd
 		self.mask = mask
 
