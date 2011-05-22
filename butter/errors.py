@@ -38,8 +38,8 @@ def get_error(val):
 
 def check_error(val, exp_obj=CError):
 	if val < 0:
-		errnum = ctypes.get_errno()
-		#errnum = ctypes.c_int.in_dll(libc, "errno").value
+		#errnum = ctypes.get_errno()
+		errnum = ctypes.c_int.in_dll(libc, "errno").value
 		num, name, msg = get_error(errnum)
 		raise exp_obj(num, name, msg)
 
