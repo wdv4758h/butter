@@ -9,6 +9,7 @@ detect and handle xxx64 func calls and padding
 from ctypes.util import find_library
 from ctypes import c_int, c_char, c_char, c_void_p, POINTER
 import cytpes
+import error
 
 # Calculated in /usr/include/asm-generic/siginfo.h
 _ARCH_SIGEV_PREAMBLE_SIZE(len(c_int) * 2 + len(sigval))
@@ -83,51 +84,74 @@ class aioinit(ctypes.Structure):
 				("aio_idle_time", c_int), # number of seconds before idle thread
 				("aio_reserved", c_int)) # for future use
 
-libc = ctypes.CDLL(find_library("c"))
+class AIOErrror(errors.CError):
+	def __repr__(self):
+		return "<AIOError {0}: {1}>".format(self.name, sel.msg)
 
-_aio_init = libc.aio_init
-_aio_init.argtypes = (POINTER(aioinit))
-_aio_init.restype = None # XXX is this alright?
+def aio_error(val, func, args):
+	"""Generic AIO Error handling"""
+	errors.check_error(val, AIOError)
 
-_lio_listio = libc.lio_listio
-_lio_listio.argtypes = ()
-_lio_listio.restypr = c_int
-
-_aio_read = libc.aio_read
-_aio_read.argtypes = (POINTER(aiocb))
-_aio_write.restype = c_int
-
-_aio_write = libc.aio_write
-_aio_write.argtypes = (POINTER(aiocb))
-_aio_write.restype = c_int 
-
-_aio_error = libc.aio_error
-_aio_error.argtypes = (POINTER(aiocb))
-_aio_error.restype = c_int
-
-_aio_return = libc.aio_return
-_aio_return.argtypes = (POINTER(aiocb))
-_aio_return.restype = ssize_t
-
-_aio_cancel = libc.aio_cancel
-# args: fd, aiocb block
-_aio_cancel.argtypes = (c_int, POINTER(aiocb))
-_aio_cancel.restype = c_int
-
-_aio_suspend = libc.aio_suspend
-# first arg is complex, arg is a list of pointers of type aiocb, pointer can be None
-_aio_suspend.argtypes = (None, c_int, timespec)
-_aio_cancel.restype = c_int
-
-_aio_fsync = aio.fsync
-_aio_fsync.argtypes = (c_int, aiocb)
-_aio_fsync.restype = c_int
+def aio_error_error(val, func, args):
+	"""Error handling for the aio_error function"""
+	if val < 0:
+		num, name, msg = get_error(val)
+		raise AIOError(num, name, msg)
 
 # Enums
 # Taken from /usr/include/aio.h
 AIO_CANCELED, AIO_NOTCANCELED, AIO_ALLDONE = range(3)
 LIO_READ, LIO_WRITE, LIO_NOP = range(3)
 LIO_WAIT, LIO_NOWAIT = range(2)
+
+libc = ctypes.CDLL(find_library("c"))
+
+_aio_init = libc.aio_init
+_aio_init.argtypes = (POINTER(aioinit))
+_aio_init.restype = None # XXX is this alright?
+#_aio_init.errcheck = aio_error
+
+_lio_listio = libc.lio_listio
+_lio_listio.argtypes = ()
+_lio_listio.restypr = c_int
+#_lio_listio.errcheck = aio_error
+
+_aio_read = libc.aio_read
+_aio_read.argtypes = (POINTER(aiocb))
+_aio_read.restype = c_int
+_aio_read.errcheck = aio_error
+
+_aio_write = libc.aio_write
+_aio_write.argtypes = (POINTER(aiocb))
+_aio_write.restype = c_int 
+_aio_write.errcheck = aio_error
+
+_aio_error = libc.aio_error
+_aio_error.argtypes = (POINTER(aiocb))
+_aio_error.restype = c_int
+_aio_error.errcheck = aio_error_error
+
+_aio_return = libc.aio_return
+_aio_return.argtypes = (POINTER(aiocb))
+_aio_return.restype = ssize_t
+_aio_init.errcheck = aio_error
+
+_aio_cancel = libc.aio_cancel
+# args: fd, aiocb block
+_aio_cancel.argtypes = (c_int, POINTER(aiocb))
+_aio_cancel.restype = c_int
+_aio_cancel.errcheck = aio_error
+
+_aio_suspend = libc.aio_suspend
+# first arg is complex, arg is a list of pointers of type aiocb, pointers can be None
+_aio_suspend.argtypes = (POINTER(aiocb), c_int, POINTER(timespec))
+_aio_suspend.restype = c_int
+_aio_suspend.errcheck = aio_error
+
+_aio_fsync = aio.fsync
+_aio_fsync.argtypes = (c_int, aiocb)
+_aio_fsync.restype = c_int
+_aio_fsync.errcheck = aio_error
 
 from os import O_SYNC, O_DSYNC
 
@@ -148,3 +172,7 @@ class AIORequest(object):
 
 	def __repr__(self):
 		return "<AIORequest fd={0}, type={1}, offset={2}, size={3}>".format(self.fd, self.operation, self.offset, self.size)
+
+
+if __name__ == "__main__":
+	pass
