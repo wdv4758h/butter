@@ -7,9 +7,14 @@ detect and handle xxx64 func calls and padding
 """
 
 from ctypes.util import find_library
-from ctypes import c_int, c_char, c_char, c_ssize_t, c_void_p, POINTER, sizeof
-import cytpes
-import error
+from ctypes import c_int, c_int64, c_long, c_char, c_char, c_void_p, POINTER, sizeof
+# Pre 2.7 did not have this defined
+try:
+	from ctypes import c_ssize_t
+except ImportError:
+	c_ssize_t = c_int
+import ctypes
+import errors
 
 class sigval(ctypes.Union):
 	_defined = "/usr/include/asm-generic/siginfo.h"
@@ -17,9 +22,9 @@ class sigval(ctypes.Union):
 				("sigval_ptr", c_void_p))
 
 # Calculated in /usr/include/asm-generic/siginfo.h
-_ARCH_SIGEV_PREAMBLE_SIZE((sizeof(c_int) * 2 + sizeof(sigval))
-_SIGEV_MAX_SIZE = 64
-_SIGEV_PAD_VALUE = (SIGEV_MAX_SIZE - ARCH_SIGEV_PREAMBLE_SIZE) / sizeof(c_int)
+ARCH_SIGEV_PREAMBLE_SIZE = sizeof(c_int) * 2 + sizeof(sigval)
+SIGEV_MAX_SIZE = 64
+SIGEV_PAD_VALUE = (SIGEV_MAX_SIZE - ARCH_SIGEV_PREAMBLE_SIZE) / sizeof(c_int)
 
 class sigevent_sigev_thread(ctypes.Union):
 	_defined = "/usr/include/asm-generic/siginfo.h"
@@ -28,9 +33,9 @@ class sigevent_sigev_thread(ctypes.Union):
 
 class sigevent_sigev_un(ctypes.Union):
 	_defined = "/usr/include/asm-generic/siginfo.h"
-	_fields_ = (("_pad", c_int * _SIGEV_PAD_VALUE), # Dont ask
+	_fields_ = (("_pad", c_int * SIGEV_PAD_VALUE), # Dont ask
 				("_tid", c_int),
-				("_sigev_thread", sigevent_sigev_thread)
+				("_sigev_thread", sigevent_sigev_thread))
 
 #class sigevent(ctypes.Structure):
 #	"""man sigevent"""
@@ -50,15 +55,15 @@ class sigevent(ctypes.Structure):
 				("sigev_notfiy", c_int),
 				("_sigev_un", sigevent_sigev_un))
 
+class timespec(ctypes.Structure):
+	_defined = ""
+	_fileds_ = ()
+
 # Taken from /usr/include/asm-generic/siginfo.h
 SIGEV_NONE = 0
 SIGEV_SIGNAL = 1
 SIGEV_THREAD = 2
 SIGEV_THREAD_ID = 4
-
-# for newer versions of ctypes
-if sys.version_info[:1] < (2,7):
-	c_ssize_t = c_int
 
 # Subtle api changes
 USE_FILE_OFFSET64 = True
@@ -68,24 +73,24 @@ if USE_FILE_OFFSET64 == True:
 else:
 	off_t = c_long
 
-class aiocb(cytpes.Structure):
+class aiocb(ctypes.Structure):
 	_defined = "/usr/include/aio.h"
 	_fields_ = (("aio_fildes", c_int),
 				("aio_lio_opcode", c_int),
 				("aio_reqprio", c_int),
-				("aio_buf", c_void_p) # volitile mutable buffer
+				("aio_buf", c_void_p), # volitile mutable buffer
 				("aio_nbytes", c_int),
-				("aio_sigevent", sigevent) # sigevent struct
+				("aio_sigevent", sigevent), # sigevent struct
 				# Kernel internal accounting
-				("__next_prio", c_void_p)#pointer to next block
+				("__next_prio", c_void_p), #pointer to next block
 				("__abs_prio", c_int),
 				("__policy", c_int),
 				("__error_code", c_int),
-				("__return_value", c_ssize),#__size_t
-				("aio_offset", off_t),#__off_t (or __off_t64)
+				("__return_value", c_ssize_t), #__size_t
+				("aio_offset", off_t), #__off_t (or __off_t64)
 				# Check this, may need to provide 2 _field_ versions
 				# that are called depending on OFFSET64
-				("__pad", c_char * (sizeof(off64_t) - (off_t))),
+				("__pad", c_char * (sizeof(off64_t) - sizeof(off_t))),
 				# Padding
 				("__unused", c_char * 32))
 
@@ -125,7 +130,7 @@ libc = ctypes.CDLL(find_library("c"))
 librt = ctypes.CDLL(find_library("rt"))
 
 _aio_init = librt.aio_init
-_aio_init.argtypes = (POINTER(aioinit))
+_aio_init.argtypes = (POINTER(aioinit),)
 _aio_init.restype = None # XXX is this alright?
 _aio_init.errcheck = aio_error
 
@@ -135,23 +140,23 @@ _lio_listio.restypr = c_int
 _lio_listio.errcheck = aio_error
 
 _aio_read = librt.aio_read
-_aio_read.argtypes = (POINTER(aiocb))
+_aio_read.argtypes = (POINTER(aiocb),)
 _aio_read.restype = c_int
 _aio_read.errcheck = aio_error
 
 _aio_write = librt.aio_write
-_aio_write.argtypes = (POINTER(aiocb))
+_aio_write.argtypes = (POINTER(aiocb),)
 _aio_write.restype = c_int 
 _aio_write.errcheck = aio_error
 
 _aio_error = librt.aio_error
-_aio_error.argtypes = (POINTER(aiocb))
+_aio_error.argtypes = (POINTER(aiocb),)
 _aio_error.restype = c_int
 _aio_error.errcheck = aio_error_error
 
 _aio_return = librt.aio_return
-_aio_return.argtypes = (POINTER(aiocb))
-_aio_return.restype = ssize_t
+_aio_return.argtypes = (POINTER(aiocb),)
+_aio_return.restype = c_ssize_t
 _aio_init.errcheck = aio_error
 
 _aio_cancel = librt.aio_cancel
