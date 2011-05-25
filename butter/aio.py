@@ -196,6 +196,20 @@ class AIORequest(object):
 	def __repr__(self):
 		return "<AIORequest fd={0}, type={1}, offset={2}, size={3}>".format(self.fd, self.operation, self.offset, self.size)
 
+class AIOManager(object):
+	def __init__(self):
+		pass
+
+# manager class has instances such as open()
+# open returns a channel not a file, a file is
+# returned on the chanel when open completes
+
+# fsync on the file object calls the proxy which 
+# returns a channel, the proxy registers an event 
+# and a callback channel 
+# for sync operation block on channel for async 
+# behavior contiue work and let GC do all the 
+# work of removing
 
 if __name__ == "__main__":
 	pass
