@@ -12,6 +12,7 @@ from ctypes import c_int, c_int64, c_long, c_char, c_char, c_void_p, POINTER, si
 try:
 	from ctypes import c_ssize_t
 except ImportError:
+	# defined in /usr/include/bits/types.h and typesizes.h
 	c_ssize_t = c_int
 import ctypes
 import errors
@@ -65,7 +66,8 @@ SIGEV_SIGNAL = 1
 SIGEV_THREAD = 2
 SIGEV_THREAD_ID = 4
 
-# Subtle api changes
+# Subtle api changes ahead
+# Defined in /usr/include/bits/types.h and typesizes.h
 USE_FILE_OFFSET64 = True
 off64_t = c_int64
 if USE_FILE_OFFSET64 == True:
