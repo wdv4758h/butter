@@ -213,5 +213,12 @@ class AIOManager(object):
 # behavior contiue work and let GC do all the 
 # work of removing
 
+# Send bombs such as IOError, look into IOError
+# and file failure senarios
+# may have to catch AIOError or split to more
+# fine grain model
+
+# Look into bombs and experiment
+
 if __name__ == "__main__":
 	pass
