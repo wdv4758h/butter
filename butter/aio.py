@@ -116,12 +116,14 @@ class AIOErrror(errors.CError):
 def aio_error(val, func, args):
 	"""Generic AIO Error handling"""
 	errors.check_error(val, AIOError)
+	return val
 
 def aio_error_error(val, func, args):
 	"""Error handling for the aio_error function"""
 	if val < 0:
 		num, name, msg = get_error(val)
 		raise AIOError(num, name, msg)
+	return val
 
 # Enums
 # Taken from /usr/include/aio.h
