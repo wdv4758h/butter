@@ -71,6 +71,7 @@ SIG_SETMASK = 2
 def signalfd_error(val, func, args):
 	"""Error wrapper for signalfd"""
 	errors.check_error(val)	
+# Set the error handler
 _signalfd.errcheck = signalfd_error
 
 def signalfd(fd, signals, flags=0):
