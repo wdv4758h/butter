@@ -7,7 +7,7 @@ TODO: done = *
 """
 
 from ctypes.util import find_library
-from ctypes import c_int, c_int64, c_long, c_char, c_char, c_void_p, POINTER, sizeof
+from ctypes import c_int, c_int64, c_long, c_char, c_char, c_void_p, POINTER, sizeof, ARRAY
 # Pre 2.7 did not have this defined
 try:
 	from ctypes import c_ssize_t
@@ -160,6 +160,7 @@ _aio_error = librt.aio_error
 _aio_error.argtypes = (POINTER(aiocb),)
 _aio_error.restype = c_int
 _aio_error.errcheck = aio_error_error
+aio_error = _aio_error
 
 _aio_return = librt.aio_return
 _aio_return.argtypes = (POINTER(aiocb),)
@@ -175,7 +176,8 @@ _aio_cancel.errcheck = aio_error
 
 _aio_suspend = librt.aio_suspend
 # first arg is complex, arg is a list of pointers of type aiocb, pointers can be None
-_aio_suspend.argtypes = (POINTER(aiocb), c_int, POINTER(timespec))
+#_aio_suspend.argtypes = (ARRAY(POINTER(aiocb), 1), c_int, POINTER(timespec))
+_aio_suspend.argtypes = (c_void_p, c_int, POINTER(timespec))
 _aio_suspend.restype = c_int
 _aio_suspend.errcheck = aio_error
 aio_suspend = _aio_suspend
@@ -197,8 +199,13 @@ class AIORequest(object):
 
 		aio_cb = aiocb()
 		aio_cb.aio_fildes = fd
-		aio_cb.aio_reqprio = 0
+#		aio_cb.aio_reqprio = 0
 		aio_cb.aio_offset = offset
+
+#		sigev = sigevent()
+#		sigev.sigev_notify = SIGEV_NONE
+#		aiocb.aio_sigevent = sigev
+		
 
 		if data_len > 0:
 			self.size = data_len
@@ -218,7 +225,6 @@ class AIORequest(object):
 			# Perform the read
 			aio_read(ctypes.byref(aio_cb))
 
-#		aiocb.aio_sigevent = 
 		self.aiocb = aio_cb
 
 	def __repr__(self):
@@ -249,10 +255,12 @@ class AIOManager(object):
 if __name__ == "__main__":
 	import os
 
+	data = "*" * 64
+
 	# create a temp file
 	f = os.tmpfile()
 	# fill it with random repetable data
-	f.write("*" * 64)
+	f.write(data)
 #	f.sync()
 
 	# set up a AIO manager
@@ -262,7 +270,22 @@ if __name__ == "__main__":
 
 	# wait for data
 	print("Doing suspend")
-	aio_suspend(ctypes.byref(req.aiocb), 0, None)
+	reqs = ARRAY(POINTER(aiocb), 1)
+	reqs = reqs(req.aiocb)
+	
+	aio_suspend(ctypes.byref(reqs), 1, None)
+
+	print("Checking operation status")
+	status = aio_error(req.aiocb)
+	if status == 0:
+		print("Status: Compleated")
+	elif status == errors.ERRNO["EINPROGRESS"]:
+		print("Status: EINPROGRESS")
+	elif status == errors.ERRNO["ECANCELED"]:
+		print("Status: ECANCELLED")
+	else:
+		code, name, msg = errors.get_error(status)
+		print("Unknown Error: {} - {}: {}".format(code, name, msg))
 
 	# Compare data
 	print("Doing return")
@@ -271,5 +294,6 @@ if __name__ == "__main__":
 	if l == 64:
 		print("Reading")
 		print(req.aiocb.aio_buf)
+		#data
 	else:
 		print("Only read {0} bytes".format(l))
