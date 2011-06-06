@@ -64,6 +64,7 @@ _signalfd.restype = c_int
 SFD_CLOEXEC = 0x2000000
 SFD_NONBLOCK = 0x4000
 
+# Taken from /usr/include/bits/sigaction.h
 SIG_BLOCK = 0
 SIG_UNBLOCK = 1
 SIG_SETMASK = 2
