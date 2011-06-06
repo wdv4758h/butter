@@ -17,6 +17,7 @@ class signalfd_siginfo(ctypes.Structure):
 
 	This is a 128 byte structure read from the file descriptor opened with signalfd
 	"""
+	_defined = "/usr/include/sys/signalfd.h"
 	_fields_ = (("ssi_signo", c_uint),
 				("ssi_errno", c_int),
 				("ssi_code", c_int),
@@ -46,6 +47,7 @@ class signalfd_siginfo(ctypes.Structure):
 
 class sigset_t(ctypes.Structure):
 	"""A sigset_t structure for masking signals and marking them as blocked"""
+	_defined = "/usr/include/bits/sigset.h"
 	## 32 chosen by calculating by hand the code in 
 	## /usr/include/bits/sigset.h
 	## unsigned long int assumed to be 64 bits
