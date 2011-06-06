@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """AIO implementation for POSIX OSs
 
-TODO:
-work out wtf a size_t is
-detect and handle xxx64 func calls and padding
+TODO: done = *
+* work out wtf a size_t is
+  detect and handle xxx64 func calls and padding
 """
 
 from ctypes.util import find_library
@@ -57,8 +57,9 @@ class sigevent(ctypes.Structure):
 				("_sigev_un", sigevent_sigev_un))
 
 class timespec(ctypes.Structure):
-	_defined = ""
-	_fileds_ = ()
+	_defined = "/usr/include/time.h"
+	_fields_ = (("tv_sev", c_long),
+				("tv_nsec", c_long))
 
 # Taken from /usr/include/asm-generic/siginfo.h
 SIGEV_NONE = 0
@@ -145,11 +146,13 @@ _aio_read = librt.aio_read
 _aio_read.argtypes = (POINTER(aiocb),)
 _aio_read.restype = c_int
 _aio_read.errcheck = aio_error
+aio_read = _aio_read
 
 _aio_write = librt.aio_write
 _aio_write.argtypes = (POINTER(aiocb),)
 _aio_write.restype = c_int 
 _aio_write.errcheck = aio_error
+aio_write = _aio_write
 
 _aio_error = librt.aio_error
 _aio_error.argtypes = (POINTER(aiocb),)
@@ -159,7 +162,8 @@ _aio_error.errcheck = aio_error_error
 _aio_return = librt.aio_return
 _aio_return.argtypes = (POINTER(aiocb),)
 _aio_return.restype = c_ssize_t
-_aio_init.errcheck = aio_error
+_aio_return.errcheck = aio_error
+aio_return = _aio_return
 
 _aio_cancel = librt.aio_cancel
 # args: fd, aiocb block
@@ -172,6 +176,7 @@ _aio_suspend = librt.aio_suspend
 _aio_suspend.argtypes = (POINTER(aiocb), c_int, POINTER(timespec))
 _aio_suspend.restype = c_int
 _aio_suspend.errcheck = aio_error
+aio_suspend = _aio_suspend
 
 _aio_fsync = librt.aio_fsync
 _aio_fsync.argtypes = (c_int, aiocb)
@@ -180,20 +185,39 @@ _aio_fsync.errcheck = aio_error
 
 from os import O_SYNC, O_DSYNC
 
+class AIOError(Exception):
+	pass
+
 class AIORequest(object):
-	def init(self, fd, offset, data="", size=4096):
+	def __init__(self, fd, offset, data="", size=4096):
 		self.data = data
 		data_len = len(data)
+
+		aio_cb = aiocb()
+		aio_cb.aio_fildes = fd
+		aio_cb.aio_reqprio = 0
+		aio_cb.aio_offset = offset
+
 		if data_len > 0:
 			self.size = data_len
 			self.operation = "write"
 			# Suppress trailing "\n" (try and fit in 4k where avalible)
 			self.buffer = ctypes.create_string_buffer(data, data_len)
+			aio_cb.aio_nbytes = data_len
+			aio_cb.aio_buf = self.buffer
+			# Perform the write
+			aio_write(ctypes.byref(aio_cb))
 		else:
 			self.size = size
 			self.operation = "read"
 			self.buffer = ctypes.create_string_buffer(size)
+			aio_cb.aio_nbytes = size
+			aio_cb.aio_buf = self.buffer
+			# Perform the read
+			aio_read(ctypes.byref(aio_cb))
 
+#		aiocb.aio_sigevent = 
+		self.aiocb = aio_cb
 
 	def __repr__(self):
 		return "<AIORequest fd={0}, type={1}, offset={2}, size={3}>".format(self.fd, self.operation, self.offset, self.size)
@@ -221,4 +245,29 @@ class AIOManager(object):
 # Look into bombs and experiment
 
 if __name__ == "__main__":
-	pass
+	import os
+
+	# create a temp file
+	f = os.tmpfile()
+	# fill it with random repetable data
+	f.write("*" * 64)
+#	f.sync()
+
+	# set up a AIO manager
+	# set up an AIO read for the file
+	print("Setting up request")
+	req = AIORequest(f.fileno(), 0, size=64)
+
+	# wait for data
+	print("Doing suspend")
+	aio_suspend(ctypes.byref(req.aiocb), 0, None)
+
+	# Compare data
+	print("Doing return")
+	l = aio_return(req.aiocb)
+
+	if l == 64:
+		print("Reading")
+		print(req.aiocb.aio_buf)
+	else:
+		print("Only read {0} bytes".format(l))

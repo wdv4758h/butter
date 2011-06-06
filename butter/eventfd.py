@@ -28,7 +28,7 @@ def eventfd(count=0, flags=0):
 	to convert to a normal file, use os.fdopen(). at this time it is recomended
 	to use os.write and os.read instead of the file object
 
-	please ensure all reads and writes are 8bytes in length and in machine endian
+	please ensure all reads and writes are 8 bytes in length and in machine endian
 	for formatting the long long (64bit)
 	"""
 	return _eventfd(count, flags)
