@@ -62,6 +62,10 @@ _signalfd.restype = c_int
 SFD_CLOEXEC = 0x2000000
 SFD_NONBLOCK = 0x4000
 
+SIG_BLOCK = 0
+SIG_UNBLOCK = 1
+SIG_SETMASK = 2
+
 def signalfd_error(val, func, args):
 	"""Error wrapper for signalfd"""
 	errors.check_error(val)	
@@ -75,7 +79,7 @@ def signalfd(fd, signals, flags=0):
 	"""
 	# Make signals "Blocked"
 	sigset = make_sigset_t(signals)
-	libc.sigprocmask(0, sigset, None)
+	libc.sigprocmask(SIG_BLOCK, sigset, None)
 
 	fd = _signalfd(fd, sigset, flags)
 	return fd
