@@ -72,6 +72,7 @@ SIG_SETMASK = 2
 def signalfd_error(val, func, args):
 	"""Error wrapper for signalfd"""
 	errors.check_error(val)	
+	return val
 # Set the error handler
 _signalfd.errcheck = signalfd_error
 
@@ -125,7 +126,7 @@ class SignalFD(file):
 	"""An Event like object that represents a file like object"""
 	closed = False
 	def __init__(self, mask, flags=0):
-		fd = self.fdopen(1, mask=mask, flags=flags)
+		fd = self.fdopen(-1, mask=mask, flags=flags)
 		self._fileno = fd
 		self.mask = mask
 
