@@ -14,6 +14,7 @@ libc = ctypes.CDLL("libc.so.6")
 _eventfd = libc.eventfd
 _eventfd.argtypes = (ctypes.c_int, ctypes.c_int)
 _eventfd.restype = ctypes.c_int
+
 def eventfd(count=0, flags=0):
 	"""open and return a file discriptor refering to a new eventfd interface
 
@@ -78,7 +79,7 @@ if __name__ == "__main__":
 				count = os.write(event, data)
 				sent += count
 				fragment = data[sent:]
-				print("Write {}".format(i))
+				print("Write {0}".format(i))
 		print("Child Done")
 		sys.exit(0)
 	else:
@@ -96,5 +97,5 @@ if __name__ == "__main__":
 			pass
 
 		print("All children have returned")
-		print("events = {}".format(events))
+		print("events = {0}".format(events))
 	sys.exit(0)
