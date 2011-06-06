@@ -6,6 +6,7 @@ TODO:
 """
 import ctypes
 import struct
+import errors
 import os
 
 llong = struct.Struct("Q")
@@ -14,6 +15,12 @@ libc = ctypes.CDLL("libc.so.6")
 _eventfd = libc.eventfd
 _eventfd.argtypes = (ctypes.c_int, ctypes.c_int)
 _eventfd.restype = ctypes.c_int
+
+def eventfd_error(val, func, args):
+	errors.check_error(val)
+	return val
+# Set the error handler
+_eventfd.errcheck = eventfd_error
 
 def eventfd(count=0, flags=0):
 	"""open and return a file discriptor refering to a new eventfd interface
