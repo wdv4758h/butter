@@ -4,7 +4,7 @@
 Normmaly used with poll/select to handle signal notifcation in the main loop
 instead of in callback functions
 """
-from ctypes import c_ubyte, c_int, c_uint, c_ulong, c_ulonglong, c_void_p
+from ctypes import c_ubyte, c_int, c_int32, c_uint, c_uint32, c_uint64, c_ulong, c_ulonglong, c_void_p
 from ctypes.util import find_library
 import errors
 import ctypes
@@ -18,22 +18,22 @@ class signalfd_siginfo(ctypes.Structure):
 	This is a 128 byte structure read from the file descriptor opened with signalfd
 	"""
 	_defined = "/usr/include/sys/signalfd.h"
-	_fields_ = (("ssi_signo", c_uint),
-				("ssi_errno", c_int),
-				("ssi_code", c_int),
-				("ssi_pid", c_uint),
-				("ssi_uid", c_uint),
-				("ssi_fd", c_int),
-				("ssi_tid", c_uint),
-				("ssi_band", c_uint),
-				("ssi_overrun", c_uint),
-				("ssi_trapno", c_uint),
-				("ssi_status", c_int),
-				("ssi_int", c_int),
-				("ssi_ptr", c_ulonglong),
-				("ssi_utime", c_ulonglong),
-				("ssi_stime", c_ulonglong),
-				("ssi_addr", c_ulonglong),
+	_fields_ = (("ssi_signo", c_uint32),
+				("ssi_errno", c_int32),
+				("ssi_code", c_int32),
+				("ssi_pid", c_uint32),
+				("ssi_uid", c_uint32),
+				("ssi_fd", c_int32),
+				("ssi_tid", c_uint32),
+				("ssi_band", c_uint32),
+				("ssi_overrun", c_uint32),
+				("ssi_trapno", c_uint32),
+				("ssi_status", c_int32),
+				("ssi_int", c_int32),
+				("ssi_ptr", c_uint64),
+				("ssi_utime", c_uint64),
+				("ssi_stime", c_uint64),
+				("ssi_addr", c_uint64),
 				# pad is used to pad the structure out to 128 bytes for future expansion
 				("pad", c_ubyte * (128-80)))
 
