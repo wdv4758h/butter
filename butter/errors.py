@@ -185,7 +185,7 @@ ERRNO = {
 }
 
 
-ERRNAME = {y[0]:(x, y[1]) for x, y in ERRNO.iteritems()}
+ERRNAME = dict(((y[0], (x, y[1])) for x, y in ERRNO.iteritems()))
 #EWOULDBLOCK	EAGAIN	# Operation would block
 num, msg = ERRNAME["EAGAIN"]
 ERRNAME["EWOULDBLOCK"] = (num, "Operation would block")
@@ -193,6 +193,7 @@ ERRNAME["EWOULDBLOCK"] = (num, "Operation would block")
 #EDEADLOCK	EDEADLK
 ERRNAME["EDEADLOCK"] = ERRNAME["EDEADLK"]
 
+# man do i agree with you right now
 ERRNO[None] = name, msg = ("ENOTENOUGHCAFFINE", "More operator caffine intake required")
 ERRNAME[name] = (None, msg)
 
