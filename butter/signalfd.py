@@ -160,8 +160,7 @@ class SignalFD(file):
 		data = self.read(count * 128)
 
 		l = []
-		for i in range(len(data) / 128):
-			i *= 128
+		for i in range(0, len(data), 128):
 			buf = ctypes.create_string_buffer(data[i:i+128], 128)
 			event = signalfd_siginfo.from_address(ctypes.addressof(buf))
 			l.append(event)
