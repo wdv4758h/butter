@@ -163,6 +163,12 @@ class SignalFD(file):
 		for i in range(0, len(data), 128):
 			buf = ctypes.create_string_buffer(data[i:i+128], 128)
 			event = signalfd_siginfo.from_address(ctypes.addressof(buf))
+			# we place a refrence to the buffer in the event object so that
+			# the buffer the event points to does not go out of scope when 
+			# we call return, if youa re seeing mem coruption between the
+			# return and str(event) then it is most likley you have deleted
+			# the next line (event.buffer = buf)
+			event.buffer = buf
 			l.append(event)
 			
 		return l
