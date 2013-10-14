@@ -7,22 +7,6 @@ import errno as _errno
 
 _ffi = _FFI()
 _ffi.cdef("""
-/* 
-    __u32 event_len;
-    __u8 vers;
-    __u8 reserved;
-    __u16 metadata_len;
-    __aligned_u64 mask;
-    __s32 fd;
-    __s32 pid;
-
-};
-
-        __s32 fd;
-        __u32 response;
-};
-*/
-
 #define FAN_CLOEXEC ...
 #define FAN_NONBLOCK ...
 #define FAN_CLASS_NOTIF ...
@@ -60,15 +44,14 @@ _ffi.cdef("""
 #define FAN_ALLOW ...
 #define FAN_DENY ...
 
-#defing FAN_EVENT_OK(...)
-#define FAN_EVENT_NEXT(...)
+// #define FAN_EVENT_OK ...
+// #define FAN_EVENT_NEXT ...
 
-struct fanotify_event_metadata;
-struct fanotify_response;
+typedef struct fanotify_event_metadata { ...; };
+typedef struct fanotify_response { ...; };
 
 int fanotify_init(unsigned int flags, unsigned int event_f_flags);
 int fanotify_mark (int fanotify_fd, unsigned int flags, uint64_t mask, int dfd, const char *pathname);
-
 """)
 
 _C = _ffi.verify("""
