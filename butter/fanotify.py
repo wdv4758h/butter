@@ -3,6 +3,7 @@
 
 from cffi import FFI as _FFI
 from os import O_RDONLY, O_WRONLY, O_RDWR
+from os import fdopen
 import errno as _errno
 
 _ffi = _FFI()
@@ -139,14 +140,14 @@ def fanotify_mark():
     pass
     
 def main():
-#    print ffi.new('fanotify_event_metadata')
-#    print ffi.new('fanotify_response')
-    fd = C.fanotify_init(C.FAN_CLASS_NOTIF, os.O_RDONLY)
+    print _ffi.new('struct fanotify_event_metadata *')
+    print _ffi.new('struct fanotify_response *')
+    fd = _C.fanotify_init(_C.FAN_CLASS_NOTIF, O_RDONLY)
     if fd < 0:
         print 'fd error'
         exit(1)
-    f = os.fdopen(fd)
-    err = C.fanotify_mark(f.fileno(), C.FAN_MARK_ADD, C.FAN_MODIFY, 0, '/tmp/testing')
+    f = fdopen(fd)
+    err = _C.fanotify_mark(f.fileno(), _C.FAN_MARK_ADD, _C.FAN_MODIFY, 0, '/tmp/testing')
     print err
     f.read(60)
     print 'recived write event'
