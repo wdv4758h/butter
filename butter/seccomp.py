@@ -19,18 +19,15 @@ void seccomp_release(scmp_filter_ctx ctx);
 int seccomp_merge(scmp_filter_ctx dst, scmp_filter_ctx src);
 int seccomp_load(scmp_filter_ctx ctx);
 
-/*
-int SCMP_SYS(syscall_name);
+typedef uint64_t scmp_datum_t;
 
-struct scmp_arg_cmp SCMP_CMP(unsigned int arg,
-                             enum scmp_compare op, ...);
-struct scmp_arg_cmp SCMP_A0(enum scmp_compare op, ...);
-struct scmp_arg_cmp SCMP_A1(enum scmp_compare op, ...);
-struct scmp_arg_cmp SCMP_A2(enum scmp_compare op, ...);
-struct scmp_arg_cmp SCMP_A3(enum scmp_compare op, ...);
-struct scmp_arg_cmp SCMP_A4(enum scmp_compare op, ...);
-struct scmp_arg_cmp SCMP_A5(enum scmp_compare op, ...);
-*/
+struct scmp_arg_cmp {
+    unsigned int arg;
+    enum scmp_compare op;
+    scmp_datum_t datum_a;
+    scmp_datum_t datum_b;
+};
+
 
 int seccomp_rule_add(scmp_filter_ctx ctx, uint32_t action,
                      int syscall, unsigned int arg_cnt, ...);
@@ -49,10 +46,9 @@ int seccomp_rule_add_exact_array(scmp_filter_ctx ctx,
 //# Default actions
 #define SCMP_ACT_KILL ...
 #define SCMP_ACT_TRAP ...
-// macros that take args, needs fixing
-//#define SCMP_ACT_ERRNO ...
-//#define SCMP_ACT_TRACE ...
 #define SCMP_ACT_ALLOW ...
+uint64_t _SCMP_ACT_ERRNO(uint64_t code);
+uint64_t _SCMP_ACT_TRACE(uint64_t code);
 
 //#Valid comparison op values are as follows:
 #define SCMP_CMP_NE ...
@@ -66,6 +62,14 @@ int seccomp_rule_add_exact_array(scmp_filter_ctx ctx,
 
 _C = _ffi.verify("""
 #include <seccomp.h>
+
+uint64_t _SCMP_ACT_ERRNO(uint64_t code) {
+    return 0x7ff00000U | (code & 0x0000ffffU);
+}
+uint64_t _SCMP_ACT_TRACE(uint64_t code) {
+    return 0x00050000U | (code & 0x0000ffffU);
+}
+
 """, libraries=['seccomp'])
 
 def main():
