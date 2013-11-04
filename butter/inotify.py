@@ -77,13 +77,17 @@ _C = _ffi.verify("""
 #include <sys/ioctl.h>
 """, libraries=[])
 
+inotify_init = _C.inotify_init
+inotify_add_watch = _C.inotify_add_watch
+inotify_rm_watch = _C.inotify_add_watch
+
 def main():
-    fd = _C.inotify_init()
+    fd = inotify_init()
     if fd < 0:
         raise ValueError("syscall returned an error: {}({})".format(fd, _C.errno))
     inotify = fdopen(fd)
 
-    wd = _C.inotify_add_watch(fd, '/tmp', _C.IN_CREATE)
+    wd = inotify_add_watch(fd, '/tmp', _C.IN_ALL_EVENTS)
 
     event = inotify.read(300)
     print len(event)
