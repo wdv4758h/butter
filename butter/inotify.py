@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from cffi import FFI as _FFI
+from utils import get_buffered_length
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import fdopen
 import errno as _errno
@@ -63,9 +64,6 @@ struct inotify_event {
 #define IN_CLOEXEC  ...
 #define IN_NONBLOCK ...
 
-/* IOCTL for how many bytes avalible to read from an inotify watch */
-#define FIONREAD ...
-
 int inotify_init(void);
 int inotify_init1(int flags);
 int inotify_add_watch(int fd, const char *pathname, uint32_t mask);
@@ -89,15 +87,23 @@ def main():
 
     wd = inotify_add_watch(fd, '/tmp', _C.IN_ALL_EVENTS)
 
-    event = inotify.read(300)
-    print len(event)
-    buf = _ffi.new('char[]', len(event))
-    buf[0:len(event)] = event
-    event = _ffi.cast('struct inotify_event *', buf)
-#    buf = _ffi.buffer('struct inotify_event')
-#    buf[:] = event
-#    event = _ffi.new('struct inotify_event', tuple(event))
-    print event.wd, event.mask, event.cookie, event.len
+    event_struct_size =  _ffi.sizeof('struct inotify_event')
+
+    import select
+
+    select.select([fd], [], [])
+    l = get_buffered_length(fd)
+
+    event = inotify.read(l)
+    print "bytes read:", len(event)
+    str_buf = _ffi.new('char[]', len(event))
+    str_buf[0:len(event)] = event
+    event = _ffi.cast('struct inotify_event *', str_buf)
+    print "Watch descriptor:", event.wd
+    print "Event Mask:", event.mask
+    print "Event Cookie:", event.cookie
+    print "Event length:", event.len
+    print "Event filename:", _ffi.string(_ffi.cast("char *", event[event_struct_size:event_struct_size+event.len]))
 
 if __name__ == "__main__":
     main()
