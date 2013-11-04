@@ -103,7 +103,8 @@ def main():
     print "Event Mask:", event.mask
     print "Event Cookie:", event.cookie
     print "Event length:", event.len
-    print "Event filename:", _ffi.string(_ffi.cast("char *", event[event_struct_size:event_struct_size+event.len]))
+    print "Event filename:", _ffi.string(str_buf[event_struct_size:event_struct_size+event.len])
+#    _ffi.string(_ffi.cast("char *", event[event_struct_size:event_struct_size+event.len]))
 
 if __name__ == "__main__":
     main()
