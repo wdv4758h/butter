@@ -156,7 +156,7 @@ def inotify_add_watch(fd, path, mask):
     
     wd = _C.inotify_add_watch(fd, path, mask)
 
-    if fd < 0:
+    if wd < 0:
         err = _ffi.errno
         if err == _errno.EINVAL:
             raise ValueError("The event mask contains no valid events; or fd is not an inotify file descriptor")
@@ -192,9 +192,9 @@ def inotify_rm_watch(fd, wd):
     ValueError: Returned if supplied watch is not valid or if the file descriptor is not an inotify file descriptor
     OSError: File descriptor is invalid
     """
-    ret = _C.inotify_add_watch(fd, wd)
+    ret = _C.inotify_rm_watch(fd, wd)
 
-    if fd < 0:
+    if ret < 0:
         err = _ffi.errno
         if err == _errno.EINVAL:
             raise ValueError("wd is invalid or fd is not an inotify File Descriptor")
