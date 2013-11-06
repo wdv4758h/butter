@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from cffi import FFI as _FFI
-from utils import get_buffered_length
+from utils import get_buffered_length as _get_buffered_length
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import fdopen
 import errno as _errno
@@ -224,7 +224,7 @@ def main():
     import select
 
     select.select([fd], [], [])
-    l = get_buffered_length(fd)
+    l = _get_buffered_length(fd)
 
     event = inotify.read(l)
     print "bytes read:", len(event)
