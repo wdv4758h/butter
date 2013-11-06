@@ -212,6 +212,17 @@ def inotify_rm_watch(fd, wd):
             raise ValueError("Unknown Error: {}".format(err))
 
 
+# Make the inotify flags more easily accessible by hoisting them out of the _C object
+l = locals()
+for key, value in _C.__dict__.iteritems():
+    if key.startswith("IN_"):
+        l[key] = value
+# <_<
+# >_>
+# -_- <(This never happened, what you just saw was light reflecting off Venus)
+del l
+del key, value # python 2.x has vars escape from the scope of the loop, clean this up
+
 def main():
     fd = inotify_init()
     if fd < 0:
