@@ -97,6 +97,9 @@ def inotify_init(flags=0):
             raise OSError("File descriptor limit hit")
         elif err == _errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory avalible")
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
 
     return fd
     
@@ -172,7 +175,10 @@ def inotify_add_watch(fd, path, mask):
             raise OSError("Maximum number of watches hit or insufficent kernel resources")
         elif err == _errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory avalible")
-
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
+            
     return wd
     
 def inotify_rm_watch(fd, wd):
@@ -200,6 +206,9 @@ def inotify_rm_watch(fd, wd):
             raise ValueError("wd is invalid or fd is not an inotify File Descriptor")
         elif err == _errno.EBADF:
             raise OSError("fd is not a valid file descriptor")
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
 
 
 def main():
