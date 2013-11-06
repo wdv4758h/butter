@@ -148,6 +148,12 @@ def inotify_add_watch(fd, path, mask):
     MemoryError:
     * Raised if the kernel cannot allocate sufficent resources to handle the watch (eg kernel memory)
     """
+    if hasattr(fd, "fileno"):
+        fd = fd.fileno()
+    assert isinstance(fd, int), "fd must by an integer"
+    assert isinstance(path, basestring), "path is not a string"
+    assert isinstance(mask, int), "mask must be an integer"
+    
     wd = _C.inotify_add_watch(fd, path, mask)
 
     if fd < 0:
