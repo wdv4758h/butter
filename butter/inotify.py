@@ -75,9 +75,126 @@ _C = _ffi.verify("""
 #include <sys/ioctl.h>
 """, libraries=[])
 
-inotify_init = _C.inotify_init
-inotify_add_watch = _C.inotify_add_watch
-inotify_rm_watch = _C.inotify_add_watch
+def inotify_init(flags=0):
+    """Initialise an inotify instnace and return a File Descriptor to refrence is
+    
+    Arguments:
+    -----------
+    Flags:
+    -------
+    IN_CLOEXEC: Automatically close the inotify handle on exec()
+    IN_NONBLOCK: Place the file descriptor in non blocking mode
+    """
+    fd = _C.inotify_init1(flags)
+    
+    if fd < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("Invalid argument or flag")
+        elif err == _errno.EMFILE:
+            raise OSError("Maximum inotify instances reached")
+        elif err == _errno.ENFILE:
+            raise OSError("File descriptor limit hit")
+        elif err == _errno.ENOMEM:
+            raise MemoryError("Insufficent kernel memory avalible")
+
+    return fd
+    
+def inotify_add_watch(fd, path, mask):
+    """Start watching a filepath for events
+    
+    Arguments:
+    -----------
+    fd:    The inotify file descriptor to attach the watch to
+    path:  The path to the file/directory to be monitored for events
+    mask:  The events to listen for
+    
+    Flags:
+    -------
+    IN_ACCESS:        File was accessed
+    IN_MODIFY:        File was modified
+    IN_ATTRIB:        Metadata changed
+    IN_CLOSE_WRITE:   Writtable file was closed
+    IN_CLOSE_NOWRITE: Unwrittable file closed
+    IN_OPEN:          File was opened
+    IN_MOVED_FROM:    File was moved from X
+    IN_MOVED_TO:      File was moved to Y
+    IN_CREATE:        Subfile was created
+    IN_DELETE:        Subfile was deleted
+    IN_DELETE_SELF:   Self was deleted
+    IN_MOVE_SELF:     Self was moved
+
+    IN_ONLYDIR:      only watch the path if it is a directory
+    IN_DONT_FOLLOW:  don't follow a sym link
+    IN_EXCL_UNLINK:  exclude events on unlinked objects
+    IN_MASK_ADD:     add to the mask of an already existing watch
+    IN_ISDIR:        event occurred against dir
+    IN_ONESHOT:      only send event once
+    
+    Returns:
+    ---------
+    int: A watch descriptor that can be passed to inotify_rm_watch
+    
+    Exceptions:
+    ------------
+    ValueError:
+    * No valid events in the event mask
+    * fd is not an inotify file descriptor
+    OSError:
+    * fd is not a valid file descriptor
+    * Process has no access to specified file
+    * File/Folder specified does not exist
+    * Maximum number of watches hit
+    MemoryError:
+    * Raised if the kernel cannot allocate sufficent resources to handle the watch (eg kernel memory)
+    """
+    wd = _C.inotify_add_watch(fd, path, mask)
+
+    if fd < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("The event mask contains no valid events; or fd is not an inotify file descriptor")
+        elif err == _errno.EACCES:
+            raise OSError("You do not have permission to read the specified path")
+        elif err == _errno.EBADF:
+            raise OSError("fd is not a valid file descriptor")
+        elif err == _errno.EFAULT:
+            raise OSError("path points to a file/folder outside the processes accessible address space")
+        elif err == _errno.ENOENT:
+            raise OSError("File/Folder pointed to by path does not exist")
+        elif err == _errno.ENOSPC:
+            raise OSError("Maximum number of watches hit or insufficent kernel resources")
+        elif err == _errno.ENOMEM:
+            raise MemoryError("Insufficent kernel memory avalible")
+
+    return wd
+    
+def inotify_rm_watch(fd, wd):
+    """Stop watching a path for events
+    
+    Arguments:
+    -----------
+    fd: The inotify file descriptor to remove the watch from
+    wd: The Watch to be removed
+    
+    Returns:
+    ---------
+    None
+    
+    Exceptions:
+    ------------
+    ValueError: Returned if supplied watch is not valid or if the file descriptor is not an inotify file descriptor
+    OSError: File descriptor is invalid
+    """
+    ret = _C.inotify_add_watch(fd, wd)
+
+    if fd < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("wd is invalid or fd is not an inotify File Descriptor")
+        elif err == _errno.EBADF:
+            raise OSError("fd is not a valid file descriptor")
+
 
 def main():
     fd = inotify_init()
