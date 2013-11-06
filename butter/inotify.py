@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
+
 from utils import get_buffered_length as _get_buffered_length
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from cffi import FFI as _FFI
