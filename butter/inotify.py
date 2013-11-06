@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from cffi import FFI as _FFI
 from utils import get_buffered_length as _get_buffered_length
 from os import O_RDONLY, O_WRONLY, O_RDWR
+from cffi import FFI as _FFI
 import errno as _errno
 
 
