@@ -359,31 +359,20 @@ del l
 del key, value # python 2.x has vars escape from the scope of the loop, clean this up
 
 def main():
-    fd = inotify_init()
-    if fd < 0:
-        raise ValueError("syscall returned an error: {}({})".format(fd, _C.errno))
-    inotify = fdopen(fd)
-
-    wd = inotify_add_watch(fd, '/tmp', _C.IN_ALL_EVENTS)
-
-    event_struct_size =  _ffi.sizeof('struct inotify_event')
-
-    import select
-
-    select.select([fd], [], [])
-    l = _get_buffered_length(fd)
-
-    event = inotify.read(l)
-    print "bytes read:", len(event)
-    str_buf = _ffi.new('char[]', len(event))
-    str_buf[0:len(event)] = event
-    event = _ffi.cast('struct inotify_event *', str_buf)
-    print "Watch descriptor:", event.wd
-    print "Event Mask:", event.mask
-    print "Event Cookie:", event.cookie
-    print "Event length:", event.len
-    print "Event filename:", _ffi.string(str_buf[event_struct_size:event_struct_size+event.len])
-#    _ffi.string(_ffi.cast("char *", event[event_struct_size:event_struct_size+event.len]))
+    import sys
+    import os
+    
+    dir = (sys.argv + ["/tmp"])[1]
+    
+    notifier = Inotify()
+    notifier.watch(dir, IN_ALL_EVENTS)
+    
+    print "Watching {} for file changes".format(dir)
+    
+    while True:
+        event = notifier.read_event()
+        print 'The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
+                    os.path.join(dir, event.filename), event.mask, event.cookie)
 
 if __name__ == "__main__":
     main()
