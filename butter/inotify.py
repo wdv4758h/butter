@@ -2,6 +2,8 @@
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
 
 from utils import get_buffered_length as _get_buffered_length
+from select import select as _select
+from os import read as _read
 from cffi import FFI as _FFI
 import errno as _errno
 
