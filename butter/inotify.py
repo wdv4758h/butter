@@ -7,7 +7,6 @@ from os import read as _read
 from cffi import FFI as _FFI
 import errno as _errno
 
-
 _ffi = _FFI()
 _ffi.cdef("""
 /*
@@ -211,6 +210,141 @@ def inotify_rm_watch(fd, wd):
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
+
+class Inotify(object):
+    _closed = True
+    _fileno = None
+    blocking = True
+    def __init__(self, flags=0):
+        fd = inotify_init(flags)
+        self._closed = True
+        self._fileno = fd
+        
+        self._events = []
+
+        if flags & IN_NONBLOCK:
+            self.blocking = false
+        
+    def watch(self, path, events):
+        wd = inotify_add_watch(self._fileno, path, events)
+        
+        return wd
+        
+    def del_watch(self, wd):
+        inotify_rm_watch(self._fileno, wd)
+        
+    def fileno(self):
+        return self._fileno
+        
+    def close(self):
+        os.close(self._fileno)
+        
+    def closed(self):
+        return self._closed
+        
+    def isatty(self):
+        return False
+        
+    def mode(self):
+        return "r"
+        
+    def name(self):
+        return "<inotify fd:{}>".format(self._fileno)
+        
+    def read(self):
+        raise NotImplemented
+
+    def readable(self):
+        return False
+        
+    def readlines(self):
+        raise NotImplemented
+        
+    def seek(self):
+        raise NotImplemented
+    
+    def seekable(self):
+        return False
+        
+    def tell(self):
+        return 0
+        
+    def truncate(self):
+        """Discard all events in the queue"""
+        self._events = []
+        
+    def write(self):
+        raise NotImplemented
+
+    def writable(self):
+        return False
+        
+    def writelines(self):
+        raise NotImplemented
+
+    def read_event(self):
+        """Return a single event, may read more than one event fromt eh kernel and cache the values
+        """
+        try:
+            event = self._events.pop(0)
+        except IndexError:
+            events = self._read_events()
+            event = events.pop(0)
+            self._events = events
+        
+        return event
+        
+    def read_events(self):
+        """Read and return multiple events form the kernel"""
+        events = self._events
+        self._events = []
+        if len(events) > 0:
+            return events
+        else:
+            return self._read_events()
+            
+    def _read_events(self):
+        event_struct_size = _ffi.sizeof('struct inotify_event')
+
+        if self.blocking:
+            _select([self._fileno], [], [])
+            buf_len = _get_buffered_length(self._fileno)
+        else:
+            buf_len = _get_buffered_length(self._fileno)
+            assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
+        raw_events = _read(self._fileno, buf_len)
+
+        str_buf = _ffi.new('char[]', len(raw_events))
+        str_buf[0:len(raw_events)] = raw_events
+
+        events = []
+
+        i = 0
+        while i < len(str_buf):
+            event = _ffi.cast('struct inotify_event *', str_buf[i:i+event_struct_size])
+
+            filename_start = i + event_struct_size 
+            filename_end = filename_start + event.len
+            filename = _ffi.string(str_buf[filename_start:filename_end])
+            
+            events.append(InotifyEvent(event.wd, event.mask, event.cookie, filename))
+            
+            i += event_struct_size + event.len
+            
+        return events
+        
+    def __repr__(self):
+        return '<Inotify fd={}>'.format(self._fileno)
+
+class InotifyEvent(object):
+    def __init__(self, wd, mask, cookie, filename):
+        self.wd = wd
+        self.mask = mask
+        self.cookie = cookie
+        self.filename = filename
+
+    def __repr__(self):
+        return '<InotifyEvent wd={} mask=0x{:X} filename"{}">'.format(self.wd, self.mask, self.filename)
 
 
 # Make the inotify flags more easily accessible by hoisting them out of the _C object
