@@ -7,7 +7,7 @@ butter (0.3-1) stable; urgency=low
   * Add function to peer inside kernel buffer and get amount of available bytes to read
   * removed unused old (non working) signalfd, eventfd, aio
   
- -- Da_Blitz <code@pocketnix.org>  Sun, 20 Nov 2013 21:53:43 +1000
+ -- Da_Blitz <code@pocketnix.org>  Sun, 20 Nov 2013 22:31:43 +1000
 
 butter (0.2-1) stable; urgency=low
 
