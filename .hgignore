@@ -4,5 +4,7 @@ syntax: glob
 build/
 dist/
 env/
+venv/
 *.pyc
 *~
+__pycache__
