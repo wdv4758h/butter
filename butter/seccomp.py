@@ -207,6 +207,22 @@ uint64_t _SCMP_ACT_TRACE(uint64_t code) {
 
 """, libraries=['seccomp'])
 
+
+def condition(arg=0, comparison=_C.SCMP_CMP_EQ, arg1=_ffi.NULL, arg2=_ffi.NULL):
+    """Initalise a new struct_arg_cmp object
+    :parama arg int: Which argument to the syscall the test should be performed on
+    :parama comparison: The type of comparison to make (SCMP_CMP_*)
+    :parama arg1 int: argument 1 for the comaprison
+    :parama arg2 int: argument 2 for the comparison (not always used)
+    """
+    rule = _ffi.new('struct scmp_arg_cmp *')
+    rule.arg = arg
+    rule.op = comparison
+    rule.datum_a = _ffi.cast('uint64_t', arg1)
+    rule.datum_b = _ffi.cast('uint64_t', arg2)
+
+    return rule
+
 def main():
     EXIT = 1
     EXIT_GROUP = 248
@@ -222,11 +238,19 @@ def main():
     _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, EXIT, 0)
     _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, EXIT_GROUP, 0)
     _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, READ, 0)
-    _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, WRITE, 0)
+    import sys
+    from collections import namedtuple
+    Comparison = namedtuple('Comparison', 'arg op arg1 arg2')
+    only_stderr =_ffi.new('struct scmp_arg_cmp[1]')
+#    only_stderr[0] = {'arg':0, 'op':_C.SCMP_CMP_EQ, 'datum_a':sys.stderr.fileno()}
+    only_stderr[0] = Comparison(0,_C.SCMP_CMP_EQ, sys.stderr.fileno(), 0)
+    _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, WRITE, 1, only_stderr)
     _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, SIGRETURN, 0)
     _C.seccomp_rule_add(filter, _C.SCMP_ACT_ALLOW, RT_SIGACTION, 0)
+    sys.stderr.write('1\n')
     ret = _C.seccomp_load(filter)
-    print ret
+    sys.stderr.write(str(ret))
     
 if __name__ == "__main__":
     main()
+

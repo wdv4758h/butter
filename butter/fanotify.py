@@ -6,6 +6,8 @@ from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import fdopen
 import errno as _errno
 
+READ_EVENTS_MAX = 10
+
 _ffi = _FFI()
 _ffi.cdef("""
 #define FAN_CLOEXEC ...
@@ -48,8 +50,9 @@ _ffi.cdef("""
 // #define FAN_EVENT_OK ...
 // #define FAN_EVENT_NEXT ...
 
-typedef struct fanotify_event_metadata { ...; };
-typedef struct fanotify_response { ...; };
+
+typedef struct fanotify_event_metadata { ...; } fanotify_event_metadata;
+typedef struct fanotify_response { ...; } fanotify_response;
 
 int fanotify_init(unsigned int flags, unsigned int event_f_flags);
 int fanotify_mark (int fanotify_fd, unsigned int flags, uint64_t mask, int dfd, const char *pathname);
@@ -149,7 +152,24 @@ def main():
     f = fdopen(fd)
     err = _C.fanotify_mark(f.fileno(), _C.FAN_MARK_ADD, _C.FAN_MODIFY, 0, '/tmp/testing')
     print err
-    f.read(60)
+
+#    read_size = READ_EVENTS_MAX * _ffi.sizeof('fanotify_event_metadata')
+    read_size = 1 * _ffi.sizeof('fanotify_event_metadata')
+    print 'Read size: {}'.format(read_size)
+
+    buf = f.read(read_size)
+    print 'read'
+#    events = _ffi.new('struct fanotify_event_metadata *',)
+    events = _ffi.cast('struct fanotify_event_metadata', buf)
+    print events.pid
+
+    num_events = len(buf) / _ffi.sizeof('fanotify_event_metadata')
+    tmp = _ffi.buffer(events)
+    tmp[:len(buf)] = buf
+    
+#    event = _ffi.new('struct fanotify_event_metadata *')
+    event[:] = events[0]
+    print event.pid
     print 'recived write event'
 
 # make things a tiny bit more accsessable rather than going via the '__C' object
@@ -161,3 +181,4 @@ del fanotify
 
 if __name__ == "__main__":
     main()
+
