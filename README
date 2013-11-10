@@ -1,22 +1,41 @@
 ========
  Butter
 ========
-Butter is a library to integrate some of linux's low level features into python
+Butter is a library to integrate some of Linux's low level features into python
 eg signalfd, eventfd and timerfd. most of these functions are handy if you are 
 looking into creating non-blocking servers, anything using select/poll and 
 derivatives or writing server code
 
+Whats Available
+----------------
+ * inotify (Complete support)
+ * seccomp (Limited support)
+ * fanotify (Limited support)
+
+Whats Coming
+-------------
+Most of these exist in v0.2 as ctypes code. these are currently being rewritten
+to use cffi for speed and compatibility with pypy
+
+ * signalfd
+ * eventfd
+ * timerfd
+ * posix/linux aio (scatter/gather read writes with a completion based API 
+   instead of a 'ready' based interface, eg similar to IOCP on windows)
+
 Design
 -------
-where posible access to the raw calls has been made avalible as well as providing 
-a file like object that ahs been extended (hereby refered to as an "event like" 
-object. steps have been taken to preserve the current file like api calling
-conventions however be warned that doing partial reads using obj.read may cause
-issues for eventlike objects that work with constant sizes and as such the event
-functions should be called instead
+The 'fd' apis have been designed first as thin wrappers around the underlying
+kernel syscalls. A File-like object that then uses these syscalls is then made 
+available that obeys the 'event like' interface and is base on the interface
+provided by File and friends. They are intended to be drop in replacements and 
+be used with the select module
 
 Event-like objects
 +++++++++++++++++++
-eventlike objects have been extended in the following way:
-getevent() -> event
-getevents(count=1) -> [event, .....]
+Event like objects are identical to filelike objects except they have the 
+following extra methods to replace the disabled read/readline/write/writeline
+functionality
+
+ * read_event: Return a single event
+ * read_event: Return all cached events OR read all events from the kernel
