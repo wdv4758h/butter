@@ -51,8 +51,22 @@ _ffi.cdef("""
 // #define FAN_EVENT_NEXT ...
 
 
-typedef struct fanotify_event_metadata { ...; } fanotify_event_metadata;
-typedef struct fanotify_response { ...; } fanotify_response;
+struct fanotify_response {
+    int32_t fd;
+    uint32_t response;
+};
+
+//#define __aligned_u64 __u64 __attribute__((aligned(8)))
+struct fanotify_event_metadata {
+    uint32_t event_len;
+    uint8_t vers;
+    uint8_t reserved;
+    uint16_t metadata_len;
+    uint64_t mask;
+    int32_t fd;
+    int32_t pid;
+};
+
 
 int fanotify_init(unsigned int flags, unsigned int event_f_flags);
 int fanotify_mark (int fanotify_fd, unsigned int flags, uint64_t mask, int dfd, const char *pathname);
