@@ -76,6 +76,9 @@ _C = _ffi.verify("""
 #include <linux/fcntl.h>
 #include <sys/fanotify.h>
 """, libraries=[])
+#include <stdint.h>
+#include <asm-generic/int-ll64.h>
+#include <linux/types.h>
 
 
 class FANotify(object):
@@ -157,15 +160,17 @@ def fanotify_mark():
     pass
     
 def main():
-    print _ffi.new('struct fanotify_event_metadata *')
-    print _ffi.new('struct fanotify_response *')
     fd = _C.fanotify_init(_C.FAN_CLASS_NOTIF, O_RDONLY)
     if fd < 0:
         print 'fd error'
         exit(1)
     f = fdopen(fd)
     err = _C.fanotify_mark(f.fileno(), _C.FAN_MARK_ADD, _C.FAN_MODIFY, 0, '/tmp/testing')
-    print err
+    import errno
+    if err > 0:
+        print err, _ffi.errno, errno.errorcode[_ffi.errno]
+    else:
+        print "all good"
 
 #    read_size = READ_EVENTS_MAX * _ffi.sizeof('fanotify_event_metadata')
     read_size = 1 * _ffi.sizeof('fanotify_event_metadata')
