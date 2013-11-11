@@ -177,23 +177,13 @@ def main():
     print 'Read size: {}'.format(read_size)
 
     buf = f.read(read_size)
-    print 'read'
 
     str_buf = _ffi.new('char[]', len(buf))
     str_buf[0:len(buf)] = buf
                 
 #    events = _ffi.new('struct fanotify_event_metadata *',)
     events = _ffi.cast('struct fanotify_event_metadata *', str_buf)
-    print events.pid
-
-    num_events = len(buf) / _ffi.sizeof('fanotify_event_metadata')
-    tmp = _ffi.buffer(events)
-    tmp[:len(buf)] = buf
-    
-#    event = _ffi.new('struct fanotify_event_metadata *')
-    event[:] = events[0]
-    print event.pid
-    print 'recived write event'
+    print 'Writer PID:', events.pid
 
 # make things a tiny bit more accsessable rather than going via the '__C' object
 import fanotify
