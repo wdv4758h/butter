@@ -173,7 +173,7 @@ def main():
         print "all good"
 
 #    read_size = READ_EVENTS_MAX * _ffi.sizeof('fanotify_event_metadata')
-    read_size = 1 * _ffi.sizeof('fanotify_event_metadata')
+    read_size = 1 * _ffi.sizeof('struct fanotify_event_metadata')
     print 'Read size: {}'.format(read_size)
 
     buf = f.read(read_size)
