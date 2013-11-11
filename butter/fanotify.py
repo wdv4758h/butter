@@ -76,10 +76,6 @@ _C = _ffi.verify("""
 #include <linux/fcntl.h>
 #include <sys/fanotify.h>
 """, libraries=[])
-#include <stdint.h>
-#include <asm-generic/int-ll64.h>
-#include <linux/types.h>
-
 
 class FANotify(object):
     def __init__(self, flags=0, mode='r'):
