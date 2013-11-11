@@ -178,8 +178,12 @@ def main():
 
     buf = f.read(read_size)
     print 'read'
+
+    str_buf = _ffi.new('char[]', len(buf))
+    str_buf[0:len(buf)] = buf
+                
 #    events = _ffi.new('struct fanotify_event_metadata *',)
-    events = _ffi.cast('struct fanotify_event_metadata', buf)
+    events = _ffi.cast('struct fanotify_event_metadata *', str_buf)
     print events.pid
 
     num_events = len(buf) / _ffi.sizeof('fanotify_event_metadata')
