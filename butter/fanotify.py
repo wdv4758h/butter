@@ -161,7 +161,9 @@ def main():
         print 'fd error'
         exit(1)
     f = fdopen(fd)
-    err = _C.fanotify_mark(f.fileno(), _C.FAN_MARK_ADD, _C.FAN_MODIFY, 0, '/tmp/testing')
+    MARK = _C.FAN_MARK_ADD
+    FLAGS = _C.FAN_MODIFY|_C.FAN_ONDIR|_C.FAN_ACCESS|_C.FAN_EVENT_ON_CHILD|_C.FAN_OPEN|_C.FAN_CLOSE
+    err = _C.fanotify_mark(f.fileno(), MARK, FLAGS, 0, '/')
     import errno
     if err > 0:
         print err, _ffi.errno, errno.errorcode[_ffi.errno]
@@ -172,14 +174,24 @@ def main():
     read_size = 1 * _ffi.sizeof('struct fanotify_event_metadata')
     print 'Read size: {}'.format(read_size)
 
-    buf = f.read(read_size)
-
-    str_buf = _ffi.new('char[]', len(buf))
-    str_buf[0:len(buf)] = buf
-                
-#    events = _ffi.new('struct fanotify_event_metadata *',)
-    events = _ffi.cast('struct fanotify_event_metadata *', str_buf)
-    print 'Writer PID:', events.pid
+    while True:
+        buf = f.read(read_size)
+    
+        str_buf = _ffi.new('char[]', len(buf))
+        str_buf[0:len(buf)] = buf
+                    
+    #    events = _ffi.new('struct fanotify_event_metadata *',)
+        events = _ffi.cast('struct fanotify_event_metadata *', str_buf)
+        print "================================"
+        print 'Event Length:   ', events.event_len
+        print 'Version:        ', events.vers
+        print 'Metadata Length:', events.metadata_len
+        print 'Mask:           ', events.mask
+        print 'Writer PID:     ', events.pid
+        print 'fd:             ', events.fd
+        import os
+        print 'filename:       ', os.readlink(os.path.join('/proc', str(os.getpid()), 'fd', str(events.fd)))
+        os.close(events.fd)
 
 # make things a tiny bit more accsessable rather than going via the '__C' object
 import fanotify
