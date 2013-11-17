@@ -211,6 +211,30 @@ def inotify_rm_watch(fd, wd):
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
 
+
+def str_to_events(str):
+    event_struct_size = _ffi.sizeof('struct inotify_event')
+
+    events = []
+
+    str_buf = _ffi.new('char[]', len(str))
+    str_buf[0:len(str)] = str
+
+    i = 0
+    while i < len(str_buf):
+        event = _ffi.cast('struct inotify_event *', str_buf[i:i+event_struct_size])
+
+        filename_start = i + event_struct_size
+        filename_end = filename_start + event.len
+        filename = _ffi.string(str_buf[filename_start:filename_end])
+        
+        events.append(InotifyEvent(event.wd, event.mask, event.cookie, filename))
+        
+        i += event_struct_size + event.len
+
+    return events
+
+
 class Inotify(object):
     _closed = True
     _fileno = None
@@ -304,8 +328,6 @@ class Inotify(object):
             return self._read_events()
             
     def _read_events(self):
-        event_struct_size = _ffi.sizeof('struct inotify_event')
-
         if self.blocking:
             _select([self._fileno], [], [])
             buf_len = _get_buffered_length(self._fileno)
@@ -314,27 +336,13 @@ class Inotify(object):
             assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
         raw_events = _read(self._fileno, buf_len)
 
-        str_buf = _ffi.new('char[]', len(raw_events))
-        str_buf[0:len(raw_events)] = raw_events
+        events = str_to_events(raw_events)
 
-        events = []
-
-        i = 0
-        while i < len(str_buf):
-            event = _ffi.cast('struct inotify_event *', str_buf[i:i+event_struct_size])
-
-            filename_start = i + event_struct_size 
-            filename_end = filename_start + event.len
-            filename = _ffi.string(str_buf[filename_start:filename_end])
-            
-            events.append(InotifyEvent(event.wd, event.mask, event.cookie, filename))
-            
-            i += event_struct_size + event.len
-            
         return events
         
     def __repr__(self):
         return '<Inotify fd={}>'.format(self._fileno)
+
 
 class InotifyEvent(object):
     def __init__(self, wd, mask, cookie, filename):
