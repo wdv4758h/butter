@@ -1,4 +1,9 @@
 butter (0.3-1) stable; urgency=low
+  [ Da_Blitz ]
+  * Refactor inotify
+  * Provide inotify.str_to_events()
+
+butter (0.3-1) stable; urgency=low
 
   [ Da_Blitz ]
   * Support for inotify
