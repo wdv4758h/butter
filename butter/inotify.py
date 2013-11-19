@@ -355,10 +355,13 @@ class InotifyEvent(object):
         return '<InotifyEvent wd={} mask=0x{:X} filename"{}">'.format(self.wd, self.mask, self.filename)
 
 
+# Provide a nice ID to NAME mapping for debugging
+signal_name = {}
 # Make the inotify flags more easily accessible by hoisting them out of the _C object
 l = locals()
 for key, value in _C.__dict__.iteritems():
     if key.startswith("IN_"):
+        signal_name[value] = key
         l[key] = value
 # <_<
 # >_>

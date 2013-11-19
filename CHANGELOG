@@ -1,7 +1,8 @@
-butter (0.3-1) stable; urgency=low
+butter (0.4-1) stable; urgency=low
   [ Da_Blitz ]
   * Refactor inotify
   * Provide inotify.str_to_events()
+  * Add int to signal name mapping for inotify
 
 butter (0.3-1) stable; urgency=low
 
