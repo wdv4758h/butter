@@ -6,7 +6,6 @@ from os import O_RDONLY, O_WRONLY, O_RDWR
 from select import select as _select
 from collections import namedtuple
 from cffi import FFI as _FFI
-from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import fdopen
 import errno as _errno
 
@@ -193,7 +192,9 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
-                                            
+
+FanotifyEvent = namedtuple('FanotifyEvent', 'version mask fd pid filename')
+
     
 def main():
     fd = fanotify_init(_C.FAN_CLASS_NOTIF)
