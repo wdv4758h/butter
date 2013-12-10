@@ -210,12 +210,20 @@ def main():
         print 'filename:       ', os.readlink(os.path.join('/proc', str(os.getpid()), 'fd', str(events.fd)))
         os.close(events.fd)
 
-# make things a tiny bit more accsessable rather than going via the '__C' object
-import fanotify
-for key, val in _C.__dict__.iteritems():
-    if key.startswith('FAN_'):
-        fanotify.__dict__[key] = val
-del fanotify
+
+# Provide a nice ID to NAME mapping for debugging
+signal_name = {}
+# Make the inotify flags more easily accessible by hoisting them out of the _C object
+l = locals()
+for key, value in _C.__dict__.iteritems():
+    if key.startswith("FAN_"):
+        signal_name[value] = key
+        l[key] = value
+# <_<
+# >_>
+# -_- <(This never happened, what you just saw was light reflecting off Venus)
+del l
+del key, value # python 2.x has vars escape from the scope of the loop, clean this up
 
 if __name__ == "__main__":
     main()
