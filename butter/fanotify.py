@@ -243,31 +243,19 @@ def main():
     fd = fanotify_init(_C.FAN_CLASS_NOTIF)
     f = _fdopen(fd)
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
-    fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, '/')
-
-#    read_size = READ_EVENTS_MAX * _ffi.sizeof('fanotify_event_metadata')
-    read_size = 1 * _ffi.sizeof('struct fanotify_event_metadata')
-    print 'Read size: {}'.format(read_size)
+    fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, '/tmp')
 
     while True:
-        buf = f.read(read_size)
-    
-        str_buf = _ffi.new('char[]', len(buf))
-        str_buf[0:len(buf)] = buf
-                    
-    #    events = _ffi.new('struct fanotify_event_metadata *',)
-        events = _ffi.cast('struct fanotify_event_metadata *', str_buf)
-        print "================================"
-        print 'Event Length:   ', events.event_len
-        print 'Version:        ', events.vers
-        print 'Metadata Length:', events.metadata_len
-        print 'Mask:           ', events.mask
-        print 'Writer PID:     ', events.pid
-        print 'fd:             ', events.fd
-        import os
-        print 'filename:       ', os.readlink(os.path.join('/proc', str(os.getpid()), 'fd', str(events.fd)))
-        os.close(events.fd)
-
+        buf = f.read(24)
+        events = str_to_events(buf)
+        for event in events:
+            print "================================"
+            print 'Version:        ', event.version
+            print 'Mask:           ', event.mask
+            print 'Writer PID:     ', event.pid
+            print 'fd:             ', event.fd
+            print 'filename:       ', event.filename
+            event.close()
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
