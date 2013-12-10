@@ -221,6 +221,23 @@ class FanotifyEvent(object):
         return "<FanotifyEvent filename={}, version={}, mask=0x{:X}, fd={}, pid={}>".format(
                 self.filename, self.version, self.mask, self.fd, self.pid)
 
+def str_to_events(str):
+    event_struct_size = _ffi.sizeof('struct fanotify_event_metadata')
+
+    events = []
+
+    str_buf = _ffi.new('char[]', len(str))
+    str_buf[0:len(str)] = str
+
+    i = 0
+    while i < len(str_buf):
+        event = _ffi.cast('struct fanotify_event_metadata *', str_buf[i:i+event_struct_size])
+        events.append(FanotifyEvent(event.vers, event.mask, event.fd, event.pid))
+
+        i += event.event_len
+
+    return events
+
     
 def main():
     fd = fanotify_init(_C.FAN_CLASS_NOTIF)
