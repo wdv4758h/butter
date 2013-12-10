@@ -178,9 +178,8 @@ def fanotify_mark():
 def main():
     fd = fanotify_init(_C.FAN_CLASS_NOTIF)
     f = fdopen(fd)
-    MARK = _C.FAN_MARK_ADD
-    FLAGS = _C.FAN_MODIFY|_C.FAN_ONDIR|_C.FAN_ACCESS|_C.FAN_EVENT_ON_CHILD|_C.FAN_OPEN|_C.FAN_CLOSE
-    err = _C.fanotify_mark(f.fileno(), MARK, FLAGS, 0, '/')
+    FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
+    err = _C.fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, 0, '/')
     import errno
     if err > 0:
         print err, _ffi.errno, errno.errorcode[_ffi.errno]
