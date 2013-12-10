@@ -3,6 +3,7 @@
 
 from utils import get_buffered_length as _get_buffered_length
 from select import select as _select
+from collections import namedtuple
 from os import read as _read
 from cffi import FFI as _FFI
 import errno as _errno
@@ -343,17 +344,7 @@ class Inotify(object):
     def __repr__(self):
         return '<Inotify fd={}>'.format(self._fileno)
 
-
-class InotifyEvent(object):
-    def __init__(self, wd, mask, cookie, filename):
-        self.wd = wd
-        self.mask = mask
-        self.cookie = cookie
-        self.filename = filename
-
-    def __repr__(self):
-        return '<InotifyEvent wd={} mask=0x{:X} filename"{}">'.format(self.wd, self.mask, self.filename)
-
+InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
