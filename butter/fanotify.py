@@ -2,11 +2,13 @@
 """fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
 
 from utils import get_buffered_length as _get_buffered_length
+from os import getpid as _getpid, readlink as _readlink
+from os import fdopen as _fdopen, close as _close
 from os import O_RDONLY, O_WRONLY, O_RDWR
+from os.path import join as _path_join
 from select import select as _select
 from collections import namedtuple
 from cffi import FFI as _FFI
-from os import fdopen
 import errno as _errno
 
 READ_EVENTS_MAX = 10
@@ -198,7 +200,7 @@ FanotifyEvent = namedtuple('FanotifyEvent', 'version mask fd pid filename')
     
 def main():
     fd = fanotify_init(_C.FAN_CLASS_NOTIF)
-    f = fdopen(fd)
+    f = _fdopen(fd)
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
     fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, '/')
 
