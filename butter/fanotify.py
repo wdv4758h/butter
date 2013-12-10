@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""fanotify: wrapper aroudn the fanotify family of syscalls for watching for file modifcation"""
+"""fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
 
 from utils import get_buffered_length as _get_buffered_length
 from os import O_RDONLY, O_WRONLY, O_RDWR
