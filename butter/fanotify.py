@@ -4,6 +4,7 @@
 from utils import get_buffered_length as _get_buffered_length
 from os import getpid as _getpid, readlink as _readlink
 from os import fdopen as _fdopen, close as _close
+from os import read as _read
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os.path import join as _path_join
 from select import select as _select
@@ -82,72 +83,114 @@ _C = _ffi.verify("""
 #include <sys/fanotify.h>
 """, libraries=[])
 
-class FANotify(object):
-    def __init__(self, flags=0, mode='r'):
-        """Create a new fanotify context to track file modification/creation/deleteion
-        
-        :param integer flags: Define what type of fanotify context you wish to open, can be a mix of the following
-                      FAN_CLOEXEC, FAN_NONBLOCK, FAN_CLASS_NOTIF, FAN_CLASS_CONTENT, FAN_CLASS_PRE_CONTENT
-                      FAN_UNLIMITED_QUEUE, FAN_UNLIMITED_MARKS
-        :param integer mode: str or int. when used with a str, behaves identically to the 'mode' keyword in open()
-        
-        :raises ValueError: If ethier flags or mode contains an invalid value, this will be raised
-        :raises IOError: Raised for any of the following conditions:
-                         Number of listeners exceeds FANOTIFY_DEFAULT_MAX_LISTENERS
-                         flag FAN_UNLIMITED_QUEUE was set without the CAP_SYS_ADMIN capability
-                         flag FAN_UNLIMITED_MARKS was set without the CAP_SYS_ADMIN capability
-        :raises OSError: Raised on permissions issue or Non memory avalible
-        
-        """
-        if isinstance(mode, str):
-            if '+' in mode:
-                mode = O_RDWR
-            elif 'w' in mode:
-                mode = O_WRONLY
-            elif 'r' in mode:
-                mode = O_RDONLY
+class Fanotify(object):
+    _closed = True
+    _fileno = None
+    blocking = True
+    def __init__(self, flags, event_flags=O_RDONLY):
+        fd = fanotify_init(flags, event_flags)
+        self._closed = True
+        self._fileno = fd
 
-        fd = _C.fanotify_init(flags, mode)
+        self._events = []
 
-        if fd < 0:
-            # handle error cases
-            error = _ffi.errno
-            if error == _errno.EINVAL:
-                # EINVAL: Flags contains invalid options $FAN_ALL_INIT_FLAGS indicates valid flags
-                raise ValueError('"flags" contains invalid values')
-            elif error == _errno.EMFILE:
-                # EMFILE: indicates one of the following situations:
-                #         - The number of listeners exceeds FANOTIFY_DEFAULT_MAX_LISTENERS.
-                #         - Flag FAN_UNLIMITED_QUEUE was set without owning the CAP_SYS_ADMIN capability.
-                #         - Flag FAN_UNLIMITED_MARKS was set without owning the CAP_SYS_ADMIN capability.
-                raise IOError('Max listeners exceeded or do not have CAP_SYS_ADMIN')
-            elif error == _errno.ENOMEM:
-                # ENOMEM: No mem avalible
-                raise OSError('No Mem avalibel to service request')
-            elif error == _errno.EPERM:
-                # EPERM: Operation not permitted, may need root/CAP_SYS_ADMIN
-                raise OSError('Operation not permitted')
-            else:
-                raise Exception('Unknown Error')
-            
-        self._fd = fd
-        pass
-    
+        if flags & FAN_NONBLOCK:
+            self.blocking = false
+
+    def watch(self, flags, mask, path, dfd=0):
+        flags |= FAN_MARK_ADD
+        fanotify_mark(self._fileno, flags, mask, path, dfd)
+
+    def del_watch(self, flags, mask, path, dfd=0):
+        flags |= FAN_MARK_REMOVE
+        fanotify_mark(self._fileno, flags, mask, path, dfd)
+
     def fileno(self):
-        """Returns the file descriptor associated with the fanotify handle
-        
-        :returns int: The file descriptor used for the fanotify handle
+        return self._fileno
+
+    def close(self):
+        os.close(self._fileno)
+
+    def closed(self):
+        return self._closed
+
+    def isatty(self):
+        return False
+
+    def mode(self):
+        return "r"
+
+    def name(self):
+        return "<fanotify fd:{}>".format(self._fileno)
+
+    def read(self):
+        raise NotImplemented
+
+    def readable(self):
+        return False
+
+    def readlines(self):
+        raise NotImplemented
+
+    def seek(self):
+        raise NotImplemented
+
+    def seekable(self):
+        return False
+
+    def tell(self):
+        return 0
+
+    def truncate(self):
+        """Discard all events in the queue"""
+        self._events = []
+
+    def write(self):
+        raise NotImplemented
+
+    def writable(self):
+        return False
+
+    def writelines(self):
+        raise NotImplemented
+
+    def read_event(self):
+        """Return a single event, may read more than one event from the kernel and cache the values
         """
-        return self._fd
-    
-    def add_watch(self):
-        pass
+        try:
+            event = self._events.pop(0)
+        except IndexError:
+            events = self._read_events()
+            event = events.pop(0)
+            self._events = events
 
-    def del_watch(self):
-        pass
+        return event
 
-    def flush_watches(self):
-        pass
+    def read_events(self):
+        """Read and return multiple events from the kernel"""
+        events = self._events
+        self._events = []
+        if len(events) > 0:
+            return events
+        else:
+            return self._read_events()
+
+    def _read_events(self):
+        if self.blocking:
+            _select([self._fileno], [], [])
+            buf_len = _get_buffered_length(self._fileno)
+        else:
+            buf_len = _get_buffered_length(self._fileno)
+            assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
+        raw_events = _read(self._fileno, buf_len)
+
+        events = str_to_events(raw_events)
+
+        return events
+
+    def __repr__(self):
+        return '<Fanotify fd={}>'.format(self._fileno)
+
     
 def fanotify_init(flags, event_flags=O_RDONLY):
     """Create a fanotify handle
