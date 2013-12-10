@@ -191,6 +191,10 @@ class Fanotify(object):
     def __repr__(self):
         return '<Fanotify fd={}>'.format(self._fileno)
 
+    def __iter__(self):
+        while True:
+            yield self.read_event()
+
     
 def fanotify_init(flags, event_flags=O_RDONLY):
     """Create a fanotify handle
@@ -287,8 +291,7 @@ def main():
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
     notifier.watch(0, FLAGS, '/tmp')
 
-    while True:
-        event = notifier.read_event()
+    for event in notifier:
         print "================================"
         print 'Version:        ', event.version
         print 'Mask:            0x{:08X}'.format(event.mask)
