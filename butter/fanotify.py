@@ -164,27 +164,38 @@ def fanotify_init(flags, event_flags=O_RDONLY):
                                             
     return fd
 
-def fanotify_mark():
+def fanotify_mark(fd, flags, mask, path, dfd=0):
     """Add a file to a fanotify context"""
     """
-    EBADF: an invalid fd was passed in
     EINVAL: an invalid flag or mask was passed in
+    EBADF: an invalid fd was passed in
     ENOENT: directory is invalid or directory/mount not marked
     ENOMEM: no mem avalible
     ENOSPC: Too many marks
     """
-    pass
+    ret = _C.fanotify_mark(fd, flags, mask, dfd, path)
+    if ret < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("Invalid flag or mask")
+        elif err == _errno.EBADF:
+            raise OSError("fd does not exist or was of the incorrect type")
+        elif err == _errno.ENOENT:
+            raise OSError("DIrectory is invalid of directory/mount not marked")
+        elif err == _errno.ENOMEM:
+            raise MemoryError("Insufficent kernel memory avalible")
+        elif err == _errno.ENOSPC:
+            raise OSError("Too many marks")
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
+                                            
     
 def main():
     fd = fanotify_init(_C.FAN_CLASS_NOTIF)
     f = fdopen(fd)
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
-    err = _C.fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, 0, '/')
-    import errno
-    if err > 0:
-        print err, _ffi.errno, errno.errorcode[_ffi.errno]
-    else:
-        print "all good"
+    fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, '/')
 
 #    read_size = READ_EVENTS_MAX * _ffi.sizeof('fanotify_event_metadata')
     read_size = 1 * _ffi.sizeof('struct fanotify_event_metadata')
