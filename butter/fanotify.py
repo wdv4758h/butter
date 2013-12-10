@@ -283,22 +283,19 @@ def str_to_events(str):
 
     
 def main():
-    fd = fanotify_init(_C.FAN_CLASS_NOTIF)
-    f = _fdopen(fd)
+    notifier = Fanotify(FAN_CLASS_NOTIF)
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
-    fanotify_mark(f.fileno(), FAN_MARK_ADD, FLAGS, '/tmp')
+    notifier.watch(0, FLAGS, '/tmp')
 
     while True:
-        buf = f.read(24)
-        events = str_to_events(buf)
-        for event in events:
-            print "================================"
-            print 'Version:        ', event.version
-            print 'Mask:           ', event.mask
-            print 'Writer PID:     ', event.pid
-            print 'fd:             ', event.fd
-            print 'filename:       ', event.filename
-            event.close()
+        event = notifier.read_event()
+        print "================================"
+        print 'Version:        ', event.version
+        print 'Mask:            0x{:08X}'.format(event.mask)
+        print 'Writer PID:     ', event.pid
+        print 'fd:             ', event.fd
+        print 'filename:       ', event.filename
+        event.close()
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
