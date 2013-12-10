@@ -259,7 +259,7 @@ def main():
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
-# Make the inotify flags more easily accessible by hoisting them out of the _C object
+# Make the fanotify flags more easily accessible by hoisting them out of the _C object
 l = locals()
 for key, value in _C.__dict__.iteritems():
     if key.startswith("FAN_"):
