@@ -344,6 +344,10 @@ class Inotify(object):
     def __repr__(self):
         return '<Inotify fd={}>'.format(self._fileno)
 
+    def __iter__(self):
+        while True:
+            yield self.read_event()
+
 InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
 
 # Provide a nice ID to NAME mapping for debugging
@@ -371,8 +375,7 @@ def main():
     
     print "Watching {} for file changes".format(dir)
     
-    while True:
-        event = notifier.read_event()
+    for event in notifier:
         print 'The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
                     os.path.join(dir, event.filename), event.mask, event.cookie)
 
