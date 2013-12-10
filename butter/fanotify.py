@@ -195,7 +195,31 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
 
-FanotifyEvent = namedtuple('FanotifyEvent', 'version mask fd pid filename')
+class FanotifyEvent(object):
+    _filename = None
+    def __init__(self, version, mask, fd, pid):
+        self.version = version
+        self.mask = mask
+        self.fd = fd
+        self.pid = pid
+                
+    @property
+    def filename(self):
+        if not self._filename:
+            try:
+                name = _readlink(_path_join('/proc', str(_getpid()), 'fd', str(self.fd)))
+                self._filename = name
+            except OSError:
+                self._filename = "<Unknown>"
+    
+        return self._filename
+        
+    def close(self):
+        _close(self.fd)
+
+    def __repr__(self):
+        return "<FanotifyEvent filename={}, version={}, mask=0x{:X}, fd={}, pid={}>".format(
+                self.filename, self.version, self.mask, self.fd, self.pid)
 
     
 def main():
