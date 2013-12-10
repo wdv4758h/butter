@@ -144,6 +144,26 @@ class FANotify(object):
     def flush_watches(self):
         pass
     
+def fanotify_init(flags, event_flags=O_RDONLY):
+    """Create a fanotify handle
+    """
+    fd = _C.fanotify_init(flags, event_flags)
+    if fd < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("Invalid argument or flag")
+        elif err == _errno.EMFILE:
+            raise OSError("Maximum fanotify instances reached or cant Queue/Mark limits")
+        elif err == _errno.ENOMEM:
+            raise MemoryError("Insufficent kernel memory avalible")
+        elif err == _errno.EPERM:
+            raise OSError("Operation not permitted")
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
+                                            
+    return fd
+
 def fanotify_mark():
     """Add a file to a fanotify context"""
     """
@@ -156,10 +176,7 @@ def fanotify_mark():
     pass
     
 def main():
-    fd = _C.fanotify_init(_C.FAN_CLASS_NOTIF, O_RDONLY)
-    if fd < 0:
-        print 'fd error'
-        exit(1)
+    fd = fanotify_init(_C.FAN_CLASS_NOTIF)
     f = fdopen(fd)
     MARK = _C.FAN_MARK_ADD
     FLAGS = _C.FAN_MODIFY|_C.FAN_ONDIR|_C.FAN_ACCESS|_C.FAN_EVENT_ON_CHILD|_C.FAN_OPEN|_C.FAN_CLOSE
