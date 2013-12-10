@@ -308,7 +308,7 @@ class Inotify(object):
         raise NotImplemented
 
     def read_event(self):
-        """Return a single event, may read more than one event fromt eh kernel and cache the values
+        """Return a single event, may read more than one event from the kernel and cache the values
         """
         try:
             event = self._events.pop(0)
@@ -320,7 +320,7 @@ class Inotify(object):
         return event
         
     def read_events(self):
-        """Read and return multiple events form the kernel"""
+        """Read and return multiple events from the kernel"""
         events = self._events
         self._events = []
         if len(events) > 0:
