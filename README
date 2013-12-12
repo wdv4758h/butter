@@ -37,5 +37,5 @@ Event like objects are identical to filelike objects except they have the
 following extra methods to replace the disabled read/readline/write/writeline
 functionality
 
- * read_event: Return a single event
- * read_event: Return all cached events OR read all events from the kernel
+ * read_event:  Return a single event
+ * read_events: Return all cached events OR read all events from the kernel
