@@ -1,8 +1,12 @@
 butter (0.4-1) stable; urgency=low
   [ Da_Blitz ]
+  * Refactor fanotify
   * Refactor inotify
+  * Provide fanotify.str_to_events()
   * Provide inotify.str_to_events()
   * Add int to signal name mapping for inotify
+
+ -- Da_Blitz <code@pocketnix.org>  Sun, 12 Dec 2013 11:10:43 +1000
 
 butter (0.3-1) stable; urgency=low
 
