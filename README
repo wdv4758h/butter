@@ -27,7 +27,7 @@ Design
 -------
 The 'fd' apis have been designed first as thin wrappers around the underlying
 kernel syscalls. A File-like object that then uses these syscalls is then made 
-available that obeys the 'event like' interface and is base on the interface
+available that obeys the 'event like' interface and is based on the interface
 provided by File and friends. They are intended to be drop in replacements and 
 be used with the select module
 
