@@ -11,6 +11,7 @@ Whats Available
  * inotify (Complete support)
  * seccomp (Limited support)
  * fanotify (Limited support)
+ * splice
 
 Whats Coming
 -------------
@@ -22,6 +23,8 @@ to use cffi for speed and compatibility with pypy
  * timerfd
  * posix/linux aio (scatter/gather read writes with a completion based API 
    instead of a 'ready' based interface, eg similar to IOCP on windows)
+ * tee
+ * vmsplice
 
 Design
 -------
