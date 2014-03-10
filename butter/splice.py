@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """splice: wrapper around the splice() syscall"""
 
-#from __future__ import print_function
+from __future__ import print_function
 
 from select import select as _select
 from collections import namedtuple
