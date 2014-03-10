@@ -132,13 +132,17 @@ def socket_main():
     bytes = True
     
     try:
-        while bytes != 0:
+        while True:
             rd, wr, err = select([conn], [], [conn])
             if err:
                 print('Connection error')
                 break
+                
             print('Splicing')
             bytes = splice(conn, in_pipe, len=max_segment, flags=SPLICE_F_MOVE)
+            if bytes == 0:
+                break
+                
             print("Read {} Bytes".format(bytes))
             bytes = splice(out_pipe, out_sock, len=max_segment)
             out_sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_CORK, 0)
