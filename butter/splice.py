@@ -154,7 +154,7 @@ def socket_main():
     print('Connecting to (::1, 8091)')
     out_sock.connect(('::1', 8091))
 
-    max_segment = 2**24
+    max_segment = 2**24 # chosen arbitrarily
     bytes = True
     
     try:
