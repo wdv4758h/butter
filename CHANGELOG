@@ -1,5 +1,11 @@
 butter (0.5-1) stable; urgency=low
   [ Da_Blitz ]
+  * splice syscall documentation
+ 
+ -- Da_Blitz <code@pocketnix.org>  Tue, 11 Mar 2014 02:11:43 +1000
+
+butter (0.5-1) stable; urgency=low
+  [ Da_Blitz ]
   * Added splice() syscall
  
  -- Da_Blitz <code@pocketnix.org>  Tue, 11 Mar 2014 02:11:43 +1000
