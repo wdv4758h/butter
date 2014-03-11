@@ -25,27 +25,37 @@ _C = _ffi.verify("""
 def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
     """Take data from fd_in and pass it to fd_out without going through userspace
     
-    Arguments:
-    -----------
-    Flags:
-    -------
+    Arguments
+    ----------
+    :param file fd_in: File object or fd to splice from
+    :param file fd_out: File object or fd to splice to
+    :param int in_offset: Offset inside fd_in to read from
+    :param int out_offset: Offset inside fd_out to write to
+    :param int len: Ammount of data to transfer
+    :param int flags: Flags to specify extra options
+    
+    Flags
+    ------
     SPLICE_F_MOVE: This is a noop in modern kernels and is left here for compatibility
     SPLICE_F_NONBLOCK: Make splice operations Non blocking (as long as the fd's are non blocking)
     SPLICE_F_MORE: After splice() more data will be sent, this is a hint to add TCP_CORK like buffering
     SPLICE_F_GIFT: unused for splice() (vmsplice compatibility)
     
-    Returns:
-    ---------
-    int: Number of bytes written
+    Returns
+    --------
+    :return: Number of bytes written
+    :rtype: int
     
-    Exceptions:
-    ------------
-    EBADF   One or both file descriptors are not valid, or do not have proper read-write mode.
-    EINVAL  Target filesystem doesn't support splicing; target file is opened in append mode; neither of the descriptors refers to a pipe; or offset given for
-            nonseekable device.
-    ENOMEM  Out of memory.
-    ESPIPE  Either off_in or off_out was not NULL, but the corresponding file descriptor refers to a pipe.
-
+    Exceptions
+    -----------
+    :raises ValueError: One of the file descriptors is unseekable
+    :raises ValueError: Neither descriptor refers to a pipe
+    :raises ValueError: Target filesystem does not support splicing
+    :raises OSError: supplied fd does not refer to a file
+    :raises OSError: Incorrect mode for file
+    :raises MemoryError: Insufficient kernel memory
+    :raises IOError: No writers waiting on fd_in
+    :raises IOError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
     """
     fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
     fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
@@ -82,6 +92,10 @@ SPLICE_F_MORE = _C.SPLICE_F_MORE
 SPLICE_F_GIFT = _C.SPLICE_F_GIFT    
 
 def main():
+    """Simple test to confirm that splice works and can handle short reads
+    where we write less than len that we dont block and wait but get the exact
+    same data out the other end
+    """
     import sys
     import os
 
@@ -109,6 +123,18 @@ def main():
 
 
 def socket_main():
+    """Simple example showing how to transfer from socket to socket using a Pipe
+    as an intermediate buffer
+    
+    Things to note:
+    * sockets cant be spliced directly (pipe is required)
+    * len is more of a hint, splicing may return less than specified
+    * splice only transfers whats currently in the buffer, it will not
+      wait until len bytes are transferred
+    * Data does not get flushed out automatically, hence TCP_NODELAY to
+      flush data out
+    * :py:func:`.splice` will be called once per packet
+    """
     from select import select
     import socket
     import os
