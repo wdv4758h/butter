@@ -16,6 +16,7 @@ _ffi.cdef("""
 #define SPLICE_F_GIFT     ... /* unused for splice() (vmsplice compatibility) */
 
 ssize_t splice(int fd_in, signed long long *off_in, int fd_out, signed long long *off_out, size_t len, unsigned int flags);
+ssize_t tee(int fd_in, int fd_out, size_t len, unsigned int flags);
 """)
 
 _C = _ffi.verify("""
@@ -85,6 +86,54 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
             raise ValueError("Unknown Error: {}".format(err))
 
     return size
+
+
+def tee(fd_in, fd_out, len=0, flags=0):
+    """Splice data like the :py:func:`.splice` but also leave a copy of the data in the original fd's buffers
+    
+    Arguments
+    ----------
+    :param file fd_in: File object or fd to splice from
+    :param file fd_out: File object or fd to splice to
+    :param int len: Ammount of data to transfer
+    :param int flags: Flags to specify extra options
+    
+    Flags
+    ------
+    SPLICE_F_MOVE: This is a noop in modern kernels and is left here for compatibility
+    SPLICE_F_NONBLOCK: Make tee operations Non blocking (as long as the fd's are non blocking)
+    SPLICE_F_MORE: unused for tee()
+    SPLICE_F_GIFT: unused for tee() (:py:func:`.vmsplice` compatibility)
+    
+    Returns
+    --------
+    :return: Number of bytes written
+    :rtype: int
+    
+    Exceptions
+    -----------
+    :raises ValueError: One of the file descriptors is not a pipe
+    :raises ValueError: Both file descriptors refer to the same pipe
+    :raises MemoryError: Insufficient kernel memory
+    """
+    fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
+    fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
+    
+    size = _C.tee(fd_in, fd_out, len, flags)
+    
+    if size < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("fd_in or fd_out are not a pipe or refer to the same pipe")
+        elif err == _errno.ENOMEM:
+            raise MemoryError("Insufficent kernel memory avalible")
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
+
+    return size
+
+
 
 SPLICE_F_MOVE = _C.SPLICE_F_MOVE    
 SPLICE_F_NONBLOCK = _C.SPLICE_F_NONBLOCK
