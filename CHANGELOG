@@ -1,10 +1,11 @@
 butter (0.6-1) stable; urgency=low
   [ Da_Blitz ]
   * splice syscall documentation
-  * add tee() syscall
-  * add tee() example
-  * add vmsplice() syscall
-  * add vmsplice() example
+  * Added tee() syscall
+  * Added tee() example
+  * Added vmsplice() syscall
+  * Added vmsplice() example
+  * Updated setup.py to newer auto detecting version
  
  -- Da_Blitz <code@pocketnix.org>  Tue, 12 Mar 2014 23:26:43 +1000
 
