@@ -6,3 +6,5 @@ __version__ = "0.6"
 __email__ = "code@pocketnix.org"
 __license__ = "BSD (3 Clause)"
 __url__ = "http://code.pocketnix.org/butter"
+
+__all__ = ['fanotify', 'inotify', 'seccomp', 'splice', 'utils']
