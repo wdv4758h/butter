@@ -6,6 +6,7 @@ butter (0.6-1) stable; urgency=low
   * Added vmsplice() syscall
   * Added vmsplice() example
   * Updated setup.py to newer auto detecting version
+  * hide 'main' functions in splice module
  
  -- Da_Blitz <code@pocketnix.org>  Tue, 12 Mar 2014 23:26:43 +1000
 

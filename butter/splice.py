@@ -216,7 +216,7 @@ SPLICE_F_GIFT = _C.SPLICE_F_GIFT
 IOV_MAX = _C.IOV_MAX
 
 
-def main():
+def _main():
     """Simple test to confirm that splice works and can handle short reads
     where we write less than len that we dont block and wait but get the exact
     same data out the other end
@@ -247,7 +247,7 @@ def main():
     print('all ok')
 
 
-def socket_main():
+def _socket_main():
     """Simple example showing how to transfer from socket to socket using a Pipe
     as an intermediate buffer
     
@@ -304,7 +304,7 @@ def socket_main():
     print("Exiting")
 
 
-def tee_main():
+def _tee_main():
     """An example showing off using tee in production use
     pipes data from stdin to stdout but looks for the magic 'exit' command
     in the stream and exit when it sees it
@@ -337,7 +337,7 @@ def tee_main():
             print("Exit command ({}) found, exiting".format(command))
             break
 
-def vmsplice_main():
+def _vmsplice_main():
     import sys
     import os
 
@@ -353,5 +353,5 @@ def vmsplice_main():
     print('spliced {} bytes'.format(bytes))
 
 if __name__ == "__main__":
-    socket_main()
-    #main()
+    _socket_main()
+    #_main()
