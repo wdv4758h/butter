@@ -89,6 +89,9 @@ MAXPATHLEN = 256
 getpid = _C.getpid
 getppid = _C.getppid
 
+class Retry(Exception):
+    """Filesystem now marked as expired"""
+
 
 def mount(src, target, fs, flags=0, data=""):
     """Take data from fd_in and pass it to fd_out without going through userspace
@@ -188,7 +191,7 @@ def umount(target, flags=0):
     if err < 0:
         err = _ffi.errno
         if err == _errno.EAGAIN:
-            raise ValueError("A call to umount2() specifying MNT_EXPIRE successfully marked an unbusy filesystem as expired")
+            raise Retry("Filesystem marked as expired, call again to unmount filesystem")
         elif err == _errno.EBUSY:
             raise ValueError("target could not be unmounted because it is busy")
         elif err == _errno.EFAULT:
