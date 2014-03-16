@@ -92,6 +92,9 @@ getppid = _C.getppid
 class Retry(Exception):
     """Filesystem now marked as expired"""
 
+class PermissionError(Exception):
+    """You do not have the required pemissions to use this syscall (CAP_SYS_ADMIN)"""
+
 
 def mount(src, target, fs, flags=0, data=""):
     """Take data from fd_in and pass it to fd_out without going through userspace
@@ -151,7 +154,7 @@ def mount(src, target, fs, flags=0, data=""):
         elif err == _errno.ENXIO:
             raise IOError("The major number of the block device source is out of range")
         elif err == _errno.EPERM:
-            raise OSError("Permission denied, SYS_CAP_ADMIN not in capability bits")
+            raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
@@ -205,7 +208,7 @@ def umount(target, flags=0):
         elif err == _errno.ENOMEM:
             raise MemError("The kernel could not allocate a free page to copy filenames or data into")
         elif err == _errno.EPERM:
-            raise OSError("Permission denied, SYS_CAP_ADMIN not in capability bits")
+            raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
@@ -259,7 +262,7 @@ def pivot_root(new, old):
                 # hit it
                 raise OSError("old or new is not a dir but could not work out which one")
         elif err == _errno.EPERM:
-            raise OSError("Permission denied, SYS_CAP_ADMIN not in capability bits")
+            raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
@@ -309,7 +312,7 @@ def sethostname(hostname):
             # great, for some reason we did not allocate a long enough buffer
             raise OSError("Supplied buffer not long enough")
         elif err == _errno.EPERM:
-            raise OSError("Permission denied, SYS_CAP_ADMIN not in capability bits")
+            raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
@@ -357,7 +360,7 @@ def gethostname():
             # great, for some reason we did not allocate a long enough buffer
             raise OSError("Supplied buffer not long enough")
         elif err == _errno.EPERM:
-            raise OSError("Permission denied, SYS_CAP_ADMIN not in capability bits")
+            raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
