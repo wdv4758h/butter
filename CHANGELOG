@@ -1,3 +1,17 @@
+butter (0.7-1) stable; urgency=low
+  [ Da_Blitz ]
+  * Added system.py module
+  * Added gethostname syscall
+  * Added sethostname syscall
+  * Added mount syscall
+  * Added umount syscall
+  * Added pivot_root syscall
+  * Added getpid syscall
+  * Added getppid syscall
+  * Documented all new syscalls
+   
+ -- Da_Blitz <code@pocketnix.org>  Tue, 16 Mar 2014 22:04:43 +1000
+
 butter (0.6-1) stable; urgency=low
   [ Da_Blitz ]
   * splice syscall documentation
