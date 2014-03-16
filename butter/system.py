@@ -370,7 +370,7 @@ def gethostname():
     return hostname
     
 
-def main():
+def _main():
     import os
     
     path = "/tmp/test"
@@ -408,4 +408,4 @@ def main():
     print("os PPID: ", os.getppid())
 
 if __name__ == "__main__":
-    main()
+    _main()
