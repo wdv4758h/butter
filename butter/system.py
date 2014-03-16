@@ -1,5 +1,30 @@
 #!/usr/bin/env python
-"""system: syscalls for system managment"""
+"""system: syscalls for system managment
+
+This module includes a number of helpful functions for managing and maintaing 
+a system. These were orignially created to support a Linux contaienrs solution 
+written in python but may be genrally useful and have been broken off and 
+intergrarated into butter in this module
+
+
+* mount: Mount filesystems using the `man 2 mount` syscall (simmilar to 
+         /sbin/mount)
+* umount: Unmount filesystems in the system
+* pivot_root: Exchange the filesystem at 'new' with '/' and mount the old 
+              filesystem at 'old'
+* sethostname: Set the hostname of the system
+* gethostname: Retrvie the current system hostname (identical to 
+              :py:func:`socket.gethostname`)
+* getpid: Call the syscall `getpid` directly, bypassing glibc and any caching 
+          it performs
+* getppid: Call the syscall `getppid` directly, bypassing glibc and any caching 
+           it performs
+
+
+For example usage of the above functions look at thier docstrings of the 
+function body of _main() in this module which includes short examples for 
+quick testing
+"""
 
 from __future__ import print_function
 
@@ -97,25 +122,61 @@ class PermissionError(Exception):
 
 
 def mount(src, target, fs, flags=0, data=""):
-    """Take data from fd_in and pass it to fd_out without going through userspace
+    """Mount the specified filesystem at `target`
 
     Arguments
     ----------
-    :param file fd_in: File object or fd to splice from
+    :param str src: Filesystem dependent string specifing the source of the mount
+                    eg for nfs this would be <ip>:/remote/path or a block device 
+                    dev for a normal filesystem
+    :param str target: The path to mount the filesystem on
+    :param str fs: The type of filesystem to mount on `target`
+    :param int flags: Extra conditions on the mount (see flags below)
+    :param str data: Additinal data to pass to teh filesystem driver
 
     Flags
     ------
-    SPLICE_F_GIFT: unused for splice() (vmsplice compatibility)
+    :py:const:`MS_BIND`: Make mount a bind mount, `fs` is ignored with this option
+    :py:const:`MS_DIRSYNC`: Perform all directory operations synchronously
+    :py:const:`MS_MANDLOCK`: Enable Mandatory locking for the filesystem
+    :py:const:`MS_MOVE`: Move a mountpoint to a new location atomically without unmounting
+    :py:const:`MS_NOATIME`: Dont update atime on file access
+    :py:const:`MS_NODEV`: Prevent device nodes from ebing created on the filesystem
+    :py:const:`MS_NODIRATIME`: Dont update Directory atime on file access
+    :py:const:`MS_NOEXEC`: Prevent files from being exected on the filesystem via `exec()`
+    :py:const:`MS_NOSUID`: Disable SUID flag on files in this filesystem
+    :py:const:`MS_RDONLY`: Mount filesystem Read Only
+    :py:const:`MS_RELATIME`: only update atime if ctime or mtime have been updated
+    :py:const:`MS_REMOUNT`: Remount the filesystem in place
+    :py:const:`MS_SILENT`: Disable printing messages to dmesg for the mount
+    :py:const:`MS_STRICTATIME`: Always update atime on file access
+    :py:const:`MS_SYNCHRONOUS`: Mount the filesystem in synchronous mode (same as passing 
+                                O_SYNC to :py:func:`os.open()`
 
     Returns
     --------
-    :return: Number of bytes written
-    :rtype: int
+    No return value
 
     Exceptions
     -----------
-    :raises ValueError: One of the file descriptors is unseekable
-    :raises ValueError: Neither descriptor refers to a pipe
+    :raises ValueError: Attempt to mount a Read only filesystem without specifing MS_RDONLY as a flag
+    :raises ValueError: `src` or `target` contain a component that does not exist or was not searchable
+    :raises ValueError: `src` is already mounted
+    :raises ValueError: Filesystem cannot be mounted read only as it still holds files open for writing
+    :raises ValueError: Target is busy (it is the working directory of some thread, the mount point of another device, has open files, etc.)
+    :raises OsError: `src` has an invalid superblock
+    :raises OsError: MS_REMOUNT was attempted but `src` is not mounted on `target`
+    :raises OsError: MS_MOVE attempted but `src` is not a mount point or is '/'
+    :raises OsError: Filesystem not available in the kernel
+    :raises ValueError: Too many links encountered during pathname resolution
+    :raises ValueError: MS_MOVE attempted while `target` is a descendent of `src`
+    :raises ValueError: `src` or `target` longer than MAXPATHLEN
+    :raises ValueError: `src` or `target` contains an empty or non existent component
+    :raises ValueError: `src` is nto a valid block device and a block device is required by this filesystem
+    :raises ValueError: `target` or prefix of `src` is nto a directory
+    :raises IOError: The major number of `src` is out of the range for valid block devices
+    :raises MemError: Kernel could not allocate enough memory to handle the request
+    :raises PermissionError: No permission to pivot_root to new location
     """
     assert 0 < len(src) < MAXPATHLEN, "src is too long in length"
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
@@ -161,31 +222,40 @@ def mount(src, target, fs, flags=0, data=""):
 
 
 def umount(target, flags=0):
-    """Take data from fd_in and pass it to fd_out without going through userspace
+    """Unmount the specified filesystem
 
     Arguments
     ----------
-    :param file fd_in: File object or fd to splice from
+    :param str target: The path to the filesystem to unmount
+    :param int flags: Extra options to use to unmount the filesystem
 
     Flags
     ------
-    SPLICE_F_GIFT: unused for splice() (vmsplice compatibility)
+    :py:const:`MNT_FORCE`: Forcibly detach the filesystem, even if busy (NFS only)
+    :py:const:`MNT_DETACH`: Lazily detach the filesystem (filesystem will be detached
+                            when there are no more consumers of the filesystem). This
+                            will cause the mount to appear unmounted to processes that
+                            are not using the detached mount point
+    :py:const:`MNT_EXPIRE`: Mark the mountpoint as expired and trigger an EAGAIN. any
+                            access by a program will mark the filesystem as active
+                            again. if a filesystem is marked as expired, then another
+                            umount call will unmount the filesystem normmaly
+    :py:const:`UMOUNT_NOFOLLOW`: Do not derefrence any symlinks when unmounting the 
+                                 filesystem
 
     Returns
     --------
-    :return: Number of bytes written
-    :rtype: int
+    No return value
 
     Exceptions
     -----------
-    :raises ValueError: One of the file descriptors is unseekable
-    :raises ValueError: Neither descriptor refers to a pipe
-    :raises ValueError: Target filesystem does not support splicing
-    :raises OSError: supplied fd does not refer to a file
-    :raises OSError: Incorrect mode for file
-    :raises MemoryError: Insufficient kernel memory
-    :raises IOError: No writers waiting on fd_in
-    :raises IOError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
+    :raises Retry: Filesystem now marked as expired, call again to unmount
+    :raises ValueError: Could not unount filesystema s it is currently in use
+    :raises OSError: Target is not a mount point
+    :raises OSError: umount called with MNT_EXPIRE and ethier MNT_DETACH or MNT_FORCE
+    :raises ValueError: Supplied path is too long
+    :raises ValueError: Supplied path has an empty or non-existent component
+    :raises PermissionError: No permission to pivot_root to new location
     """
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
 
@@ -215,31 +285,23 @@ def umount(target, flags=0):
 
 
 def pivot_root(new, old):
-    """Take data from fd_in and pass it to fd_out without going through userspace
+    """Move the filesystem specfied by `new` and mount it at '/' and move the old '/' to `old`
 
     Arguments
     ----------
-    :param file fd_in: File object or fd to splice from
-
-    Flags
-    ------
-    SPLICE_F_GIFT: unused for splice() (vmsplice compatibility)
+    :param str new: Path to a mounted filesystem to make the new '/'
+    :param str old: Location where current '/' should be mounted
 
     Returns
     --------
-    :return: Number of bytes written
-    :rtype: int
+    No return value
 
     Exceptions
     -----------
-    :raises ValueError: One of the file descriptors is unseekable
-    :raises ValueError: Neither descriptor refers to a pipe
-    :raises ValueError: Target filesystem does not support splicing
-    :raises OSError: supplied fd does not refer to a file
-    :raises OSError: Incorrect mode for file
-    :raises MemoryError: Insufficient kernel memory
-    :raises IOError: No writers waiting on fd_in
-    :raises IOError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
+    :raises ValueError: `new` or `old` does not refer to a directory
+    :raises ValueError: `new` or `old` are on the current root filesystem or filesystem already mounted on `old`
+    :raises ValueError: `old` is not a folder underneath `new`
+    :raises PermissionError: No permission to pivot_root to new location
     """
     assert len(new) > 0
     assert len(old) > 0
@@ -269,11 +331,11 @@ def pivot_root(new, old):
 
 
 def sethostname(hostname):
-    """Take data from fd_in and pass it to fd_out without going through userspace
+    """Set the hostname for they system
 
     Arguments
     ----------
-    :param file fd_in: File object or fd to splice from
+    :param str hostname: The hostname to set
 
     Flags
     ------
@@ -281,19 +343,12 @@ def sethostname(hostname):
 
     Returns
     --------
-    :return: Number of bytes written
-    :rtype: int
+    No return value
 
     Exceptions
     -----------
-    :raises ValueError: One of the file descriptors is unseekable
-    :raises ValueError: Neither descriptor refers to a pipe
-    :raises ValueError: Target filesystem does not support splicing
-    :raises OSError: supplied fd does not refer to a file
-    :raises OSError: Incorrect mode for file
-    :raises MemoryError: Insufficient kernel memory
-    :raises IOError: No writers waiting on fd_in
-    :raises IOError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
+    :raises ValueError: Hostname too long
+    :raises PermissionError: No permission to set hostname
     """
     assert len(hostname) < HOST_NAME_MAX, "Specified hostname too long"
 
@@ -318,31 +373,12 @@ def sethostname(hostname):
             raise ValueError("Unknown Error: {}".format(err))
 
 def gethostname():
-    """Take data from fd_in and pass it to fd_out without going through userspace
-
-    Arguments
-    ----------
-    :param file fd_in: File object or fd to splice from
-
-    Flags
-    ------
-    SPLICE_F_GIFT: unused for splice() (vmsplice compatibility)
+    """Retrive the specified hostname of the system
 
     Returns
     --------
-    :return: Number of bytes written
-    :rtype: int
-
-    Exceptions
-    -----------
-    :raises ValueError: One of the file descriptors is unseekable
-    :raises ValueError: Neither descriptor refers to a pipe
-    :raises ValueError: Target filesystem does not support splicing
-    :raises OSError: supplied fd does not refer to a file
-    :raises OSError: Incorrect mode for file
-    :raises MemoryError: Insufficient kernel memory
-    :raises IOError: No writers waiting on fd_in
-    :raises IOError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
+    :return: The hostname of the system
+    :rtype: str
     """
     hostname = _ffi.new('char[]', HOST_NAME_MAX)
     err = _C.gethostname(hostname, len(hostname))
