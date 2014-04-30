@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
+from __future__ import print_function
 
 from utils import get_buffered_length as _get_buffered_length
 from select import select as _select
@@ -373,11 +374,11 @@ def main():
     notifier = Inotify()
     notifier.watch(dir, IN_ALL_EVENTS)
     
-    print "Watching {} for file changes".format(dir)
+    print("Watching {} for file changes".format(dir))
     
     for event in notifier:
-        print 'The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
-                    os.path.join(dir, event.filename), event.mask, event.cookie)
+        print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
+                    os.path.join(dir, event.filename), event.mask, event.cookie))
 
 if __name__ == "__main__":
     main()

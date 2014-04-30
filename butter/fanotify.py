@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
+from __future__ import print_function
 
 from utils import get_buffered_length as _get_buffered_length
 from os import getpid as _getpid, readlink as _readlink
@@ -292,12 +293,12 @@ def main():
     notifier.watch(0, FLAGS, '/tmp')
 
     for event in notifier:
-        print "================================"
-        print 'Version:        ', event.version
-        print 'Mask:            0x{:08X}'.format(event.mask)
-        print 'Writer PID:     ', event.pid
-        print 'fd:             ', event.fd
-        print 'filename:       ', event.filename
+        print("================================")
+        print('Version:        ', event.version)
+        print('Mask:            0x{:08X}'.format(event.mask))
+        print('Writer PID:     ', event.pid)
+        print('fd:             ', event.fd)
+        print('filename:       ', event.filename)
         event.close()
 
 # Provide a nice ID to NAME mapping for debugging
