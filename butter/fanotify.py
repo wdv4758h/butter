@@ -200,6 +200,9 @@ class Fanotify(object):
 def fanotify_init(flags, event_flags=O_RDONLY):
     """Create a fanotify handle
     """
+    assert isinstance(flags, int), 'Flags must be an integer'
+    assert isinstance(event_flags, int), 'Event flags must be an integer'
+
     fd = _C.fanotify_init(flags, event_flags)
     if fd < 0:
         err = _ffi.errno
@@ -226,6 +229,15 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
     ENOMEM: no mem avalible
     ENOSPC: Too many marks
     """
+    assert isinstance(fd, int), 'FD must be an integer'
+    assert isinstance(dfd, int), 'DFD must be an integer'
+    assert isinstance(flags, int), 'Flags must be an integer'
+    assert isinstance(mask, int), 'Mask must be an integer'
+    assert isinstance(path, (str, bytes)), 'Path must be a string'
+    
+    if isinstance(path, str):
+        path = path.encode()
+
     ret = _C.fanotify_mark(fd, flags, mask, dfd, path)
     if ret < 0:
         err = _ffi.errno
