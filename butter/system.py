@@ -181,6 +181,24 @@ def mount(src, target, fs, flags=0, data=""):
     assert 0 < len(src) < MAXPATHLEN, "src is too long in length"
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
     
+    assert isinstance(src,    (str, bytes)), "src must be a string"
+    assert isinstance(target, (str, bytes)), "target must be a string"
+    assert isinstance(fs,     (str, bytes)), "fs must be a string"
+    assert isinstance(flags,   int        ), "flags must be a integer"
+    assert isinstance(data,   (str, bytes)), "data must be a string"
+
+    if isinstance(src, str):
+        src = src.encode()
+
+    if isinstance(target, str):
+        target = target.encode()
+
+    if isinstance(fs, str):
+        fs = fs.encode()
+
+    if isinstance(data, str):
+        data = data.encode()
+    
     err = _C.mount(src, target, fs, flags, data)
 
     if err < 0:
