@@ -132,7 +132,7 @@ def mount(src, target, fs, flags=0, data=""):
     :param str target: The path to mount the filesystem on
     :param str fs: The type of filesystem to mount on `target`
     :param int flags: Extra conditions on the mount (see flags below)
-    :param str data: Additinal data to pass to teh filesystem driver
+    :param str data: Additinal data to pass to the filesystem driver
 
     Flags
     ------
