@@ -355,7 +355,7 @@ InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
 signal_name = {}
 # Make the inotify flags more easily accessible by hoisting them out of the _C object
 l = locals()
-for key, value in _C.__dict__.iteritems():
+for key, value in _C.__dict__.items():
     if key.startswith("IN_"):
         signal_name[value] = key
         l[key] = value

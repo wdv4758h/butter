@@ -305,7 +305,7 @@ def main():
 signal_name = {}
 # Make the fanotify flags more easily accessible by hoisting them out of the _C object
 l = locals()
-for key, value in _C.__dict__.iteritems():
+for key, value in _C.__dict__.items():
     if key.startswith("FAN_"):
         signal_name[value] = key
         l[key] = value
