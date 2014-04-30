@@ -277,6 +277,12 @@ def umount(target, flags=0):
     """
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
 
+    assert isinstance(target, (str, bytes)), "target must be a string"
+    assert isinstance(flags, int), "flags must be a integer"
+
+    if isinstance(target, str):
+        target = target.encode()
+
     err = _C.umount2(target, flags)
 
     if err < 0:
@@ -324,6 +330,15 @@ def pivot_root(new, old):
     assert len(new) > 0
     assert len(old) > 0
 
+    assert isinstance(new, (str, bytes)), "new must be a string"
+    assert isinstance(old, (str, bytes)), "old must be a string"
+
+    if isinstance(new, str):
+        new = new.encode()
+
+    if isinstance(old, str):
+        old = old.encode()
+
     err = _C.pivot_root(new, old)
 
     if err < 0:
@@ -369,6 +384,11 @@ def sethostname(hostname):
     :raises PermissionError: No permission to set hostname
     """
     assert len(hostname) < HOST_NAME_MAX, "Specified hostname too long"
+
+    assert isinstance(hostname, (str, bytes)), "Hostname must be a string"
+
+    if isinstance(hostname, str):
+        hostname = hostname.encode()
 
     err = _C.sethostname(hostname, len(hostname))
 
