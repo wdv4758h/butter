@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """fanotify: wrapper aroudn the fanotify family of syscalls for watching for file modifcation"""
+from __future__ import print_function
 
 from cffi import FFI as _FFI
 from os import O_RDONLY, O_WRONLY, O_RDWR
@@ -231,7 +232,7 @@ def main():
     SIGRETURN = 119
     RT_SIGACTION = 174
 
-    print 'a'
+    print('a')
 
 #    filter = _C.seccomp_init(_C.SCMP_ACT_KILL)
     filter = _C.seccomp_init(_C.SCMP_ACT_KILL)

@@ -132,7 +132,7 @@ def mount(src, target, fs, flags=0, data=""):
     :param str target: The path to mount the filesystem on
     :param str fs: The type of filesystem to mount on `target`
     :param int flags: Extra conditions on the mount (see flags below)
-    :param str data: Additinal data to pass to teh filesystem driver
+    :param str data: Additinal data to pass to the filesystem driver
 
     Flags
     ------
@@ -180,6 +180,24 @@ def mount(src, target, fs, flags=0, data=""):
     """
     assert 0 < len(src) < MAXPATHLEN, "src is too long in length"
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
+    
+    assert isinstance(src,    (str, bytes)), "src must be a string"
+    assert isinstance(target, (str, bytes)), "target must be a string"
+    assert isinstance(fs,     (str, bytes)), "fs must be a string"
+    assert isinstance(flags,   int        ), "flags must be a integer"
+    assert isinstance(data,   (str, bytes)), "data must be a string"
+
+    if isinstance(src, str):
+        src = src.encode()
+
+    if isinstance(target, str):
+        target = target.encode()
+
+    if isinstance(fs, str):
+        fs = fs.encode()
+
+    if isinstance(data, str):
+        data = data.encode()
     
     err = _C.mount(src, target, fs, flags, data)
 
@@ -259,6 +277,12 @@ def umount(target, flags=0):
     """
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
 
+    assert isinstance(target, (str, bytes)), "target must be a string"
+    assert isinstance(flags, int), "flags must be a integer"
+
+    if isinstance(target, str):
+        target = target.encode()
+
     err = _C.umount2(target, flags)
 
     if err < 0:
@@ -306,6 +330,15 @@ def pivot_root(new, old):
     assert len(new) > 0
     assert len(old) > 0
 
+    assert isinstance(new, (str, bytes)), "new must be a string"
+    assert isinstance(old, (str, bytes)), "old must be a string"
+
+    if isinstance(new, str):
+        new = new.encode()
+
+    if isinstance(old, str):
+        old = old.encode()
+
     err = _C.pivot_root(new, old)
 
     if err < 0:
@@ -351,6 +384,11 @@ def sethostname(hostname):
     :raises PermissionError: No permission to set hostname
     """
     assert len(hostname) < HOST_NAME_MAX, "Specified hostname too long"
+
+    assert isinstance(hostname, (str, bytes)), "Hostname must be a string"
+
+    if isinstance(hostname, str):
+        hostname = hostname.encode()
 
     err = _C.sethostname(hostname, len(hostname))
 

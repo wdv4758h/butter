@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
+from __future__ import print_function
 
 from utils import get_buffered_length as _get_buffered_length
 from select import select as _select
@@ -156,8 +157,11 @@ def inotify_add_watch(fd, path, mask):
     if hasattr(fd, "fileno"):
         fd = fd.fileno()
     assert isinstance(fd, int), "fd must by an integer"
-    assert isinstance(path, basestring), "path is not a string"
+    assert isinstance(path, (str, bytes)), "path is not a string"
     assert isinstance(mask, int), "mask must be an integer"
+    
+    if isinstance(path, str):
+        path = path.encode()
     
     wd = _C.inotify_add_watch(fd, path, mask)
 
@@ -354,7 +358,7 @@ InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
 signal_name = {}
 # Make the inotify flags more easily accessible by hoisting them out of the _C object
 l = locals()
-for key, value in _C.__dict__.iteritems():
+for key, value in _C.__dict__.items():
     if key.startswith("IN_"):
         signal_name[value] = key
         l[key] = value
@@ -367,17 +371,17 @@ del key, value # python 2.x has vars escape from the scope of the loop, clean th
 def main():
     import sys
     import os
-    
+
     dir = (sys.argv + ["/tmp"])[1]
     
     notifier = Inotify()
     notifier.watch(dir, IN_ALL_EVENTS)
     
-    print "Watching {} for file changes".format(dir)
+    print("Watching {} for file changes".format(dir))
     
     for event in notifier:
-        print 'The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
-                    os.path.join(dir, event.filename), event.mask, event.cookie)
+        print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
+                    os.path.join(dir, event.filename.decode()), event.mask, event.cookie))
 
 if __name__ == "__main__":
     main()
