@@ -2,7 +2,8 @@
 """fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
 from __future__ import print_function
 
-from utils import get_buffered_length as _get_buffered_length
+from .utils import get_buffered_length as _get_buffered_length
+
 from os import getpid as _getpid, readlink as _readlink
 from os import fdopen as _fdopen, close as _close
 from os import read as _read

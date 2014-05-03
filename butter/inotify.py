@@ -2,7 +2,8 @@
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
 from __future__ import print_function
 
-from utils import get_buffered_length as _get_buffered_length
+from .utils import get_buffered_length as _get_buffered_length
+
 from select import select as _select
 from collections import namedtuple
 from os import read as _read

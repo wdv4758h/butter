@@ -28,9 +28,9 @@ quick testing
 
 from __future__ import print_function
 
+from os.path import isdir as _isdir
 from cffi import FFI as _FFI
 import errno as _errno
-from os.path import isdir as _isdir
 
 _ffi = _FFI()
 _ffi.cdef("""

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from cffi import FFI as _FFI
 import fcntl
 import array
