@@ -157,8 +157,11 @@ def inotify_add_watch(fd, path, mask):
     if hasattr(fd, "fileno"):
         fd = fd.fileno()
     assert isinstance(fd, int), "fd must by an integer"
-    assert isinstance(path, str), "path is not a string"
+    assert isinstance(path, (str, bytes)), "path is not a string"
     assert isinstance(mask, int), "mask must be an integer"
+    
+    if isinstance(path, str):
+        path = path.encode()
     
     wd = _C.inotify_add_watch(fd, path, mask)
 
@@ -368,7 +371,7 @@ del key, value # python 2.x has vars escape from the scope of the loop, clean th
 def main():
     import sys
     import os
-    
+
     dir = (sys.argv + ["/tmp"])[1]
     
     notifier = Inotify()
@@ -378,7 +381,7 @@ def main():
     
     for event in notifier:
         print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
-                    os.path.join(dir, event.filename), event.mask, event.cookie))
+                    os.path.join(dir, event.filename.decode()), event.mask, event.cookie))
 
 if __name__ == "__main__":
     main()
