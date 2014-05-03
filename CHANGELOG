@@ -1,3 +1,10 @@
+butter (0.8-1) stable; urgency=low
+  [ Da_Blitz ]
+  * Now works with python3.4 and higher
+  * 'from butter import *' now imports the system module
+   
+ -- Da_Blitz <code@pocketnix.org>  Tue, 16 Mar 2014 22:04:43 +1000
+
 butter (0.7-1) stable; urgency=low
   [ Da_Blitz ]
   * Added system.py module
