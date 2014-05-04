@@ -357,51 +357,55 @@ InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
 class InotifyEvent(InotifyEvent):
     __slots__ = []
     @property
-    def access(self):
+    def access_event(self):
         return True if self.mask & IN_ACCESS else False
 
     @property
-    def modify(self):
+    def modify_event(self):
         return True if self.mask & IN_MODIFY else False
 
     @property
-    def attrib(self):
+    def attrib_event(self):
         return True if self.mask & IN_ATTRIB else False
 
     @property
-    def close_write(self):
+    def close_write_event(self):
         return True if self.mask & IN_CLOSE_WRITE else False
 
     @property
-    def close_nowrite(self):
+    def close_nowrite_event(self):
         return True if self.mask & IN_CLOSE_NOWRITE else False
 
     @property
-    def open(self):
+    def close_event(self):
+        return True if self.mask & (IN_CLOSE_NOWRITE|IN_CLOSE_WRITE) else False
+
+    @property
+    def open_event(self):
         return True if self.mask & IN_OPEN else False
 
     @property
-    def moved_from(self):
+    def moved_from_event(self):
         return True if self.mask & IN_MOVED_FROM else False
 
     @property
-    def moved_to(self):
+    def moved_to_event(self):
         return True if self.mask & IN_MOVED_TO else False
 
     @property
-    def create(self):
+    def create_event(self):
         return True if self.mask & IN_CREATE else False
 
     @property
-    def delete(self):
+    def delete_event(self):
         return True if self.mask & IN_DELETE else False
 
     @property
-    def delete_self(self):
+    def delete_self_event(self):
         return True if self.mask & IN_DELETE_SELF else False
 
     @property
-    def move_self(self):
+    def move_self_event(self):
         return True if self.mask & IN_MOVE_SELF else False
 
 
@@ -433,17 +437,17 @@ def main():
     for event in notifier:
         print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
                     os.path.join(dir, event.filename.decode()), event.mask, event.cookie))
-        if event.attrib:
+        if event.attrib_event:
             print('attrib')
-        if event.access:
+        if event.access_event:
             print('access')
-        if event.modify:
+        if event.modify_event:
             print('modify')
-        if event.close_write:
+        if event.close_write_event:
             print('close_write')
-        if event.close_nowrite:
+        if event.close_nowrite_event:
             print('close_nowrite')
-        if event.open:
+        if event.open_event:
             print('open')
 
 if __name__ == "__main__":
