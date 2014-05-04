@@ -3,6 +3,7 @@ butter (0.8-1) stable; urgency=low
   * Now works with python3.4 and higher
   * 'from butter import *' now imports the system module
   * Added trove classification
+  * Added friendly properties to inotify event object
    
  -- Da_Blitz <code@pocketnix.org>  Tue, 16 Mar 2014 22:04:43 +1000
 
