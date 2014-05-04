@@ -354,6 +354,56 @@ class Inotify(object):
             yield self.read_event()
 
 InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
+class InotifyEvent(InotifyEvent):
+    __slots__ = []
+    @property
+    def access(self):
+        return True if self.mask & IN_ACCESS else False
+
+    @property
+    def modify(self):
+        return True if self.mask & IN_MODIFY else False
+
+    @property
+    def attrib(self):
+        return True if self.mask & IN_ATTRIB else False
+
+    @property
+    def close_write(self):
+        return True if self.mask & IN_CLOSE_WRITE else False
+
+    @property
+    def close_nowrite(self):
+        return True if self.mask & IN_CLOSE_NOWRITE else False
+
+    @property
+    def open(self):
+        return True if self.mask & IN_OPEN else False
+
+    @property
+    def moved_from(self):
+        return True if self.mask & IN_MOVED_FROM else False
+
+    @property
+    def moved_to(self):
+        return True if self.mask & IN_MOVED_TO else False
+
+    @property
+    def create(self):
+        return True if self.mask & IN_CREATE else False
+
+    @property
+    def delete(self):
+        return True if self.mask & IN_DELETE else False
+
+    @property
+    def delete_self(self):
+        return True if self.mask & IN_DELETE_SELF else False
+
+    @property
+    def move_self(self):
+        return True if self.mask & IN_MOVE_SELF else False
+
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
@@ -383,6 +433,18 @@ def main():
     for event in notifier:
         print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
                     os.path.join(dir, event.filename.decode()), event.mask, event.cookie))
+        if event.attrib:
+            print('attrib')
+        if event.access:
+            print('access')
+        if event.modify:
+            print('modify')
+        if event.close_write:
+            print('close_write')
+        if event.close_nowrite:
+            print('close_nowrite')
+        if event.open:
+            print('open')
 
 if __name__ == "__main__":
     main()
