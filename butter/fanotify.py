@@ -257,12 +257,14 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
             raise ValueError("Unknown Error: {}".format(err))
 
 class FanotifyEvent(object):
-    _filename = None
+    __slots__ = ['_filename', 'version', 'mask', 'fd', 'pid']
     def __init__(self, version, mask, fd, pid):
         self.version = version
         self.mask = mask
         self.fd = fd
         self.pid = pid
+
+        self._filename = None
                 
     @property
     def filename(self):
