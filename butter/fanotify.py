@@ -284,6 +284,51 @@ class FanotifyEvent(object):
         return "<FanotifyEvent filename={}, version={}, mask=0x{:X}, fd={}, pid={}>".format(
                 self.filename, self.version, self.mask, self.fd, self.pid)
 
+    @property
+    def access_event(self):
+        return True if self.mask & FAN_ACCESS else False
+
+    @property
+    def access_perm_event(self):
+        return True if self.mask & FAN_ACCESS_PERM else False
+
+    @property
+    def modify_event(self):
+        return True if self.mask & FAN_MODIFY else False
+
+    @property
+    def close_event(self):
+        return True if self.mask & FAN_CLOSE else False
+
+    @property
+    def close_write_event(self):
+        return True if self.mask & FAN_CLOSE_WRITE else False
+
+    @property
+    def close_nowrite_event(self):
+        return True if self.mask & FAN_CLOSE_NOWRITE else False
+
+    @property
+    def open_event(self):
+        return True if self.mask & FAN_OPEN else False
+
+    @property
+    def open_perm_event(self):
+        return True if self.mask & FAN_OPEN_PERM else False
+
+    @property
+    def queue_overflow_event(self):
+        return True if self.mask & FAN_Q_OVERFLOW else False
+
+    @property
+    def on_dir_event(self):
+        return True if self.mask & FAN_ONDIR else False
+
+    @property
+    def on_child_event(self):
+        return True if self.mask & FAN_EVENT_ON_CHILD else False
+
+
 def str_to_events(str):
     event_struct_size = _ffi.sizeof('struct fanotify_event_metadata')
 
@@ -314,6 +359,10 @@ def main():
         print('Writer PID:     ', event.pid)
         print('fd:             ', event.fd)
         print('filename:       ', event.filename)
+        if event.access_event:
+            print("This is an access event")
+        if event.open_event:
+            print("This is an open event")
         event.close()
 
 # Provide a nice ID to NAME mapping for debugging
