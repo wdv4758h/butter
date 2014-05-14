@@ -88,7 +88,7 @@ setup(
 #    scripts = ['scripts/dosomthing'],
     zip_safe = False,
     setup_requires = [],
-    install_requires = ['distribute', 'cffi>=0.7.2'],
+    install_requires = ['cffi>=0.7.2'],
     tests_require = ['tox', 'pytest', 'pytest-cov'],
     cmdclass = {'test': PyTest},
     ext_package = name,
