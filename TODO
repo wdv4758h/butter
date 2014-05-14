@@ -1,0 +1,1 @@
+look at fanotify and inotify args and ensure they are in a 'sane' order and have 'sane' defaults (eg why is flags not set to 0 by default?)
