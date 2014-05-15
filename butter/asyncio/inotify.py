@@ -99,6 +99,9 @@ class Inotify:
             # case a subclass has logic that must run (e.g. JoinableQueue).
             self._put(item)
             getter.set_result(self._get())
+        elif self._maxsize > 0 and self._maxsize == self.qsize():
+            self.loop.remove_reader(self._fd)
+            raise QueueFull
         else:
             # No listeners so queue up the data and stop 
             # listening for events on the FD
