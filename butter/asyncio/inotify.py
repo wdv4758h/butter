@@ -1,6 +1,8 @@
 #!/usr/bih/env python
 from butter.inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
+from butter.utils import get_buffered_length
 from collections import deque
+from os import read
 from os import O_RDONLY
 import asyncio
 
@@ -69,25 +71,22 @@ class Inotify:
     def _put(self, item):
         self._events.append(item)
 
-    def _put_event(self, event=None):
+    def _read_event(self):
+        buf_len = get_buffered_length(self._fd)
+        raw_events = read(self._fd, buf_len)
+                
+        events = str_to_events(raw_events)
+
+        for event in events:
+            self._put_event(event)
+
+        
+    def _put_event(self, event):
         """Put an item into the queue without blocking.
 
         If no free slot is immediately available, raise QueueFull.
         """
-        from os import read as _read
-        from butter.utils import get_buffered_length as _get_buffered_length
-        
-        buf_len = _get_buffered_length(self._fd)
-        assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
-        raw_events = _read(self._fd, buf_len)
-                
-        events = str_to_events(raw_events)
-        item = events[0]
-
-        self._events += events
-
-        if self._maxsize > 0 and self._maxsize == self.qsize():
-            raise QueueFull
+        self._event.append(event)
         
         self._consume_done_getters()
         if self._getters:
