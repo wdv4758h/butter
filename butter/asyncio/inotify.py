@@ -77,7 +77,6 @@ class Inotify:
 
         for event in events:
             self._put_event(event)
-
         
     def _put_event(self, event):
         """Put an item into the queue without blocking.
