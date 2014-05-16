@@ -1,1 +1,2 @@
 look at fanotify and inotify args and ensure they are in a 'sane' order and have 'sane' defaults (eg why is flags not set to 0 by default?)
+Make close on exec the default for all 'fd' operations to be in line with python 3.4
