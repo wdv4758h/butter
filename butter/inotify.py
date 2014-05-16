@@ -10,6 +10,7 @@ from os import read as _read
 from cffi import FFI as _FFI
 import errno as _errno
 
+
 _ffi = _FFI()
 _ffi.cdef("""
 /*
@@ -422,6 +423,15 @@ for key, value in _C.__dict__.items():
 # -_- <(This never happened, what you just saw was light reflecting off Venus)
 del l
 del key, value # python 2.x has vars escape from the scope of the loop, clean this up
+
+# import asyncio code if avalible
+# must be done here as otherwise the module's dict
+# does not have the required functions defined yet
+# as it is a circular import
+import platform
+if platform.python_version_tuple() >= ('3', '4', '0'):
+    from .asyncio.inotify import Inotify as Inotify_Async
+
 
 def main():
     import sys

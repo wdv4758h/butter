@@ -1,6 +1,6 @@
 #!/usr/bih/env python
-from butter.inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
-from butter.utils import get_buffered_length
+from ..inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
+from ..utils import get_buffered_length
 from collections import deque
 from os import read
 from os import O_RDONLY
