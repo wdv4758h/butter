@@ -33,7 +33,7 @@ class Inotify:
         if self._events:
             return self._get()
         else:
-            self._loop.add_reader(self._fd, self._put_event)
+            self._loop.add_reader(self._fd, self._read_event)
 
             waiter = asyncio.Future(loop=self._loop)
 
@@ -86,18 +86,15 @@ class Inotify:
 
         If no free slot is immediately available, raise QueueFull.
         """
-        self._event.append(event)
-        
         self._consume_done_getters()
         if self._getters:
-            assert not self._events, (
-                'queue non-empty, why are getters waiting?')
+            assert not self._events, ('queue non-empty, why are getters waiting?')
 
             getter = self._getters.popleft()
 
             # Use _put and _get instead of passing item straight to getter, in
             # case a subclass has logic that must run (e.g. JoinableQueue).
-            self._put(item)
+            self._put(event)
             getter.set_result(self._get())
         elif self._maxsize > 0 and self._maxsize == self.qsize():
             self.loop.remove_reader(self._fd)
@@ -105,8 +102,8 @@ class Inotify:
         else:
             # No listeners so queue up the data and stop 
             # listening for events on the FD
-            self._put(item)
-            self.loop.remove_reader(self._fd)
+            self._put(event)
+            self._loop.remove_reader(self._fd)
     
 
     def qsize(self):
