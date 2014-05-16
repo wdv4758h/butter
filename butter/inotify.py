@@ -430,7 +430,7 @@ del key, value # python 2.x has vars escape from the scope of the loop, clean th
 # as it is a circular import
 import platform
 if platform.python_version_tuple() >= ('3', '4', '0'):
-    from .asyncio.inotify import Inotify as Inotify_Async
+    from .asyncio.inotify import Inotify as Inotify_async
 
 
 def main():
