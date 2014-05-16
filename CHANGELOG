@@ -9,7 +9,7 @@ butter (0.8-1) stable; urgency=low
   * AsyncIO support for inotify on supported platforms
   * AsyncIO support for fanotify on supported platforms
    
- -- Da_Blitz <code@pocketnix.org>  Tue, 16 Mar 2014 22:04:43 +1000
+ -- Da_Blitz <code@pocketnix.org>  Tue, 17 May 2014 01:10:43 +1000
 
 butter (0.7-1) stable; urgency=low
   [ Da_Blitz ]
