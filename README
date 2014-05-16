@@ -8,9 +8,9 @@ derivatives or writing server code
 
 Whats Available
 ----------------
- * inotify (Complete support)
+ * inotify (Complete support, includes asyncio support)
  * seccomp (Limited support)
- * fanotify (Limited support)
+ * fanotify (Limited support, includes asyncio support)
  * splice
  * tee
  * vmsplice
@@ -38,6 +38,7 @@ Supported Python
 Butter currently supported the following python interpreters
 
 * pypy (2.7 and 3.2 python implementations)
+* cpython 3.4 (required for asyncio support)
 * cpython 3.x
 * cpython 2.7
 
@@ -60,3 +61,14 @@ functionality
 
  * read_event:  Return a single event
  * read_events: Return all cached events OR read all events from the kernel
+
+AsyncIO
+++++++++
+Some syscalls (ones that deal with fd's) have been made to work with the 
+asyncio framework that baecame avalible in python3.4. The asyncio enabled
+object is named after the normal Event-like object equivlent with '_async'
+after it, eg Inotify => Inotify_async. These asyncio Eventlike objects are
+designed to act and behave like the asyncio.Queue object without the ability
+to write events to the queue (ie they can only be read from and events are
+injected from the fd as required)
+
