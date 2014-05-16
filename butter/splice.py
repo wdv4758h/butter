@@ -98,7 +98,7 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
         elif err == _errno.ESPIPE:
             raise OSError("offset specified but one of the fds is a pipe")
         elif err == _errno.ENOMEM:
-            raise MemoryError("Insufficent kernel memory avalible")
+            raise MemoryError("Insufficent kernel memory available")
         elif err == _errno.EAGAIN:
             raise IOError("No writers on fd_in or a fd is open in BLOCKING mode and NON_BLOCK specified to splice()")
         else:
@@ -146,7 +146,7 @@ def tee(fd_in, fd_out, len=0, flags=0):
         if err == _errno.EINVAL:
             raise ValueError("fd_in or fd_out are not a pipe or refer to the same pipe")
         elif err == _errno.ENOMEM:
-            raise MemoryError("Insufficent kernel memory avalible")
+            raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
@@ -198,7 +198,7 @@ def vmsplice(fd, vec, flags=0):
         if err == _errno.EINVAL:
             raise ValueError("nr_segs is 0 or greater than IOV_MAX; or memory not aligned if SPLICE_F_GIFT set")
         elif err == _errno.ENOMEM:
-            raise MemoryError("Insufficent kernel memory avalible")
+            raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
