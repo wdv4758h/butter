@@ -41,7 +41,6 @@ class Inotify:
 
             return (yield from waiter)
 
-
     def get_event_nowait(self):
         """Remove and return an item from the queue.
 
@@ -53,12 +52,10 @@ class Inotify:
         else:
             raise QueueEmpty
 
-
     @property
     def maxsize(self):
         """Number of items allowed in the queue."""
         return self._maxsize
-
 
     def _consume_done_getters(self):
         # Delete waiters at the head of the get() queue who've timed out.
@@ -72,6 +69,7 @@ class Inotify:
         self._events.append(item)
 
     def _read_event(self):
+        """Read an event from the inotify fd and place it in the queue"""
         buf_len = get_buffered_length(self._fd)
         raw_events = read(self._fd, buf_len)
                 
@@ -104,20 +102,30 @@ class Inotify:
             # listening for events on the FD
             self._put(event)
             self._loop.remove_reader(self._fd)
-    
 
     def qsize(self):
+        """Returns the current size of the Queue
+        
+        Returns
+        --------
+        int: The current length of the queue
+        """
         return len(self._events)
         
 
 def watcher(loop):
     inotify = Inotify(loop=loop)
-    inotify.watch('/tmp', IN_ALL_EVENTS)
+    wd = inotify.watch('/tmp', IN_ALL_EVENTS)
 
-    while True:
+    for i in range(5):
         event = yield from inotify.get_event()
         print(event)
 
+    inotify.ignore(wd)
+    print('done')
+
+    event = yield from inotify.get_event()
+    print(event)
 
 
 def main():
