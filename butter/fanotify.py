@@ -247,7 +247,7 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
         elif err == _errno.EBADF:
             raise OSError("fd does not exist or was of the incorrect type")
         elif err == _errno.ENOENT:
-            raise OSError("DIrectory is invalid of directory/mount not marked")
+            raise OSError("Directory is invalid of directory/mount not marked")
         elif err == _errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory avalible")
         elif err == _errno.ENOSPC:
