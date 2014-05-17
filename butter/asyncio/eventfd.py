@@ -1,5 +1,5 @@
 #!/usr/bih/env python
-from os import read as _read, write as _write
+from os import read as _read, write as _write, close as _close
 from ..eventfd import eventfd, _ffi
 from collections import deque
 import asyncio
@@ -67,6 +67,8 @@ class Eventfd:
 
         self._value = value
 
+    def close(self):
+        _close(self._fd)
 
 def watcher(loop):
     ev = Eventfd(10)

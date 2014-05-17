@@ -2,7 +2,7 @@
 from ..inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
 from ..utils import get_buffered_length
 from collections import deque
-from os import read
+from os import read, close
 from os import O_RDONLY
 import asyncio
 
@@ -111,6 +111,8 @@ class Inotify:
         """
         return len(self._events)
         
+    def close(self):
+        close(self._fd)
 
 def watcher(loop):
     inotify = Inotify(loop=loop)

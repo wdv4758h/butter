@@ -3,7 +3,7 @@ from ..fanotify import FAN_MARK_ADD, FAN_MARK_REMOVE, FAN_CLASS_NOTIF
 from ..fanotify import fanotify_init, fanotify_mark, str_to_events
 from ..utils import get_buffered_length
 from collections import deque
-from os import read
+from os import read, close
 from os import O_RDONLY
 import asyncio
 
@@ -113,7 +113,9 @@ class Fanotify:
         int: The current length of the queue
         """
         return len(self._events)
-        
+    
+    def close(self):
+        close(self._fd)
 
 def watcher(loop):
     from ..fanotify import FAN_MODIFY, FAN_ONDIR, FAN_ACCESS, FAN_EVENT_ON_CHILD, FAN_OPEN, FAN_CLOSE

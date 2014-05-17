@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-from os import write as _write, read as _read
+from os import write as _write, read as _read, close as _close
 from cffi import FFI as _FFI
 import errno as _errno
 
@@ -117,6 +117,8 @@ class Eventfd(object):
     def __int__(self):
         return self.read()
 
+    def close(self):
+        _close(self._fd)
 
 def _main():
     ev = Eventfd(30)
