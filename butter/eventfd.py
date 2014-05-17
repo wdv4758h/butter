@@ -5,7 +5,6 @@ from __future__ import print_function
 
 from os import write as _write, read as _read
 from cffi import FFI as _FFI
-from array import array
 import errno as _errno
 
 _ffi = _FFI()
