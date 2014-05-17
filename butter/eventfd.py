@@ -21,10 +21,6 @@ int eventfd(unsigned int initval, int flags);
 _C = _ffi.verify("""
 #include <sys/eventfd.h>
 #include <stdint.h> /* Definition of uint64_t */
-
-uint64_t get_int(char * buffer) {
-    
-}
 """, libraries=[])
 
 def eventfd(inital_value=0, flags=0):
