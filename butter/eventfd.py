@@ -13,8 +13,6 @@ _ffi.cdef("""
 #define EFD_NONBLOCK ...
 #define EFD_SEMAPHORE ...
 
-typedef uint64_t eventfd_t;
-
 int eventfd(unsigned int initval, int flags);
 """)
 
