@@ -2,6 +2,9 @@ butter (0.9-1) stable; urgency=low
   [ Da_Blitz ]
   * Add eventfd support
   * Add eventfd asyncio support
+  * asyncio objects now have a close() method
+  * eventfd now has a close() method
+  * eventfd now has a fileno() method
    
  -- Da_Blitz <code@pocketnix.org>  Tue, 17 May 2014 01:10:43 +1000
 

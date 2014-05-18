@@ -120,6 +120,9 @@ class Eventfd(object):
     def close(self):
         _close(self._fd)
 
+    def fileno(self):
+        return self._fd
+
 def _main():
     ev = Eventfd(30)
     
