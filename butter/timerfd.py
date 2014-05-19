@@ -483,8 +483,8 @@ def _main():
 # does not have the required functions defined yet
 # as it is a circular import
 import platform
-#if platform.python_version_tuple() >= ('3', '4', '0'):
-#    from .asyncio.eventfd import Eventfd as Eventfd_async
+if platform.python_version_tuple() >= ('3', '4', '0'):
+    from .asyncio.timerfd import Timerfd as Timerfd_async
     
 if __name__ == "__main__":
     _main()
