@@ -198,34 +198,54 @@ def timerfd_settime(fd, timer_spec, flags=0):
     return old_timer_spec
 
 class TimerSpec(object):
-    def __init__(self, reoccuring=None, reoccuring_sec=None, reoccuring_nano=None, 
-                       one_off=None, one_off_sec=None, one_off_nano=None,
+    """Thin wrapper around the itimerspec c struct providing convience methods"""
+    def __init__(self, reoccuring=None, reoccuring_seconds=None, reoccuring_nano_seconds=None, 
+                       one_off=None, one_off_seconds=None, one_off_nano_seconds=None,
                        timerspec=None):
-   
+        """Friendly wrapper around a c struct
+        
+        If setting a raw timerspec via the timerspec field then the reoccuring and one_off fields
+        can still be used to customise the timerspec object in one go
+        
+        Arguments
+        ----------
+        :param int reoccuring: set the reoccuring interval
+        :param int reoccuring_seconds: set the reoccuring intervals seconds field
+        :param int reoccuring_nano_seconds: set the reoccuring intervals nano seconds field
+        :param int one_off: set a one off interval
+        :param int one_off_seconds: set a one off intervals seconds field
+        :param int one_off_nanon_seconds: set a one off intervals nano seconds field
+        :param int timerspec: set the timerspec to an exisiting timerspec
+        """
+        self._timerspec = _ffi.new('struct itimerspec *')
+        # cheap clone (this is harder than it appears at fist glance)
         if timerspec:
-            self._timerspec = timerspec
-        else:
-            self._timerspec = _ffi.new('struct itimerspec *')
+            self._timerspec.it_interval.tv_sec = timerspec.it_interval.tv_sec
+            self._timerspec.it_interval.tv_nsec = timerspec.it_interval.tv_nsec
+            self._timerspec.it_value.tv_sec = timerspec.it_value.tv_sec
+            self._timerspec.it_value.tv_nsec = timerspec.it_value.tv_nsec
             
         if reoccuring:
             self.reoccuring = reoccuring
-        if reoccuring_sec:
-            self.reoccuring_sec = reoccuring_sec
-        if reoccuring_nano:
-            self.reoccuring_nano = reoccuring_nano
+        if reoccuring_seconds:
+            self.reoccuring_seconds = reoccuring_sec
+        if reoccuring_nano_seconds:
+            self.reoccuring_nano_seconds = reoccuring_nano
         if one_off:
             self.one_off = one_off
-        if one_off_sec:
-            self.one_off_sec = one_off_sec
-        if one_off_nano:
-            self.one_off_nano = one_off_nano
+        if one_off_seconds:
+            self.one_off_seconds = one_off_sec
+        if one_off_nano_seconds:
+            self.one_off_nano_seconds = one_off_nano
     
     @property
     def reoccuring(self):
+        """The interval for reoccuring events in seconds as a float"""
         return self.reoccuring_sec + (self.reoccuring_nano / 1000000000)
         
     @reoccuring.setter
     def reoccuring(self, val):
+        """The interval for reoccuring events in seconds as a float"""
         if isinstance(val, float):
             x, y = _math.modf(val)
             sec = int(y)
@@ -234,31 +254,37 @@ class TimerSpec(object):
             sec = val
             nano = 0
         
-        self.reoccuring_sec = sec
-        self.reoccuring_nano = nano
+        self.reoccuring_seconds = sec
+        self.reoccuring_nano_seconds = nano
     
     @property
-    def reoccuring_sec(self):
+    def reoccuring_seconds(self):
+        """Seconds part of a reoccuring event as an integer"""
         return self._timerspec.it_interval.tv_sec
         
-    @reoccuring_sec.setter
-    def reoccuring_sec(self, val):
+    @reoccuring_seconds.setter
+    def reoccuring_seconds(self, val):
+        """Seconds part of a reoccuring event as an integer"""
         self._timerspec.it_interval.tv_sec = val
 
     @property
-    def reoccuring_nano(self):
+    def reoccuring_nano_seconds(self):
+        """Nano seconds part of a reoccuring event as an integer"""
         return self._timerspec.it_interval.tv_nsec
     
-    @reoccuring_nano.setter
-    def reoccuring_nano(self, val):
+    @reoccuring_nano_seconds.setter
+    def reoccuring_nano_seconds(self, val):
+        """Nano seconds part of a reoccuring event as an integer"""
         self._timerspec.it_interval.tv_nsec = val
 
     @property
     def one_off(self):
+        """The interval for a one off event in seconds as a float"""
         return self.one_off_sec + (self.one_off_nano / 1000000000)
         
     @one_off.setter
     def one_off(self, val):
+        """The interval for a one off event in seconds as a float"""
         if isinstance(val, float):
             x, y = _math.modf(val)
             sec = int(y)
@@ -267,38 +293,64 @@ class TimerSpec(object):
             sec = val
             nano = 0
         
-        self.one_off_sec = sec
-        self.one_off_nano = nano
+        self.one_off_seconds = sec
+        self.one_off_nano_seconds = nano
 
     @property
-    def one_off_sec(self):
+    def one_off_seconds(self):
+        """Seconds part of a one off event as an integer"""
         return self._timerspec.it_value.tv_sec
         
-    @one_off_sec.setter
-    def one_off_sec(self, val):
+    @one_off_seconds.setter
+    def one_off_seconds(self, val):
+        """Seconds part of a one off event as an integer"""
         self._timerspec.it_value.tv_sec = val
 
     @property
-    def one_off_nano(self):
+    def one_off_nano_seconds(self):
+        """Nano seconds part of a one off event as an integer"""
         return self._timerspec.it_value.tv_nsec
     
-    @one_off_nano.setter
-    def one_off_nano(self, val):
+    @one_off_nano_seconds.setter
+    def one_off_nano_seconds(self, val):
+        """Nano seconds part of a one off event as an integer"""
         self._timerspec.it_value.tv_nsec = val
     
     def __timerspec__(self):
         return self._timerspec
     
     def __bool__(self):
-        return False is self.one_off == 0.0 else True
+        return False if self.one_off == 0.0 else True
     
     @property
     def enabled(self):
+        """Will this timer fire if used?, returns a bool"""
         return bool(self)
     
     @property
     def disabled(self):
+        """Will this timer not fire if used?, returns a bool"""
         return not self.enabled
+
+    def disable(self):
+        """Disable the timer in this timespec"""
+        self.one_off = 0.0
+    
+    @property
+    def next_event(self):
+        """Convenience accessor for results returned by timerfd_gettime"""
+        return self.one_off
+
+    @property
+    def next_event_seconds(self):
+        """Convenience accessor for results returned by timerfd_gettime"""
+        return self.one_off_seconds
+        
+    @property
+    def next_event_nano_seconds(self):
+        """Convenience accessor for results returned by timerfd_gettime"""
+        return self.one_off_nano_seconds
+    
 
 TFD_CLOEXEC = _C.TFD_CLOEXEC
 TFD_NONBLOCK = _C.TFD_NONBLOCK
@@ -323,39 +375,45 @@ class Timerfd(object):
         TFD_CLOEXEC: Close the timerfd when executing a new program
         TFD_NONBLOCK: Open the socket in non-blocking mode
         """
-        self._fd = timerfd_create(clock_type, flags)
+        self._fd = timerfd(clock_type, flags)
         self._timerspec = TimerSpec()
     
-    def set_one_off(self, seconds, nano_seconds=None, absolute=False, update=True):
-        self._timerspec.one_off = seconds
-        if nano_seconds:
-            self._timerspec.one_off_nano = nano_seconds
+    def set_one_off(self, seconds, nano_seconds=0, absolute=False):
+        timer = TimerSpec()
+        timer.one_off = seconds
+        timer.one_off = nano_seconds
         
-        old_val = None
-        if update:
-            old_val = self._update(absolute=absolute)
+        old_val = self._update(timer, absolute=absolute)
         
         return old_val
         
-    def set_reoccuring(self, seconds, nano_seconds=None, absolute=False):
-        self._timerspec.reoccuring = seconds
-        if nano_seconds:
-            self._timerspec.reoccuring_nano = seconds
+    def set_reoccuring(self, seconds, nano_seconds=0, 
+                             next_seconds=0, next_nano_seconds=0,
+                             absolute=False):
+        timer = TimerSpec()
+        # set nano seconds first, if seconds is a float it
+        # will get overidden. this was we dont need any
+        # if conditionals/guards
+        timer.reoccuring_nano = nano_seconds
+        timer.reoccuring = seconds
         
-        # prime the timer with the same val
-        self.set_one_off(seconds, nano_seconds, update=update)
+        if next_seconds or next_nano_seconds:
+            timer.one_off = next_nano_seconds
+            timer.one_off = next_seconds
+        else:
+            timer.one_off = nano_seconds
+            timer.one_off = seconds
 
-        old_val = None
-        # Allow disabling of the update function in case we wish
-        # to set the inital period to somthign diffrent
-        if update:
-            old_val = self._update(absolute=absolute)
+        old_val = self._update(timer, absolute=absolute)
         
         return old_val
 
-    def _update(self, absolute=False):
+    def get_current(self):
+        return timerfd_gettime(self._fd)
+
+    def _update(self, timerspec, absolute=False):
         flags = TFD_TIMER_ABSTIME if absolute else 0
-        old_timer = timerfd_settime(self._fd, self._timerspec, flags)
+        old_timer = timerfd_settime(self._fd, timerspec, flags)
         
         return old_timer
     
@@ -367,7 +425,7 @@ class Timerfd(object):
         :return: The amount of timerfd events that have fired since the last read()
         :rtype: int
         """
-        select([self._fd], [], [])
+        _select([self._fd], [], [])
         
         data = _read(self._fd, 8)
         value = _ffi.new('uint64_t[1]')
@@ -383,28 +441,34 @@ class Timerfd(object):
 
     @property
     def enabled(self):
-        return self.timer_val.enabled
-
-    @enabled.setter
-    def enabled(self, val):
-        assert isinstance(val, bool), "enabled() requires a boolean"
-        self.timer_val.enabled = val
-        
-        self._update()
+        return self.get_current().enabled
 
     @property
     def disabled(self):
         return not self.enabled
 
-    @disabled.setter
-    def disabled(self, val):
-        assert isinstance(val, bool), "disabled() requires a boolean"
-        self.timer_val.disabled = val
+    def disable(self):
+        timer = self.get_current()
+        timer.disable()
 
-        self._update()
+        self._update(timer)
 
 def _main():
-    pass
+    from time import time
+    t = Timerfd()
+    
+    time_val = 0.5
+    t.set_reoccuring(time_val)
+    print("Setting time interval to {:.2f} seconds".format(time_val))
+    
+    for i in range(5):
+        old_time = time()
+        num_events = t.wait()
+        new_time = time()
+        assert num_events == 1, "Too many events"
+        print("Woke up after {:.2f} seconds".format(new_time - old_time))
+        
+    print("Got all 5 events")
         
 # import asyncio code if avalible
 # must be done here as otherwise the module's dict
