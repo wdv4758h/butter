@@ -241,7 +241,7 @@ class TimerSpec(object):
     @property
     def reoccuring(self):
         """The interval for reoccuring events in seconds as a float"""
-        return self.reoccuring_sec + (self.reoccuring_nano / 1000000000)
+        return self.reoccuring_seconds + (self.reoccuring_nano_seconds / 1000000000)
         
     @reoccuring.setter
     def reoccuring(self, val):
@@ -280,7 +280,7 @@ class TimerSpec(object):
     @property
     def one_off(self):
         """The interval for a one off event in seconds as a float"""
-        return self.one_off_sec + (self.one_off_nano / 1000000000)
+        return self.one_off_seconds + (self.one_off_nano_seconds / 1000000000)
         
     @one_off.setter
     def one_off(self, val):
@@ -457,7 +457,7 @@ class Timerfd(object):
         self._update(timer)
 
 def _main():
-    from time import time
+    from time import time, sleep
     t = Timerfd()
     
     time_val = 0.5
@@ -473,6 +473,8 @@ def _main():
         
     print("Got all 5 events")
     
+    print("Sleeping for 0.3s")
+    sleep(0.3)
     print("Next event:", t.get_current())
     
     
