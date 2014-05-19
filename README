@@ -22,6 +22,7 @@ Whats Available
  * getpid (bypasses glibc caching)
  * getppid (bypasses glibc caching)
  * eventfd (includes asyncio support)
+ * timerfd (includes asyncio support)
 
 Whats Coming
 -------------
@@ -29,7 +30,6 @@ Most of these exist in v0.2 as ctypes code. these are currently being rewritten
 to use cffi for speed and compatibility with pypy
 
  * signalfd
- * timerfd
  * posix/linux aio (scatter/gather read writes with a completion based API 
    instead of a 'ready' based interface, eg similar to IOCP on windows)
 
