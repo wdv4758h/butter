@@ -351,6 +351,9 @@ class TimerSpec(object):
         """Convenience accessor for results returned by timerfd_gettime"""
         return self.one_off_nano_seconds
     
+    def __repr__(self):
+        return "<{} next={}s reoccuring={}s>".format(self.__class__.__name__, self.next_event, self.reoccuring)
+    
 
 TFD_CLOEXEC = _C.TFD_CLOEXEC
 TFD_NONBLOCK = _C.TFD_NONBLOCK
@@ -469,7 +472,10 @@ def _main():
         print("Woke up after {:.2f} seconds".format(new_time - old_time))
         
     print("Got all 5 events")
-        
+    
+    print("Next event:", t.get_current())
+    
+    
 # import asyncio code if avalible
 # must be done here as otherwise the module's dict
 # does not have the required functions defined yet
