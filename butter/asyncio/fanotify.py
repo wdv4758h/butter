@@ -1,18 +1,11 @@
 #!/usr/bih/env python
+from ..fanotify import FAN_MARK_ADD, FAN_MARK_REMOVE, FAN_CLASS_NOTIF
+from ..fanotify import fanotify_init, fanotify_mark, str_to_events
 from ..utils import get_buffered_length
 from collections import deque
 from os import read, close
 from os import O_RDONLY
 import asyncio
-
-
-# As we have a circular import and module code
-# may be run twice, make sure there is a dummy token
-# to import
-# yes this is a bad hack
-Fanotify = None
-from ..fanotify import FAN_MARK_ADD, FAN_MARK_REMOVE, FAN_CLASS_NOTIF
-from ..fanotify import fanotify_init, fanotify_mark, str_to_events
 
 
 class Fanotify:

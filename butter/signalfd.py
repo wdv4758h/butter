@@ -208,13 +208,6 @@ def _main():
     else:
         print("Bomb not set up")
     
-# import asyncio code if avalible
-# must be done here as otherwise the module's dict
-# does not have the required functions defined yet
-# as it is a circular import
-#import platform
-#if platform.python_version_tuple() >= ('3', '4', '0'):
-#    from .asyncio.eventfd import Eventfd as Eventfd_async
     
 if __name__ == "__main__":
     _main()

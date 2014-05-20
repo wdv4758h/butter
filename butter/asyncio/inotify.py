@@ -1,4 +1,5 @@
 #!/usr/bih/env python
+from ..inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
 from ..utils import get_buffered_length
 from collections import deque
 from os import read, close
@@ -142,13 +143,6 @@ def main():
     
     loop.run_forever()
     
-
-# As we have a circular import and module code
-# may be run twice, delay the circular import
-# until all the required tokens are actually there
-# (in this case Inotifyfd)
-# yes this is a bad hack
-from ..inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
 
 if __name__ == "__main__":
     main()

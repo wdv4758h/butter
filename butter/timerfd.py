@@ -480,13 +480,5 @@ def _main():
     print("Next event:", t.get_current())
     
     
-# import asyncio code if avalible
-# must be done here as otherwise the module's dict
-# does not have the required functions defined yet
-# as it is a circular import
-import platform
-if platform.python_version_tuple() >= ('3', '4', '0'):
-    from .asyncio.timerfd import Timerfd as Timerfd_async
-    
 if __name__ == "__main__":
     _main()
