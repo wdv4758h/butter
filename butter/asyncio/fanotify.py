@@ -1,30 +1,28 @@
 #!/usr/bih/env python
-from ..fanotify import FAN_MARK_ADD, FAN_MARK_REMOVE, FAN_CLASS_NOTIF
-from ..fanotify import fanotify_init, fanotify_mark, str_to_events
-from ..utils import get_buffered_length
-from collections import deque
-from os import read, close
-from os import O_RDONLY
-import asyncio
+from ..fanotify import FAN_CLASS_NOTIF as _FAN_CLASS_NOTIF
+from ..fanotify import Fanotify as _Fanotify
+from collections import deque as _deque
+from os import O_RDONLY as _O_RDONLY
+import asyncio as _asyncio
 
-
-class Fanotify:
-    def __init__(self, flags=FAN_CLASS_NOTIF, event_flags=O_RDONLY, *, loop=None, maxsize=0):
-        self._loop = loop or asyncio.get_event_loop()
+class Fanotify_async:
+    def __init__(self, flags=_FAN_CLASS_NOTIF, event_flags=_O_RDONLY, *, loop=None, maxsize=0):
+        self._loop = loop or _asyncio.get_event_loop()
         self._maxsize = maxsize
-        self._fd = fanotify_init(flags, event_flags)
-        self._getters = deque()
-        self._events = deque()
+
+        self._fanotify = fanotify = _Fanotify(flags, event_flags)
+        self._fd = fanotify.fileno()
+
+        self._getters = _deque()
+        self._events = _deque()
         
     def watch(self, path, event_mask, flags=0, dfd=0):
-        flags |= FAN_MARK_ADD
-        fanotify_mark(self._fd, flags, event_mask, path, dfd)
+        self._fanotify.watch(flags, event_mask, path, dfd)
 
     def ignore(self, path, event_mask, flags=0, dfd=0):
-        flags |= FAN_MARK_REMOVE
-        fanotify_mark(self._fd, flags, event_mask, path, dfd)
+        self._fanotify.ignore(flags, event_mask, path, dfd)
          
-    @asyncio.coroutine
+    @_asyncio.coroutine
     def get_event(self):
         """Remove and return an item from the queue.
 
@@ -38,7 +36,7 @@ class Fanotify:
         else:
             self._loop.add_reader(self._fd, self._read_event)
 
-            waiter = asyncio.Future(loop=self._loop)
+            waiter = _asyncio.Future(loop=self._loop)
 
             self._getters.append(waiter)
 
@@ -73,12 +71,7 @@ class Fanotify:
 
     def _read_event(self):
         """Read an event from the inotify fd and place it in the queue"""
-        buf_len = get_buffered_length(self._fd)
-        raw_events = read(self._fd, buf_len)
-                
-        events = str_to_events(raw_events)
-
-        for event in events:
+        for event in self._fanotify.read_events():
             self._put_event(event)
         
     def _put_event(self, event):
@@ -117,10 +110,10 @@ class Fanotify:
     def close(self):
         close(self._fd)
 
-def watcher(loop):
+def _watcher(loop):
     from ..fanotify import FAN_MODIFY, FAN_ONDIR, FAN_ACCESS, FAN_EVENT_ON_CHILD, FAN_OPEN, FAN_CLOSE
     
-    fanotify = Fanotify(loop=loop)
+    fanotify = Fanotify_async(loop=loop)
     event_mask = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
     wd = fanotify.watch('/tmp', event_mask)
 
@@ -137,8 +130,9 @@ def watcher(loop):
     event.close()
 
 
-def main():
+def _main():
     import logging
+    import asyncio
     
     log = logging.getLogger()
     log.setLevel(logging.DEBUG)
@@ -147,10 +141,10 @@ def main():
     loop = asyncio.get_event_loop()
     
     from asyncio import Task
-    task = Task(watcher(loop))
+    task = Task(_watcher(loop))
     
     loop.run_forever()
     
 
 if __name__ == "__main__":
-    main()
+    _main()
