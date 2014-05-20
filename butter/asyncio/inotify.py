@@ -1,27 +1,27 @@
 #!/usr/bih/env python
-from ..inotify import inotify_init, inotify_add_watch, inotify_rm_watch, str_to_events, IN_ALL_EVENTS
-from ..utils import get_buffered_length
-from collections import deque
-from os import read, close
-from os import O_RDONLY
-import asyncio
+from ..inotify import Inotify as _Inotify
+from collections import deque as _deque
+import asyncio as _asyncio
 
 
-class Inotify:
+class Inotify_async:
     def __init__(self, flags=0, *, loop=None, maxsize=0):
-        self._loop = loop or asyncio.get_event_loop()
+        self._loop = loop or _asyncio.get_event_loop()
         self._maxsize = maxsize
-        self._fd = inotify_init(flags)
-        self._getters = deque()
-        self._events = deque()
+        
+        self._inotify = inotify = _Inotify()
+        self._fd = inotify.fileno()
+        
+        self._getters = _deque()
+        self._events = _deque()
         
     def watch(self, path, mask):
-        return inotify_add_watch(self._fd, path, mask)
+        return self._inotify.watch(path, mask)
 
     def ignore(self, wd):
-        inotify_rm_watch(self._fd, wd)
+        inotify.ignore(wd)
          
-    @asyncio.coroutine
+    @_asyncio.coroutine
     def get_event(self):
         """Remove and return an item from the queue.
 
@@ -35,7 +35,7 @@ class Inotify:
         else:
             self._loop.add_reader(self._fd, self._read_event)
 
-            waiter = asyncio.Future(loop=self._loop)
+            waiter = _asyncio.Future(loop=self._loop)
 
             self._getters.append(waiter)
 
@@ -70,12 +70,7 @@ class Inotify:
 
     def _read_event(self):
         """Read an event from the inotify fd and place it in the queue"""
-        buf_len = get_buffered_length(self._fd)
-        raw_events = read(self._fd, buf_len)
-                
-        events = str_to_events(raw_events)
-
-        for event in events:
+        for event in self._inotify.read_events():
             self._put_event(event)
         
     def _put_event(self, event):
@@ -112,10 +107,12 @@ class Inotify:
         return len(self._events)
         
     def close(self):
-        close(self._fd)
+        self._inotify.close()
 
-def watcher(loop):
-    inotify = Inotify(loop=loop)
+def _watcher(loop):
+    from ..inotify import IN_ALL_EVENTS
+    
+    inotify = Inotify_async(loop=loop)
     wd = inotify.watch('/tmp', IN_ALL_EVENTS)
 
     for i in range(5):
@@ -129,8 +126,9 @@ def watcher(loop):
     print(event)
 
 
-def main():
+def _main():
     import logging
+    import asyncio
     
     log = logging.getLogger()
     log.setLevel(logging.DEBUG)
@@ -139,10 +137,10 @@ def main():
     loop = asyncio.get_event_loop()
     
     from asyncio import Task
-    task = Task(watcher(loop))
+    task = Task(_watcher(loop))
     
     loop.run_forever()
     
 
 if __name__ == "__main__":
-    main()
+    _main()
