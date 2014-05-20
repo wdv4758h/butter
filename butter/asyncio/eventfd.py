@@ -1,15 +1,15 @@
 #!/usr/bih/env python
 from os import read as _read, write as _write, close as _close
-from ..eventfd import eventfd, _ffi
-from collections import deque
-import asyncio
+from ..eventfd import eventfd as _eventfd, _ffi
+from collections import deque as _deque
+import asyncio as _asyncio
 
 
-class Eventfd:
+class Eventfd_async:
     def __init__(self, inital_value=0, flags=0, *, loop=None):
-        self._loop = loop or asyncio.get_event_loop()
-        self._fd = eventfd(inital_value, flags)
-        self._getters = deque()
+        self._loop = loop or _asyncio.get_event_loop()
+        self._fd = _eventfd(inital_value, flags)
+        self._getters = _deque()
         self._value = inital_value
         
     def increment(self, value=1):
@@ -21,7 +21,7 @@ class Eventfd:
         packed_value = _ffi.buffer(packed_value)[:]
         _write(self._fd, packed_value)
 
-    @asyncio.coroutine
+    @_asyncio.coroutine
     def read(self):
         """Read the current value of the counter and zero the counter
 
@@ -32,7 +32,7 @@ class Eventfd:
         """
         self._loop.add_reader(self._fd, self._read_event)
 
-        waiter = asyncio.Future(loop=self._loop)
+        waiter = _asyncio.Future(loop=self._loop)
 
         self._getters.append(waiter)
 
@@ -70,8 +70,8 @@ class Eventfd:
     def close(self):
         _close(self._fd)
 
-def watcher(loop):
-    ev = Eventfd(10)
+def _watcher(loop):
+    ev = Eventfd_async(10)
     print('Waiting read:', (yield from ev.read()))
     ev.increment(2)
     ev.increment(2)
@@ -79,8 +79,9 @@ def watcher(loop):
     print('No wait read:', ev.read_nowait())
     print('done')
 
-def main():
+def _main():
     import logging
+    import asyncio
     
     log = logging.getLogger()
     log.setLevel(logging.DEBUG)
@@ -89,10 +90,10 @@ def main():
     loop = asyncio.get_event_loop()
     
     from asyncio import Task
-    task = Task(watcher(loop))
+    task = Task(_watcher(loop))
     
     loop.run_forever()
     
 
 if __name__ == "__main__":
-    main()
+    _main()
