@@ -262,6 +262,9 @@ class Inotify(object):
         return wd
         
     def del_watch(self, wd):
+        self.ignore(wd)
+
+    def ignore(self, wd):
         inotify_rm_watch(self._fileno, wd)
         
     def fileno(self):
