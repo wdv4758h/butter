@@ -1,8 +1,14 @@
 #!/usr/bih/env python
 from os import read as _read, write as _write, close as _close
-from ..timerfd import Timerfd as orig_Timerfd, _ffi, CLOCK_REALTIME
 from collections import deque
 import asyncio
+
+# As we have a circular import and module code
+# may be run twice, so insert a dummy value
+# to be loaded (and overwritten)
+# yes this is a bad hack
+Timerfd = None
+from ..timerfd import Timerfd as orig_Timerfd, _ffi, CLOCK_REALTIME
 
 
 class Timerfd:
@@ -102,7 +108,7 @@ def main():
     task = Task(watcher(loop))
     
     loop.run_forever()
-    
+
 
 if __name__ == "__main__":
     main()

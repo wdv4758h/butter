@@ -1,6 +1,5 @@
 #!/usr/bih/env python
 from os import read as _read, write as _write, close as _close
-from ..eventfd import eventfd, _ffi
 from collections import deque
 import asyncio
 
@@ -93,6 +92,12 @@ def main():
     
     loop.run_forever()
     
+# As we have a circular import and module code
+# may be run twice, delay the circular import
+# until all the required tokens are actually there
+# (in this case Eventfd)
+# yes this is a bad hack
+from ..eventfd import eventfd, _ffi
 
 if __name__ == "__main__":
     main()
