@@ -104,6 +104,9 @@ class Fanotify(object):
         fanotify_mark(self._fileno, flags, mask, path, dfd)
 
     def del_watch(self, flags, mask, path, dfd=0):
+        self.ignore(flags, mask, path, dfd)
+        
+    def ignore(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_REMOVE
         fanotify_mark(self._fileno, flags, mask, path, dfd)
 
