@@ -439,10 +439,17 @@ class Timerfd(object):
         return value[0]
     
     def close(self):
-        _close(self._fd)
+        if self._fd:
+            _close(self._fd)
+            self._fd = None
+        else:
+            raise ValueError("I/O operation on closed file")
 
     def fileno(self):
-        return self._fd
+        if self._fd:
+            return self._fd
+        else:
+            raise ValueError("I/O operation on closed file")
 
     @property
     def enabled(self):

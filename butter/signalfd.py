@@ -177,10 +177,17 @@ class Signalfd(object):
         return event
     
     def close(self):
-        _close(self._fd)
+        if self._fd:
+            _close(self._fd)
+            self._fd = None
+        else:
+            raise ValueError("I/O operation on closed file")
     
     def fileno(self):
-        return self._fd
+        if self._fd:
+            return self._fd
+        else:
+            raise ValueError("I/O operation on closed file")
         
     def _read_event(self):
         l = _get_buffered_length(self._fd)

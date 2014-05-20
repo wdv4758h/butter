@@ -116,10 +116,17 @@ class Eventfd(object):
         return self.read()
 
     def close(self):
-        _close(self._fd)
+        if self._fb:
+            _close(self._fd)
+            self._fd = None
+        else:
+            raise ValueError("I/O operation on closed file")
 
     def fileno(self):
-        return self._fd
+        if self._fb:
+            return self._fd
+        else:
+            raise ValueError("I/O operation on closed file")
 
 def _main():
     ev = Eventfd(30)

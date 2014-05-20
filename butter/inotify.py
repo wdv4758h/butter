@@ -244,12 +244,11 @@ def str_to_events(str):
 
 class Inotify(object):
     _closed = True
-    _fileno = None
+    _fd = None
     blocking = True
     def __init__(self, flags=0):
         fd = inotify_init(flags)
-        self._closed = True
-        self._fileno = fd
+        self._fd = fd
         
         self._events = []
 
@@ -257,7 +256,7 @@ class Inotify(object):
             self.blocking = false
         
     def watch(self, path, events):
-        wd = inotify_add_watch(self._fileno, path, events)
+        wd = inotify_add_watch(self._fd, path, events)
         
         return wd
         
@@ -265,16 +264,23 @@ class Inotify(object):
         self.ignore(wd)
 
     def ignore(self, wd):
-        inotify_rm_watch(self._fileno, wd)
+        inotify_rm_watch(self._fd, wd)
         
     def fileno(self):
-        return self._fileno
+        if self._fd:
+            return self._fd
+        else:
+            raise ValueError("I/O operation on closed file")
         
     def close(self):
-        os.close(self._fileno)
+        if self._fd:
+            os.close(self._fd)
+            self._fd = None
+        else:
+            raise ValueError("I/O operation on closed file")
         
     def closed(self):
-        return self._closed
+        return False if self._fd else True
         
     def isatty(self):
         return False
@@ -283,7 +289,7 @@ class Inotify(object):
         return "r"
         
     def name(self):
-        return "<inotify fd:{}>".format(self._fileno)
+        return "<inotify fd:{}>".format(self._fd)
         
     def read(self):
         raise NotImplemented
@@ -339,19 +345,19 @@ class Inotify(object):
             
     def _read_events(self):
         if self.blocking:
-            _select([self._fileno], [], [])
-            buf_len = _get_buffered_length(self._fileno)
+            _select([self._fd], [], [])
+            buf_len = _get_buffered_length(self._fd)
         else:
-            buf_len = _get_buffered_length(self._fileno)
+            buf_len = _get_buffered_length(self._fd)
             assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
-        raw_events = _read(self._fileno, buf_len)
+        raw_events = _read(self._fd, buf_len)
 
         events = str_to_events(raw_events)
 
         return events
         
     def __repr__(self):
-        return '<Inotify fd={}>'.format(self._fileno)
+        return '<Inotify fd={}>'.format(self._fd)
 
     def __iter__(self):
         while True:

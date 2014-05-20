@@ -86,13 +86,11 @@ _C = _ffi.verify("""
 """, libraries=[])
 
 class Fanotify(object):
-    _closed = True
-    _fileno = None
+    _fd = None
     blocking = True
     def __init__(self, flags, event_flags=O_RDONLY):
         fd = fanotify_init(flags, event_flags)
-        self._closed = True
-        self._fileno = fd
+        self._fd = fd
 
         self._events = []
 
@@ -101,23 +99,30 @@ class Fanotify(object):
 
     def watch(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_ADD
-        fanotify_mark(self._fileno, flags, mask, path, dfd)
+        fanotify_mark(self._fd, flags, mask, path, dfd)
 
     def del_watch(self, flags, mask, path, dfd=0):
         self.ignore(flags, mask, path, dfd)
         
     def ignore(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_REMOVE
-        fanotify_mark(self._fileno, flags, mask, path, dfd)
+        fanotify_mark(self._fd, flags, mask, path, dfd)
 
     def fileno(self):
-        return self._fileno
+        if self._fd:
+            return self._fd
+        else:
+            raise ValueError("I/O operation on closed file")
 
     def close(self):
-        os.close(self._fileno)
+        if self._fd:
+            os.close(self._fd)
+            self._fd = None
+        else:
+            raise ValueError("I/O operation on closed file")
 
     def closed(self):
-        return self._closed
+        return False if self._fd else True
 
     def isatty(self):
         return False
@@ -126,7 +131,7 @@ class Fanotify(object):
         return "r"
 
     def name(self):
-        return "<fanotify fd:{}>".format(self._fileno)
+        return "<fanotify fd:{}>".format(self._fd)
 
     def read(self):
         raise NotImplemented
@@ -182,19 +187,19 @@ class Fanotify(object):
 
     def _read_events(self):
         if self.blocking:
-            _select([self._fileno], [], [])
-            buf_len = _get_buffered_length(self._fileno)
+            _select([self._fd], [], [])
+            buf_len = _get_buffered_length(self._fd)
         else:
-            buf_len = _get_buffered_length(self._fileno)
+            buf_len = _get_buffered_length(self._fd)
             assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
-        raw_events = _read(self._fileno, buf_len)
+        raw_events = _read(self._fd, buf_len)
 
         events = str_to_events(raw_events)
 
         return events
 
     def __repr__(self):
-        return '<Fanotify fd={}>'.format(self._fileno)
+        return '<Fanotify fd={}>'.format(self._fd)
 
     def __iter__(self):
         while True:
@@ -282,6 +287,7 @@ class FanotifyEvent(object):
         
     def close(self):
         _close(self.fd)
+        self.fd = None
 
     def __repr__(self):
         return "<FanotifyEvent filename={}, version={}, mask=0x{:X}, fd={}, pid={}>".format(
