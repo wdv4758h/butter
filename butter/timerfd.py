@@ -250,6 +250,7 @@ class TimerSpec(object):
             x, y = _math.modf(val)
             sec = int(y)
             nano = round(1000000000 * x)
+            nano = int(nano) # python2.7 workaround (returns float there)
         else:
             sec = val
             nano = 0
@@ -289,6 +290,7 @@ class TimerSpec(object):
             x, y = _math.modf(val)
             sec = int(y)
             nano = round(1000000000 * x)
+            nano = int(nano) # python2.7 workaround (returns float there)
         else:
             sec = val
             nano = 0
