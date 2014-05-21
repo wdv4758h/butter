@@ -4,7 +4,7 @@ from os import read as _read, write as _write, close as _close
 from collections import deque
 import asyncio
 
-class Timerfd:
+class Timerfd_async:
     def __init__(self, clock_type=CLOCK_REALTIME, flags=0, *, loop=None):
         self._loop = loop or asyncio.get_event_loop()
         self._timerfd = orig_Timerfd(clock_type, flags)
