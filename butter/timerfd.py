@@ -422,6 +422,13 @@ class Timerfd(object):
         
         return old_timer
     
+    def _read(self):
+        data = _read(self._fd, 8)
+        value = _ffi.new('uint64_t[1]')
+        _ffi.buffer(value, 8)[0:8] = data
+
+        return value[0]
+
     def wait(self):
         """Wait for the next timer event (ethier one off or periodic)
         
@@ -431,12 +438,8 @@ class Timerfd(object):
         :rtype: int
         """
         _select([self._fd], [], [])
-        
-        data = _read(self._fd, 8)
-        value = _ffi.new('uint64_t[1]')
-        _ffi.buffer(value, 8)[0:8] = data
 
-        return value[0]
+        return self._read()        
     
     def close(self):
         if self._fd:
