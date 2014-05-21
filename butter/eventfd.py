@@ -116,14 +116,14 @@ class Eventfd(object):
         return self.read()
 
     def close(self):
-        if self._fb:
+        if self._fd:
             _close(self._fd)
             self._fd = None
         else:
             raise ValueError("I/O operation on closed file")
 
     def fileno(self):
-        if self._fb:
+        if self._fd:
             return self._fd
         else:
             raise ValueError("I/O operation on closed file")
