@@ -11,7 +11,6 @@ class Fanotify_async:
         self._maxsize = maxsize
 
         self._fanotify = fanotify = _Fanotify(flags, event_flags)
-        self._fd = fanotify.fileno()
 
         self._getters = _deque()
         self._events = _deque()
@@ -34,7 +33,7 @@ class Fanotify_async:
         if self._events:
             return self._get()
         else:
-            self._loop.add_reader(self._fd, self._read_event)
+            self._loop.add_reader(self._fanotify.fileno(), self._read_event)
 
             waiter = _asyncio.Future(loop=self._loop)
 
@@ -90,13 +89,13 @@ class Fanotify_async:
             self._put(event)
             getter.set_result(self._get())
         elif self._maxsize > 0 and self._maxsize == self.qsize():
-            self.loop.remove_reader(self._fd)
+            self.loop.remove_reader(self._fanotify.fileno())
             raise QueueFull
         else:
             # No listeners so queue up the data and stop 
             # listening for events on the FD
             self._put(event)
-            self._loop.remove_reader(self._fd)
+            self._loop.remove_reader(self._fanotify.fileno())
 
     def qsize(self):
         """Returns the current size of the Queue
@@ -108,7 +107,7 @@ class Fanotify_async:
         return len(self._events)
     
     def close(self):
-        close(self._fd)
+        self._fanotify.close()
 
 def _watcher(loop):
     from ..fanotify import FAN_MODIFY, FAN_ONDIR, FAN_ACCESS, FAN_EVENT_ON_CHILD, FAN_OPEN, FAN_CLOSE
