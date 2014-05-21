@@ -10,7 +10,6 @@ class Inotify_async:
         self._maxsize = maxsize
         
         self._inotify = inotify = _Inotify()
-        self._fd = inotify.fileno()
         
         self._getters = _deque()
         self._events = _deque()
@@ -33,7 +32,7 @@ class Inotify_async:
         if self._events:
             return self._get()
         else:
-            self._loop.add_reader(self._fd, self._read_event)
+            self._loop.add_reader(self._inotify.fileno(), self._read_event)
 
             waiter = _asyncio.Future(loop=self._loop)
 
@@ -89,13 +88,13 @@ class Inotify_async:
             self._put(event)
             getter.set_result(self._get())
         elif self._maxsize > 0 and self._maxsize == self.qsize():
-            self.loop.remove_reader(self._fd)
+            self.loop.remove_reader(self._inotify.fileno())
             raise QueueFull
         else:
             # No listeners so queue up the data and stop 
             # listening for events on the FD
             self._put(event)
-            self._loop.remove_reader(self._fd)
+            self._loop.remove_reader(self._inotify.fileno())
 
     def qsize(self):
         """Returns the current size of the Queue
