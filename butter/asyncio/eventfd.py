@@ -1,6 +1,5 @@
 #!/usr/bih/env python
-from os import read as _read, write as _write, close as _close
-from ..eventfd import eventfd as _eventfd, _ffi
+from ..eventfd import Eventfd as _Eventfd
 from collections import deque as _deque
 import asyncio as _asyncio
 
@@ -8,7 +7,7 @@ import asyncio as _asyncio
 class Eventfd_async:
     def __init__(self, inital_value=0, flags=0, *, loop=None):
         self._loop = loop or _asyncio.get_event_loop()
-        self._fd = _eventfd(inital_value, flags)
+        self._eventfd = _Eventfd(inital_value, flags)
         self._getters = _deque()
         self._value = inital_value
         
@@ -17,9 +16,7 @@ class Eventfd_async:
 
         :param int value: The value to increment the counter by (default=1)
         """
-        packed_value = _ffi.new('uint64_t[1]', (value,))
-        packed_value = _ffi.buffer(packed_value)[:]
-        _write(self._fd, packed_value)
+        self._eventfd.increment(value)
 
     @_asyncio.coroutine
     def read(self):
@@ -30,7 +27,7 @@ class Eventfd_async:
         :return: The current count of the timer
         :rtype: int
         """
-        self._loop.add_reader(self._fd, self._read_event)
+        self._loop.add_reader(self._eventfd.fileno(), self._read_event)
 
         waiter = _asyncio.Future(loop=self._loop)
 
@@ -47,18 +44,15 @@ class Eventfd_async:
             self._getters.popleft()
 
     def _read_event(self):
-        data = _read(self._fd, 8)
-        value = _ffi.new('uint64_t[1]')
-        _ffi.buffer(value, 8)[0:8] = data
-
-        self._put_event(value[0])
+        value = self._eventfd.read()
+        self._put_event(value)
     
     def _put_event(self, value):
         """Put an item into the queue without blocking.
 
         If no free slot is immediately available, raise QueueFull.
         """
-        self._loop.remove_reader(self._fd)
+        self._loop.remove_reader(self._eventfd.fileno())
 
         self._consume_done_getters()
 
@@ -68,7 +62,7 @@ class Eventfd_async:
         self._value = value
 
     def close(self):
-        _close(self._fd)
+        self._eventfd.close()
 
 def _watcher(loop):
     ev = Eventfd_async(10)
