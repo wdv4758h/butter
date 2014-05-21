@@ -18,7 +18,7 @@ class Inotify_async:
         return self._inotify.watch(path, mask)
 
     def ignore(self, wd):
-        inotify.ignore(wd)
+        self._inotify.ignore(wd)
          
     @_asyncio.coroutine
     def get_event(self):
