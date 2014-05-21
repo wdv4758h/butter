@@ -1,5 +1,5 @@
 #!/usr/bih/env python
-from ..timerfd import Timerfd as orig_Timerfd, _ffi, CLOCK_REALTIME
+from ..timerfd import Timerfd as _Timerfd, _ffi, CLOCK_REALTIME
 from os import read as _read, write as _write, close as _close
 from collections import deque
 import asyncio
@@ -7,7 +7,7 @@ import asyncio
 class Timerfd_async:
     def __init__(self, clock_type=CLOCK_REALTIME, flags=0, *, loop=None):
         self._loop = loop or asyncio.get_event_loop()
-        self._timerfd = orig_Timerfd(clock_type, flags)
+        self._timerfd = _Timerfd(clock_type, flags)
         self._getters = deque()
         
         self.set_one_off = self._timerfd.set_one_off
@@ -16,7 +16,6 @@ class Timerfd_async:
         self.disabled = self._timerfd.__class__.__dict__['disabled']
         self.disable = self._timerfd.disable
         self.get_current = self._timerfd.get_current
-        self.close = self._timerfd.close
         
     @asyncio.coroutine
     def wait(self):
@@ -42,11 +41,8 @@ class Timerfd_async:
             self._getters.popleft()
 
     def _read_event(self):
-        data = _read(self._timerfd.fileno(), 8)
-        value = _ffi.new('uint64_t[1]')
-        _ffi.buffer(value, 8)[0:8] = data
-
-        self._put_event(value[0])
+        value = self._timerfd._read()
+        self._put_event(value)
     
     def _put_event(self, value):
         """Put an item into the queue without blocking.
@@ -61,13 +57,13 @@ class Timerfd_async:
             getter.set_result(value)
 
     def close(self):
-        _close(self._timerfd.fileno())
+        self._timerfd.close()
 
 def watcher(loop):
     from asyncio import sleep
     from time import time
     
-    t = Timerfd()
+    t = Timerfd_async()
 
     time_val = 0.5
     t.set_reoccuring(time_val)
