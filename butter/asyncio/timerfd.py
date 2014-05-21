@@ -8,7 +8,6 @@ class Timerfd:
     def __init__(self, clock_type=CLOCK_REALTIME, flags=0, *, loop=None):
         self._loop = loop or asyncio.get_event_loop()
         self._timerfd = orig_Timerfd(clock_type, flags)
-        self._fd =  self._timerfd.fileno()
         self._getters = deque()
         
         self.set_one_off = self._timerfd.set_one_off
@@ -29,7 +28,7 @@ class Timerfd:
         :return: The current count of the timer
         :rtype: int
         """
-        self._loop.add_reader(self._fd, self._read_event)
+        self._loop.add_reader(self._timerfd.fileno(), self._read_event)
 
         waiter = asyncio.Future(loop=self._loop)
 
@@ -43,7 +42,7 @@ class Timerfd:
             self._getters.popleft()
 
     def _read_event(self):
-        data = _read(self._fd, 8)
+        data = _read(self._timerfd.fileno(), 8)
         value = _ffi.new('uint64_t[1]')
         _ffi.buffer(value, 8)[0:8] = data
 
@@ -54,7 +53,7 @@ class Timerfd:
 
         If no free slot is immediately available, raise QueueFull.
         """
-        self._loop.remove_reader(self._fd)
+        self._loop.remove_reader(self._timerfd.fileno())
 
         self._consume_done_getters()
 
@@ -62,7 +61,7 @@ class Timerfd:
             getter.set_result(value)
 
     def close(self):
-        _close(self._fd)
+        _close(self._timerfd.fileno())
 
 def watcher(loop):
     from asyncio import sleep
