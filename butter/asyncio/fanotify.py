@@ -116,6 +116,7 @@ def _watcher(loop):
     event_mask = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
     wd = fanotify.watch('/tmp', event_mask)
 
+    print("Listening for events on /tmp")
     for i in range(5):
         event = yield from fanotify.get_event()
         print(event)
