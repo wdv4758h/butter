@@ -243,7 +243,7 @@ class TimerSpec(object):
     @property
     def reoccuring(self):
         """The interval for reoccuring events in seconds as a float"""
-        return self.reoccuring_seconds + (self.reoccuring_nano_seconds / 1000000000)
+        return self.reoccuring_seconds + (self.reoccuring_nano_seconds / 1000000000.0)
         
     @reoccuring.setter
     def reoccuring(self, val):
@@ -283,7 +283,7 @@ class TimerSpec(object):
     @property
     def one_off(self):
         """The interval for a one off event in seconds as a float"""
-        return self.one_off_seconds + (self.one_off_nano_seconds / 1000000000)
+        return self.one_off_seconds + (self.one_off_nano_seconds / 1000000000.0)
         
     @one_off.setter
     def one_off(self, val):
