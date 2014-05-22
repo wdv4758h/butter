@@ -226,18 +226,19 @@ class TimerSpec(object):
             self._timerspec.it_value.tv_sec = timerspec.it_value.tv_sec
             self._timerspec.it_value.tv_nsec = timerspec.it_value.tv_nsec
             
-        if reoccuring:
-            self.reoccuring = reoccuring
-        if reoccuring_seconds:
-            self.reoccuring_seconds = reoccuring_seconds
-        if reoccuring_nano_seconds:
-            self.reoccuring_nano_seconds = reoccuring_nano_seconds
         if one_off:
             self.one_off = one_off
         if one_off_seconds:
             self.one_off_seconds = one_off_seconds
         if one_off_nano_seconds:
             self.one_off_nano_seconds = one_off_nano_seconds
+
+        if reoccuring:
+            self.reoccuring = reoccuring
+        if reoccuring_seconds:
+            self.reoccuring_seconds = reoccuring_seconds
+        if reoccuring_nano_seconds:
+            self.reoccuring_nano_seconds = reoccuring_nano_seconds
     
     @property
     def reoccuring(self):
