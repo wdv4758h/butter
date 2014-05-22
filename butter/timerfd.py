@@ -229,15 +229,15 @@ class TimerSpec(object):
         if reoccuring:
             self.reoccuring = reoccuring
         if reoccuring_seconds:
-            self.reoccuring_seconds = reoccuring_sec
+            self.reoccuring_seconds = reoccuring_seconds
         if reoccuring_nano_seconds:
-            self.reoccuring_nano_seconds = reoccuring_nano
+            self.reoccuring_nano_seconds = reoccuring_nano_seconds
         if one_off:
             self.one_off = one_off
         if one_off_seconds:
-            self.one_off_seconds = one_off_sec
+            self.one_off_seconds = one_off_seconds
         if one_off_nano_seconds:
-            self.one_off_nano_seconds = one_off_nano
+            self.one_off_nano_seconds = one_off_nano_seconds
     
     @property
     def reoccuring(self):
