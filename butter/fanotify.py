@@ -99,14 +99,14 @@ class Fanotify(object):
 
     def watch(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_ADD
-        fanotify_mark(self._fd, flags, mask, path, dfd)
+        fanotify_mark(self.fileno(), flags, mask, path, dfd)
 
     def del_watch(self, flags, mask, path, dfd=0):
         self.ignore(flags, mask, path, dfd)
         
     def ignore(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_REMOVE
-        fanotify_mark(self._fd, flags, mask, path, dfd)
+        fanotify_mark(self.fileno(), flags, mask, path, dfd)
 
     def fileno(self):
         if self._fd:
@@ -115,11 +115,8 @@ class Fanotify(object):
             raise ValueError("I/O operation on closed file")
 
     def close(self):
-        if self._fd:
-            os.close(self._fd)
-            self._fd = None
-        else:
-            raise ValueError("I/O operation on closed file")
+        _close(self.fileno())
+        self._fd = None
 
     def closed(self):
         return False if self._fd else True
@@ -186,13 +183,14 @@ class Fanotify(object):
             return self._read_events()
 
     def _read_events(self):
+        fd = self.fileno()
         if self.blocking:
-            _select([self._fd], [], [])
-            buf_len = _get_buffered_length(self._fd)
+            _select([fd], [], [])
+            buf_len = _get_buffered_length(fd)
         else:
-            buf_len = _get_buffered_length(self._fd)
+            buf_len = _get_buffered_length(fd)
             assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
-        raw_events = _read(self._fd, buf_len)
+        raw_events = _read(fd, buf_len)
 
         events = str_to_events(raw_events)
 
@@ -357,11 +355,14 @@ def str_to_events(str):
 
 
 def main():
+    path = "/tmp"
+    
     notifier = Fanotify(FAN_CLASS_NOTIF)
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
-    notifier.watch(0, FLAGS, '/tmp')
+    notifier.watch(0, FLAGS, path)
 
-    for event in notifier:
+    print("Listening for events in {}".format(path))
+    for i, event in enumerate(notifier):
         print("================================")
         print('Version:        ', event.version)
         print('Mask:            0x{:08X}'.format(event.mask))
@@ -373,6 +374,19 @@ def main():
         if event.open_event:
             print("This is an open event")
         event.close()
+        
+        if i > 5:
+            break
+    
+    print("Caught 5 events")
+    print("Closing fanotify")
+    notifier.close()
+    try:
+        notifier.close()
+    except ValueError:
+        print("Tried to close closed file descriptor, OK")
+    else:
+        print("Was able to close a closed file decriptor, ERROR")
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
