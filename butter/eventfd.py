@@ -96,7 +96,7 @@ class Eventfd(object):
         """
         packed_value = _ffi.new('uint64_t[1]', (value,))
         packed_value = _ffi.buffer(packed_value)[:]
-        _write(self._fd, packed_value)
+        _write(self.fileno(), packed_value)
 
     def read(self):
         """Read the current value of the counter and zero the counter
@@ -106,7 +106,7 @@ class Eventfd(object):
         :return: The current count of the timer
         :rtype: int
         """
-        data = _read(self._fd, 8)
+        data = _read(self.fileno(), 8)
         value = _ffi.new('uint64_t[1]')
         _ffi.buffer(value, 8)[0:8] = data
         
@@ -116,11 +116,7 @@ class Eventfd(object):
         return self.read()
 
     def close(self):
-        if self._fd:
-            _close(self._fd)
-            self._fd = None
-        else:
-            raise ValueError("I/O operation on closed file")
+        _close(self.fileno())
 
     def fileno(self):
         if self._fd:
@@ -148,6 +144,15 @@ def _main():
     ev.increment(30)
     
     print("Read value back:", int(ev))
+
+    print("Closing FD")    
+    ev.close()
+    try:
+        ev.close()
+    except OSError:
+        print("Could not close closed FD, OK")
+    else:
+        print("Closed closed FD, this is bad")
     
     
 if __name__ == "__main__":
