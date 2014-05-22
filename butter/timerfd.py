@@ -414,16 +414,16 @@ class Timerfd(object):
         return old_val
 
     def get_current(self):
-        return timerfd_gettime(self._fd)
+        return timerfd_gettime(self.fileno())
 
     def _update(self, timerspec, absolute=False):
         flags = TFD_TIMER_ABSTIME if absolute else 0
-        old_timer = timerfd_settime(self._fd, timerspec, flags)
+        old_timer = timerfd_settime(self.fileno(), timerspec, flags)
         
         return old_timer
     
     def _read(self):
-        data = _read(self._fd, 8)
+        data = _read(self.fileno(), 8)
         value = _ffi.new('uint64_t[1]')
         _ffi.buffer(value, 8)[0:8] = data
 
@@ -437,16 +437,13 @@ class Timerfd(object):
         :return: The amount of timerfd events that have fired since the last read()
         :rtype: int
         """
-        _select([self._fd], [], [])
+        _select([self.fileno()], [], [])
 
         return self._read()        
     
     def close(self):
-        if self._fd:
-            _close(self._fd)
-            self._fd = None
-        else:
-            raise ValueError("I/O operation on closed file")
+        _close(self.fileno())
+        self._fd = None
 
     def fileno(self):
         if self._fd:
@@ -488,6 +485,15 @@ def _main():
     print("Sleeping for 0.3s")
     sleep(0.3)
     print("Next event:", t.get_current())
+
+    print("Closing timer")
+    t.close()
+    try:
+        t.close()
+    except ValueError:
+        print("Was unable to close closed FD, OK")
+    else:
+        print("Attemtped to close closed FD and succseeded, ERROR")
     
     
 if __name__ == "__main__":
