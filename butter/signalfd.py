@@ -150,7 +150,7 @@ class Signalfd(object):
         return bool(val)
     
     def _update(self):
-        return signalfd(self._sigmask, self._fd, self._flags)
+        return signalfd(self._sigmask, self.fileno(), self._flags)
 
     def enable(self, signal):
         _C.sigaddset(self._sigmask, signal)
@@ -171,17 +171,14 @@ class Signalfd(object):
     def wait(self):
         from select import select
         
-        select([self._fd], [], [])
+        select([self.fileno()], [], [])
         event = self._read_event()
         
         return event
     
     def close(self):
-        if self._fd:
-            _close(self._fd)
-            self._fd = None
-        else:
-            raise ValueError("I/O operation on closed file")
+        _close(self.fileno())
+        self._fd = None
     
     def fileno(self):
         if self._fd:
@@ -190,8 +187,9 @@ class Signalfd(object):
             raise ValueError("I/O operation on closed file")
         
     def _read_event(self):
-        l = _get_buffered_length(self._fd)
-        buf = _read(self._fd, l)
+        fd = self.fileno()
+        l = _get_buffered_length(fd)
+        buf = _read(fd, l)
         siginfo = _ffi.new('signalfd_siginfo[1]')
         
         siginfo[:l] = buf
