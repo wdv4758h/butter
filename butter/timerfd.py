@@ -354,7 +354,7 @@ class TimerSpec(object):
         return self.one_off_nano_seconds
     
     def __repr__(self):
-        return "<{} next={}s reoccuring={}s>".format(self.__class__.__name__, self.next_event, self.reoccuring)
+        return "<{} next={:.3f}s reoccuring={:.3f}s>".format(self.__class__.__name__, self.next_event, self.reoccuring)
     
 
 TFD_CLOEXEC = _C.TFD_CLOEXEC
