@@ -199,9 +199,10 @@ def timerfd_settime(fd, timer_spec, flags=0):
 
 class TimerSpec(object):
     """Thin wrapper around the itimerspec c struct providing convience methods"""
-    def __init__(self, reoccuring=None, reoccuring_seconds=None, reoccuring_nano_seconds=None, 
-                       one_off=None, one_off_seconds=None, one_off_nano_seconds=None,
-                       timerspec=None):
+    def __init__(self, 
+                 one_off=None, one_off_seconds=None, one_off_nano_seconds=None,
+                 reoccuring=None, reoccuring_seconds=None, reoccuring_nano_seconds=None, 
+                 timerspec=None):
         """Friendly wrapper around a c struct
         
         If setting a raw timerspec via the timerspec field then the reoccuring and one_off fields
