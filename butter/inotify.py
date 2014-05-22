@@ -6,7 +6,7 @@ from .utils import get_buffered_length as _get_buffered_length
 
 from select import select as _select
 from collections import namedtuple
-from os import read as _read
+from os import read as _read, close as _close
 from cffi import FFI as _FFI
 import errno as _errno
 
@@ -256,7 +256,7 @@ class Inotify(object):
             self.blocking = false
         
     def watch(self, path, events):
-        wd = inotify_add_watch(self._fd, path, events)
+        wd = inotify_add_watch(self.fileno(), path, events)
         
         return wd
         
@@ -264,7 +264,7 @@ class Inotify(object):
         self.ignore(wd)
 
     def ignore(self, wd):
-        inotify_rm_watch(self._fd, wd)
+        inotify_rm_watch(self.fileno(), wd)
         
     def fileno(self):
         if self._fd:
@@ -273,11 +273,8 @@ class Inotify(object):
             raise ValueError("I/O operation on closed file")
         
     def close(self):
-        if self._fd:
-            os.close(self._fd)
-            self._fd = None
-        else:
-            raise ValueError("I/O operation on closed file")
+        _close(self.fileno())
+        self._fd = None
         
     def closed(self):
         return False if self._fd else True
@@ -344,13 +341,15 @@ class Inotify(object):
             return self._read_events()
             
     def _read_events(self):
+        fd = self.fileno()
+        
         if self.blocking:
-            _select([self._fd], [], [])
-            buf_len = _get_buffered_length(self._fd)
+            _select([fd], [], [])
+            buf_len = _get_buffered_length(fd)
         else:
-            buf_len = _get_buffered_length(self._fd)
+            buf_len = _get_buffered_length(fd)
             assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
-        raw_events = _read(self._fd, buf_len)
+        raw_events = _read(fd, buf_len)
 
         events = str_to_events(raw_events)
 
@@ -445,7 +444,7 @@ def main():
     
     print("Watching {} for file changes".format(dir))
     
-    for event in notifier:
+    for i, event in enumerate(notifier):
         print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
                     os.path.join(dir, event.filename.decode()), event.mask, event.cookie))
         if event.attrib_event:
@@ -460,6 +459,20 @@ def main():
             print('close_nowrite')
         if event.open_event:
             print('open')
+        
+        if i > 5:
+            break
+    
+    print("Got 5 events, exiting")
+    print("Closing inotify")
+    notifier.close()
+    try:
+        notifier.close()
+    except ValueError:
+        print("Unable to close a closed FD, OK")
+    else:
+        print("Attempted to close a closed FD and it sucseeded, FAILED")
+    
 
 if __name__ == "__main__":
     main()
