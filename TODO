@@ -5,3 +5,5 @@ more examples
 unify the level of documentation of all functiosn (args/return codes and exceptions raised)
 sphinxify docs
 upload to docs.blitz.works
+__repr__ for all objects including closed indication
+more file like methods for all objects
