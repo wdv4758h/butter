@@ -269,7 +269,7 @@ class Signalfd(object):
         
     def wait(self):
         _select([self.fileno()], [], [])
-        event = self._read_event()
+        event = self._read_signal()
         
         return event
     
@@ -283,7 +283,7 @@ class Signalfd(object):
         else:
             raise ValueError("I/O operation on closed file")
         
-    def _read_event(self):
+    def _read_signal(self):
         SIGNALFD_SIGINFO_LENGTH = 128 # Bytes
         buf = _read(self.fileno(), SIGNALFD_SIGINFO_LENGTH)
         siginfo = _ffi.new('struct signalfd_siginfo *')
