@@ -96,7 +96,7 @@ def main():
     from asyncio import Task
     task = Task(watcher(loop))
     
-    loop.run_forever()
+    loop.run_until_complete(task)
 
 
 if __name__ == "__main__":
