@@ -157,8 +157,28 @@ class Signalfd(object):
     def _update(self):
         return signalfd(self._sigmask, self.fileno(), self._flags)
 
-    def enable(self, signal):
-        _C.sigaddset(self._sigmask, signal)
+    def enable(self, signals):
+        """Mark signals as active on signalfd
+        
+        :param int signals: A single signal to listen for
+        :param list signals: A list of signals to listen for
+        
+        enable will mark all signals passed in on signalfd and takes
+        ethier a signal integer representing the signal to add or an
+        iterable if signals to (bulk) add
+        
+        The latter for is used for more efficent updates of signal masks
+        """
+        # if we have multipel signals then all is good
+        try:
+            signals = iter(signals)
+        except TypeError:
+        # if not make the value iterable
+            signals = [signals]
+
+        for signal in signals:
+            _C.sigaddset(self._sigmask, signal)
+            
         self._update()
 
     def enable_all(self):
