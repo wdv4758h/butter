@@ -61,7 +61,7 @@ int sigismember(const sigset_t *set, int signum);
 """)
 
 _C = _ffi.verify("""
-#include <linux/signalfd.h>
+#include <sys/signalfd.h>
 #include <stdint.h> /* Definition of uint64_t */
 #include <signal.h>
 """, libraries=[])
