@@ -3,9 +3,7 @@
 
 from __future__ import print_function
 
-from .utils import get_buffered_length as _get_buffered_length
-
-from os import write as _write, read as _read, close as _close
+from os import read as _read, close as _close
 from select import select as _select
 from cffi import FFI as _FFI
 import signal as _signal
@@ -292,11 +290,8 @@ class Signal(object):
         signame = signum_to_signame.get(self.signal, self.signal)
         return "<{} signal={} uid={} pid={}>".format(self.__class__.__name__, signame, self.uid, self.pid)
 
-
-
 signum_to_signame = {val:key for key, val in _signal.__dict__.items()
                      if isinstance(val, int) and "_" not in key}
-
 
 def _main():
     import signal
