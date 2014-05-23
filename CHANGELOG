@@ -9,6 +9,9 @@ butter (0.9-1) stable; urgency=low
   * Add timerfd asyncio support
   * Fixed issue with circular imports preventing python3.4 from working
   * Fixed issue with python2.7 returning floats where python3 returned ints
+  * Added pthread_sigmask
+  * Added Signalfd
+  * Added Signalfd asyncio support
    
  -- Da_Blitz <code@pocketnix.org>  Tue, 17 May 2014 01:10:43 +1000
 
