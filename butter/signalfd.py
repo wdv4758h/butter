@@ -133,8 +133,56 @@ def signalfd(mask, fd=NEW_SIGNALFD, flags=0):
 
     return ret_fd
 
-def pthread_sigmask(how, sigset):
-    pass
+def pthread_sigmask(how, signals):
+    """Create a new signalfd
+    
+    Arguments
+    ----------
+    :param int how: The mask of signals to listen for
+    :param list signals: An iterable of signals
+    :param int signals: A single signal
+    
+    Flags: how
+    -----------
+    SIG_BLOCK: Block the signals in sigmask from being delivered
+    SIG_UNBLOCK: Unblock the signals in the supplied sigmask
+    SIG_SETMASK: Set the active signals to match the supplied sigmask
+    
+    Returns
+    --------
+    :return: The old set of active signals
+    :rtype: sigset
+    
+    Exceptions
+    -----------
+    :raises ValueError: Invalid value in 'how'
+    :raises ValueError: sigmask is not a valid sigmask_t
+    """
+    new_sigmask = _ffi.new('sigset_t[1]')
+    old_sigmask = _ffi.new('sigset_t[1]')
+
+    # if we have multipel signals then all is good
+    try:
+        signals = iter(signals)
+    except TypeError:
+    # if not make the value iterable
+        signals = [signals]
+
+    for signal in signals:
+        _C.sigaddset(new_sigmask, signal)
+    
+    ret = _C.pthread_sigmask(how, new_sigmask, _ffi.NULL)
+    
+    if ret < 0:
+        err = _ffi.errno
+        if err == _errno.EINVAL:
+            raise ValueError("'how' is an invalid value (not one of SIG_BLOCK, SIG_UNBLOCK or SIG_SETMASK)")
+        elif err == _errno.EFAULT:
+            raise ValueError("sigmask is not a valid sigset_t")
+        else:
+            # If you are here, its a bug. send us the traceback
+            raise ValueError("Unknown Error: {}".format(err))
+
 
 class Signalfd(object):
     def __init__(self, sigmask=set(), flags=0):
@@ -316,7 +364,8 @@ def _main():
     sfd.enable(signal.SIGINT)
 
     print("Ignoring SIGINT via normal channels")
-    signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT])
+#    signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT])
+    pthread_sigmask(SIG_BLOCK, [signal.SIGINT])
     print("Sending self SIGINT")
     os.kill(os.getpid(), signal.SIGINT)
 
