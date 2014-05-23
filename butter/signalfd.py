@@ -124,7 +124,7 @@ SFD_CLOEXEC = _C.SFD_CLOEXEC
 SFD_NONBLOCK = _C.SFD_NONBLOCK
 
 class Signalfd(object):
-    def __init__(self, sigmask=set(), flags=0, fd=NEW_SIGNALFD):
+    def __init__(self, sigmask=set(), flags=0):
         """Create a new Signalfd object
 
         Arguments
@@ -137,14 +137,11 @@ class Signalfd(object):
         SFD_CLOEXEC: Close the signalfd when executing a new program
         SFD_NONBLOCK: Open the socket in non-blocking mode
         """
-        self._fd = fd
-        
-        self._sigmask = _ffi.new('sigset_t[1]')
-        self.disable_all()
-        
         self._flags = flags
-        
-        self._update()
+
+        self._sigmask = sigmask = _ffi.new('sigset_t[1]')
+
+        self._fd = signalfd(sigmask, NEW_SIGNALFD, flags)
         
     def __contains__(self, signal):
         val = _C.sigismember(self._sigmask, signal)
