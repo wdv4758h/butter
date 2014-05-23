@@ -222,18 +222,30 @@ def _main():
     import signal
     import os
     
-    
+    print("creating signalfd")
     sfd = Signalfd()
+    print("Enabling keyboard interrupt via signalfd")
     sfd.enable(signal.SIGINT)
     
+    print("Ignoring SIGINT via normal channels")
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+    print("Sending self SIGINT")
     os.kill(os.getpid(), signal.SIGINT)
 
+    print("Waiting for SIGINT")
     s = sfd.wait()
     if s.signal == signal.SIGINT:
         print("We get signal")
     else:
         print("Bomb not set up")
+    
+    sfd.close()
+    try:
+        sfd.close()
+    except ValueError:
+        print("Attempted to close closed signalfd and failed, OK")
+    else:
+        print("Attempted to close closed signalfd and succseeded, ERROR")
     
     
 if __name__ == "__main__":
