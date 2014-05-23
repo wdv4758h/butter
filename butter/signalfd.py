@@ -58,6 +58,12 @@ int sigfillset(sigset_t *set);
 int sigaddset(sigset_t *set, int signum);
 int sigdelset(sigset_t *set, int signum);
 int sigismember(const sigset_t *set, int signum);
+
+#define SIG_BLOCK ...
+#define SIG_UNBLOCK ...
+#define SIG_SETMASK ...
+
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
 """)
 
 _C = _ffi.verify("""
@@ -65,6 +71,13 @@ _C = _ffi.verify("""
 #include <stdint.h> /* Definition of uint64_t */
 #include <signal.h>
 """, libraries=[])
+
+SFD_CLOEXEC = _C.SFD_CLOEXEC
+SFD_NONBLOCK = _C.SFD_NONBLOCK
+
+SIG_BLOCK = _C.SIG_BLOCK
+SIG_UNBLOCK = _C.SIG_UNBLOCK
+SIG_SETMASK = _C.SIG_SETMASK
 
 NEW_SIGNALFD = -1 # Create a new signal rather than modify an exsisting one
 
@@ -120,8 +133,8 @@ def signalfd(mask, fd=NEW_SIGNALFD, flags=0):
 
     return ret_fd
 
-SFD_CLOEXEC = _C.SFD_CLOEXEC
-SFD_NONBLOCK = _C.SFD_NONBLOCK
+def pthread_sigmask(how, sigset):
+    pass
 
 class Signalfd(object):
     def __init__(self, sigmask=set(), flags=0):
