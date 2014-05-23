@@ -8,8 +8,9 @@ from .utils import get_buffered_length as _get_buffered_length
 from os import write as _write, read as _read, close as _close
 from select import select as _select
 from cffi import FFI as _FFI
+import signal as _signal
 import errno as _errno
-        
+
 _ffi = _FFI()
 _ffi.cdef("""
 #define SFD_CLOEXEC ...
@@ -214,7 +215,87 @@ class Signalfd(object):
 
         _ffi.buffer(siginfo)[0:SIGNALFD_SIGINFO_LENGTH] = buf
         
-        return siginfo
+        return Signal(siginfo)
+
+class Signal(object):
+    """Proxy object for data returned by signalfd when a signal is recived
+    
+    Maps to most fields in a signalfd_siginfo
+    
+    Ommited mappings are ones that deal with traps and SIGQUEUE
+    """
+    def __init__(self, siginfo):
+        self._siginfo = siginfo
+
+    @property
+    def signal(self):
+        """The number of the signal being sent"""
+        return self._siginfo.ssi_signo
+
+    @property
+    def signal_code(self):
+        """The signal code"""
+        return self._siginfo.ssi_code
+
+    @property
+    def pid(self):
+        """PID of the sender of the signal"""
+        return self._siginfo.ssi_pid
+
+    @property
+    def uid(self):
+        """UID of the sender of the signal"""
+        return self._siginfo.ssi_uid
+
+    @property
+    def sigio_fd(self):
+        """FD that triggered the SIGIO signal"""
+        return self._siginfo.ssi_fd
+
+    @property
+    def timer_id(self):
+        """Kernel timer ID (POSIX Timers)"""
+        return self._siginfo.ssi_tid
+        
+    @property
+    def sigio_band(self):
+        """SIGIO Band event"""
+        return self._siginfo.ssi_band
+        
+    @property
+    def overrun(self):
+        """POSIX timer overrun count"""
+        return self._siginfo.ssi_overrun
+        
+    @property
+    def trapno(self):
+        """Trap number that caused the signal"""
+        return self._siginfo.trapno
+
+    @property
+    def child_status(self):
+        """The return code of the exiting child process"""
+        return self._siginfo.ssi_status
+        
+    @property
+    def child_user_time(self):
+        """The ammount of user time used by the exiting child process"""
+        return self._siginfo.ssi_utime
+        
+    @property
+    def child_system_time(self):
+        """The ammount of system time used by the exiting child process"""
+        return self._siginfo.ssi_stime
+
+    def __repr__(self):
+        # convert to Alpha name, else just return the int
+        signame = signum_to_signame.get(self.signal, self.signal)
+        return "<{} signal={} uid={} pid={}>".format(self.__class__.__name__, signame, self.uid, self.pid)
+
+
+
+signum_to_signame = {val:key for key, val in _signal.__dict__.items()
+                     if isinstance(val, int) and "_" not in key}
 
 
 def _main():
@@ -233,10 +314,12 @@ def _main():
 
     print("Waiting for SIGINT")
     s = sfd.wait()
-    if s.ssi_signo == signal.SIGINT:
+    if s.signal == signal.SIGINT:
         print("We get signal")
     else:
         print("Bomb not set up")
+    
+    print(s)
     
     sfd.close()
     try:
