@@ -221,14 +221,14 @@ class Signalfd(object):
         
         return siginfo
 
+
 def _main():
     import signal
     import os
     
-    sigmask = SignalMask()
-    sigmask.enable(signal.SIGINT)
     
-    sfd = Signalfd(sigmask)
+    sfd = Signalfd()
+    sfd.enable(signal.SIGINT)
     
     signal.signal(signal.SIGINT, os.getpid())
     
