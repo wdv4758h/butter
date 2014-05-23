@@ -212,7 +212,7 @@ class Signalfd(object):
         buf = _read(self.fileno(), SIGNALFD_SIGINFO_LENGTH)
         siginfo = _ffi.new('struct signalfd_siginfo *')
 
-        _ffi.buffer(siginfo, SIGNALFD_SIGINFO_LENGTH)[0:SIGNALFD_SIGINFO_LENGTH] = buf
+        _ffi.buffer(siginfo)[0:SIGNALFD_SIGINFO_LENGTH] = buf
         
         return siginfo
 
