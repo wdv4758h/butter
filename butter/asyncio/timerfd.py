@@ -1,6 +1,5 @@
 #!/usr/bih/env python
 from ..timerfd import Timerfd as _Timerfd, _ffi, CLOCK_REALTIME
-from os import read as _read, write as _write, close as _close
 from collections import deque
 import asyncio
 
