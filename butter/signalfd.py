@@ -6,9 +6,10 @@ from __future__ import print_function
 from .utils import get_buffered_length as _get_buffered_length
 
 from os import write as _write, read as _read, close as _close
+from select import select as _select
 from cffi import FFI as _FFI
 import errno as _errno
-
+        
 _ffi = _FFI()
 _ffi.cdef("""
 #define SFD_CLOEXEC ...
@@ -191,9 +192,7 @@ class Signalfd(object):
         self._update()
         
     def wait(self):
-        from select import select
-        
-        select([self.fileno()], [], [])
+        _select([self.fileno()], [], [])
         event = self._read_event()
         
         return event
