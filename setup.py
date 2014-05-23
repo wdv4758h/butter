@@ -42,15 +42,13 @@ class PyTest(TestCommand):
         pytest.main(self.test_args)
 
 ## Try and extract a long description ##
-for readme_name in ("README", "README.rst", "README.md"):
+readme = ""
+for readme_name in ("README", "README.rst", "README.md",
+                    "CHANGELOG", "CHANGELOG.rst", "CHANGELOG.md"):
     try:
-        readme = open(readme_name).read()
+        readme += open(readme_name).read() + "\n\n"
     except (OSError, IOError):
         continue
-    else:
-        break
-else:
-    readme = ""
 
 ## Finally call setup ##
 setup(
