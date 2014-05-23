@@ -1,13 +1,14 @@
 #!/usr/bih/env python
-from ..timerfd import Timerfd as _Timerfd, _ffi, CLOCK_REALTIME
-from collections import deque
-import asyncio
+from ..timerfd import CLOCK_REALTIME as _CLOCK_REALTIME
+from ..timerfd import Timerfd as _Timerfd
+from collections import deque as _deque
+import asyncio as _asyncio
 
 class Timerfd_async:
-    def __init__(self, clock_type=CLOCK_REALTIME, flags=0, *, loop=None):
-        self._loop = loop or asyncio.get_event_loop()
+    def __init__(self, clock_type=_CLOCK_REALTIME, flags=0, *, loop=None):
+        self._loop = loop or _asyncio.get_event_loop()
         self._timerfd = _Timerfd(clock_type, flags)
-        self._getters = deque()
+        self._getters = _deque()
         
         self.set_one_off = self._timerfd.set_one_off
         self.set_reoccuring = self._timerfd.set_reoccuring
@@ -16,7 +17,7 @@ class Timerfd_async:
         self.disable = self._timerfd.disable
         self.get_current = self._timerfd.get_current
         
-    @asyncio.coroutine
+    @_asyncio.coroutine
     def wait(self):
         """Wait for the timer to expire, returning how many events have 
         elappsed since the last call to wait()
@@ -28,7 +29,7 @@ class Timerfd_async:
         """
         self._loop.add_reader(self._timerfd.fileno(), self._read_event)
 
-        waiter = asyncio.Future(loop=self._loop)
+        waiter = _asyncio.Future(loop=self._loop)
 
         self._getters.append(waiter)
 
@@ -84,6 +85,7 @@ def watcher(loop):
 
 def main():
     import logging
+    import asyncio
     
     log = logging.getLogger()
     log.setLevel(logging.DEBUG)
