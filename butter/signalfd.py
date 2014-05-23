@@ -81,12 +81,14 @@ SIG_SETMASK = _C.SIG_SETMASK
 
 NEW_SIGNALFD = -1 # Create a new signal rather than modify an exsisting one
 
-def signalfd(mask, fd=NEW_SIGNALFD, flags=0):
+def signalfd(signals, fd=NEW_SIGNALFD, flags=0):
     """Create a new signalfd
     
     Arguments
     ----------
-    :param int mask: The mask of signals to listen for
+    :param sigset_t signals: raw cdata to pass to the syscall
+    :param int signals: A single int representing the signal to listen for
+    :param list signals: A list of signals to listen for
     :param int fd: The file descriptor to modify, if set to NEW_SIGNALFD then a new FD is returned
     :param int flags: 
     
@@ -108,6 +110,20 @@ def signalfd(mask, fd=NEW_SIGNALFD, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if isinstance(signals, _ffi.CData):
+        mask = signals
+    else:
+        mask = _ffi.new('sigset_t[1]')
+        # if we have multiple signals then all is good
+        try:
+            signals = iter(signals)
+        except TypeError:
+        # if not make the value iterable
+            signals = [signals]
+
+        for signal in signals:
+            _C.sigaddset(mask, signal)
+
     ret_fd = _C.signalfd(fd, mask, flags)
     
     if ret_fd < 0:
@@ -161,7 +177,7 @@ def pthread_sigmask(how, signals):
     new_sigmask = _ffi.new('sigset_t[1]')
     old_sigmask = _ffi.new('sigset_t[1]')
 
-    # if we have multipel signals then all is good
+    # if we have multiple signals then all is good
     try:
         signals = iter(signals)
     except TypeError:
