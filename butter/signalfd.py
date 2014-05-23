@@ -36,11 +36,17 @@ struct signalfd_siginfo {
 //                        additional fields in the future) */
     ...;
 };
-/*
-# define _SIGSET_NWORDS ...
+
+//# define _SIGSET_NWORDS     (1024 / (8 * sizeof (unsigned long int)))
+// 32bits: 1024 / 8 / 4  = 32
+// 64bits: 1024 / 8 / 4  = 16
+// however we can just cheat and define it as 32 as 16 fits in 32 and there
+// is no length arg for the functions
+//#define _SIGSET_NWORDS 32
 typedef struct
 {
-    unsigned long int __val[_SIGSET_NWORDS];
+//    unsigned long int __val[_SIGSET_NWORDS];
+    unsigned long int __val[32];
 } __sigset_t;
 
 typedef __sigset_t sigset_t;
@@ -52,7 +58,6 @@ int sigfillset(sigset_t *set);
 int sigaddset(sigset_t *set, int signum);
 int sigdelset(sigset_t *set, int signum);
 int sigismember(const sigset_t *set, int signum);
-*/
 """)
 
 _C = _ffi.verify("""
