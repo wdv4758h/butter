@@ -227,8 +227,9 @@ def _main():
     sfd = Signalfd()
     sfd.enable(signal.SIGINT)
     
-    signal.signal(signal.SIGINT, os.getpid())
-    
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    os.kill(os.getpid(), signal.SIGINT)
+
     s = sfd.wait()
     if s.signal == signal.SIGINT:
         print("We get signal")
