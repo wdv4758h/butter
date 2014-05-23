@@ -79,7 +79,7 @@ def signalfd(mask, fd=NEW_SIGNALFD, flags=0):
     
     Flags
     ------
-    SFD_CLOEXEC: Close the eventfd when executing a new program
+    SFD_CLOEXEC: Close the signalfd when executing a new program
     SFD_NONBLOCK: Open the socket in non-blocking mode
     
     Returns
@@ -95,7 +95,7 @@ def signalfd(mask, fd=NEW_SIGNALFD, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
-    ret_fd = _C.eventfd(inital_value, flags)
+    ret_fd = _C.signalfd(fd, mask, flags)
     
     if ret_fd < 0:
         err = _ffi.errno
