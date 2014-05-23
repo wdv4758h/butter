@@ -208,12 +208,11 @@ class Signalfd(object):
             raise ValueError("I/O operation on closed file")
         
     def _read_event(self):
-        fd = self.fileno()
-        l = _get_buffered_length(fd)
-        buf = _read(fd, l)
-        siginfo = _ffi.new('signalfd_siginfo[1]')
-        
-        siginfo[:l] = buf
+        SIGNALFD_SIGINFO_LENGTH = 128 # Bytes
+        buf = _read(self.fileno(), SIGNALFD_SIGINFO_LENGTH)
+        siginfo = _ffi.new('struct signalfd_siginfo *')
+
+        _ffi.buffer(siginfo, SIGNALFD_SIGINFO_LENGTH)[0:SIGNALFD_SIGINFO_LENGTH] = buf
         
         return siginfo
 
@@ -226,15 +225,15 @@ def _main():
     sfd = Signalfd()
     print("Enabling keyboard interrupt via signalfd")
     sfd.enable(signal.SIGINT)
-    
+
     print("Ignoring SIGINT via normal channels")
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT])
     print("Sending self SIGINT")
     os.kill(os.getpid(), signal.SIGINT)
 
     print("Waiting for SIGINT")
     s = sfd.wait()
-    if s.signal == signal.SIGINT:
+    if s.ssi_signo == signal.SIGINT:
         print("We get signal")
     else:
         print("Bomb not set up")
