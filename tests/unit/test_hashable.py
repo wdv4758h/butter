@@ -48,5 +48,7 @@ def test_equals_diffrent(obj1, obj2):
                          (obj(Timerfd),  obj(Timerfd)  ),
                          ])
 def test_hashable(obj1, obj2):
+    obj1._fd = 1
     obj2 = None # we are not using this
     assert isinstance(hash(obj), int), 'hash of object is not an int'
+    assert {obj1: None}, 'Object cant be used as a key in a dict (not hashable)'
