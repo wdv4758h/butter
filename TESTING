@@ -1,0 +1,234 @@
+Testing
+========
+
+This project uses py.test as its runner and also contains support for running 
+with tox. there are multiple ways to run tests however it is recommended that 
+you make a virtual environment and run the tests inside of it as shown below
+
+
+Getting Started
+----------------
+It is recommended that testing be done in a virtual python environment as the 
+setup script may need to download and install additional dependencies which may 
+be impossible for non root users (and not recommended for the root ones anyway)
+
+The Makefile provided with this project can automatically build a virtual 
+environment for you with the recommended options, to do this try the 
+following steps
+
+    > make virtual
+    > . env/bin/activate
+
+once this is done '(env)' should be prepended to your shells default prompt to 
+indicate which virtual environment you are currently in
+
+Running Tests
+--------------
+to run the tests against your current environment simply run the 
+following command
+
+    > make test
+
+this will download all dependencies and run the tests against your current 
+version of python
+
+
+Testing multiple Python versions
+--------------------------------
+Before tagging and releasing a project to the public, it is recommended that the 
+test suite be run against all known versions of python we would expect this 
+project to be run on. if the program 'tox' is installed this is as simple as a 
+single command as shown below:
+
+    > tox
+
+this will create a per python version virtualenv under .tox and run the entire 
+test suite against each version in turn using py.test as the test runner
+
+if you need to pass args to py.test directly you can use the following form:
+
+    > tox -- --doctest-modules
+
+the example above will cause py.test to collect and execute doctests
+
+
+Speeding things up
+------------------
+If the machines you are running tests on has multiple cores and you wish to 
+speed things up or you wish to run the tests distributed over a farm of 
+computers you can do so by providing extra options to py.test or tox
+
+you may need to install an extra module or two to enable distributed/concurrent 
+testing however the project names are listed bellow and are easily search-able 
+on the chesseshop ()
+
+* detox - Distributed test runner for tox
+* pytest-xdist - run tests on multiple cores
+
+to install a module use the following command:
+
+    > pip install {module}
+
+
+Introducing Tests
+------------------ 
+Testing is important to ensure that bugs do not crop up while writing other 
+code. a feature could be written that breaks months down the track when you 
+decide a function should now be able to return None 6 months later. without 
+automated testing finding these faults tends to happen on live systems when you 
+don't want it to instead of from the comfort of your office
+
+All tests for this project are stored under tests and are further broken into 
+sub categories, these are listed below in the order of the amount of code they 
+test at once
+
+System
++++++++
+System tests are reserved for testing the system as a whole, eg running the 
+application command with specific arguments and checking the output and looking 
+for errors or running the application against a database full of test data
+
+Performance
++++++++++++
+Performance tests are used to build a histogram of performance over time to 
+ensure the code we have checked in did not make the program radically slower 
+(bad code) or faster (broken code)
+
+performance is normally measured as speed or program execution time however 
+memory usage can also be important depending on the type of application
+
+Security
++++++++++
+Security tests are simple tests that try and exploit our system. these are a 
+form of regression testing intended to make sure that reported issues are not 
+reintroduced however due to their nature they are listed separately
+
+it is recommended to have one security issue per file with links to any extra 
+information embedded in the file as well as embedding any identifying IDs to 
+help make locating an issue easier (eg CVE - Computer Vulnerability and 
+Exposures numbers)
+
+Regression
+++++++++++
+Regression testing is intended to ensure that old bugs are not reintroduced in 
+new code. it is recommended you provide the information for the bug/regression 
+in the file performing the test or a link/id to the bug itself and have one test 
+per file
+
+Integration
+++++++++++++
+Integration Testing tests larger units than unit testing, normally this means 
+cross module testing but may also mean inter module testing if a single object 
+being tested interacts with enough code
+
+Unit
+++++
+Unit tests test single objects and functions and are the smallest possible 
+testing primitive in testing. it is important in unit tests to try and limit to 
+testing the function or object under test and not how objects passed in 
+pass/fail with respect to the function as this is better done as an 
+integration test as in that scenario you are testing the interaction between 2 
+components, the argument/object/function being passed in and the object under 
+test
+
+unit tests are stored under tests/unit and a single file covers anything from a 
+single function to all the functions in a module. if you need to test things 
+over multiple modules consider an integration test instead or ask yourself if 
+the 2 modules should be separate
+
+Doc Tests
++++++++++
+Doc tests are small snippets of code in the documentation of a project that 
+show how to interact with the object being documented. by testing these code 
+snippets we can ensure that the object meets our expectations from the 
+perspective of a programmer reading our documentation and as an informal 
+contract that we can test against. if a doctest does break then either the code 
+needs to be updated to take into account the work done on the object or we need 
+to take a look at the code we added to see if it introduced a bug
+
+doc tests are not meant to be comprehensive but sort and concise and clearly 
+explain how an object is meant to be used. as these are inline in your doc 
+strings you can simply write them when you write out the method/function/class 
+definitions
+
+the aim of doc tests it to ensure the objects external appearance (the 
+functions/methods the programmer calls) meet expectations where as unit tests 
+are about ensuring the internals of the object are correct
+
+
+Writing Tests
+--------------
+The majority of tests that you will be writing are unit tests. the easiest way 
+to go about writing a unit test is to generate some input data, calculate what 
+you would expect to see and running the input over the object/method/func and 
+comparing the output with the generated data
+
+while this sounds simple it can be difficult to generate data that tests all 
+possible internal state executions exaustivly and as such i would recomend 
+focusing on the most taken paths first followed by the paths that are likley to 
+cause errors due to bad/malformed data from the programmer (and ethier check 
+that an exception was raised or an error returned)
+
+keep in mind there is such a thing as too much testing, if its tested it has to 
+be supported and writing tests takes time. it can be benifical to keep this in 
+mind and take a step back and think:
+
+* what does this function do
+* what does it not do
+* how should it react when it blows up
+
+if you can answer those 3 questions then try and implement what you came up 
+with into tests by testing everything it can do and what it does when it blows 
+up while making sure not to test what it does not do
+
+one other thing to avoid is testing beyond the object, if you are testing 
+specific objects against the unit under test because the behaviour is different 
+then you may want to stop and think about re-factoring the function i.e. if you 
+find yourself testing what happens when a specific object that is missing a 
+method you use is passed in rather than what happens when any object that is 
+missing the same method is passed in then you may have found yourself testing 
+'beyond the unit' and instead testing the integration between 2 components. in 
+this situation re-factoring so that the objects passed in all have the required 
+method is one solution or using a mock/dummy object for testing and just 
+accepting you cant extend the object may be another more generic solution
+
+the reason for using a generic (i.e defined at the unit test level) is that 
+your module should have no way of accessing the generic object ahead of time 
+and hence cant test for it specifically via 'is', 'isinstance', or 
+'issubclass' and as such you will find yourself writing code to handle any 
+object missing the method and not just special casing one object
+
+
+Coverage
+--------
+Where possible this project is automatically tested to avoid repeated manual 
+work. It is important to ensure that the tests are testing the code that we 
+intended to be tested. to do this the 'coverage' command was added to the 
+supplied Makefile that can supply coverage information simply execute:
+
+    > make coverage
+
+and annotated coverage information will be placed alongside your project code 
+in the form of {filename}.cover
+
+while not everything needs to be tested the more that is the better. also keep 
+in mind that the coverage maps may not give the full story about how well 
+something is tested, consider the following code
+
+    >>> def example(arg1, arg2):
+    ...     if arg1:
+    ...         val = 1
+    ...     if arg2:
+    ...         val = 2
+    ...     return val
+
+a simple test for the above code might check the function by first passing in a 
+non false value for arg1 and then the same for arg2. however if arg1 and arg2 
+are false this function fails with a NameError as val is undefined unless a 
+branch is taken
+
+the coverage map for this situation however would be 100% as both code paths 
+were taken once the results of all executions were added together
+
+as such it is important to carefully craft tests and use coverage to help 
+indicate what to improve and not as a measure of what has been fully tested
