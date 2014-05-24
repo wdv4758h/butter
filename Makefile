@@ -14,6 +14,7 @@ PREFIX=/usr
 
 SPHINX_OPTS     =
 SPHINX_BUILD    = sphinx-build
+SPHINX_APIDOC   = sphinx-apidoc
 PAPER           =
 PAPER_OPT       =
 DOC_BUILD_DIR   = docs/build
@@ -57,6 +58,11 @@ doc:
 	$(SPHINX_BUILD) -b html $(ALL_SPHINX_OPTS) $(DOC_BUILD_DIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(DOC_BUILD_DIR)/html."
+
+update-docs:
+	$(SPHINX_APIDOC) -o $(DOC_SOURCE_DIR) $(PROJECT)
+	@echo
+	@echo "API documents updated."
 
 cdoc:
 	rm -rf ./$(DOC_BUILD_DIR)/*
