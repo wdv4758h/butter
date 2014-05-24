@@ -109,12 +109,18 @@ class Fanotify_async:
     def close(self):
         self._fanotify.close()
 
+    def __repr__(self):
+        fd = self._fanotify._fd or "closed"
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
+
 def _watcher(loop):
     from ..fanotify import FAN_MODIFY, FAN_ONDIR, FAN_ACCESS, FAN_EVENT_ON_CHILD, FAN_OPEN, FAN_CLOSE
     
     fanotify = Fanotify_async(loop=loop)
     event_mask = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
     wd = fanotify.watch('/tmp', event_mask)
+
+    print(fanotify)
 
     print("Listening for events on /tmp")
     for i in range(5):
@@ -129,6 +135,8 @@ def _watcher(loop):
     print(event)
     event.close()
 
+    fanotify.close()
+    print(fanotify)
 
 def _main():
     import logging

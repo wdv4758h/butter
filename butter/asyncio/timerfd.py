@@ -59,12 +59,17 @@ class Timerfd_async:
     def close(self):
         self._timerfd.close()
 
+    def __repr__(self):
+        fd = self._timerfd._fd or "closed"
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
+
 def watcher(loop):
     from asyncio import sleep
     from time import time
     
     t = Timerfd_async()
-
+    print(t)
+    
     time_val = 0.5
     t.set_reoccuring(time_val)
     print("Setting time interval to {:.2f} seconds".format(time_val))
@@ -82,6 +87,9 @@ def watcher(loop):
     yield from sleep(0.3)
     print("Next event:", t.get_current())
     
+    t.close()
+    print(t)
+
 
 def main():
     import logging

@@ -55,25 +55,35 @@ class Signalfd_async:
     def close(self):
         self._signalfd.close()
 
+    def __repr__(self):
+        fd = self._signalfd._fd or "closed"
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
+ 
 def watcher(loop):
     from asyncio import sleep
     from ..signalfd import pthread_sigmask, SIG_BLOCK
     import signal
     import os
     
-    sfd = Signalfd_async(signal.SIGUSR1)
-    pthread_sigmask(SIG_BLOCK, signal.SIGUSR1)
-    sfd.enable(signal.SIGUSR1)
+    test_signal = signal.SIGUSR1
+
+    sfd = Signalfd_async(test_signal)
+    pthread_sigmask(SIG_BLOCK, test_signal)
+    sfd.enable(test_signal)
     
+    print(sfd)
+
     count = 5
     
     for i in range(count):
-        os.kill(os.getpid(), signal.SIGUSR1)
+        os.kill(os.getpid(), test_signal)
         sig = yield from sfd.wait()
         print(sig)
 
     print("Got all 5 signals")
 
+    sfd.close()
+    print(sfd)
 
 def main():
     import logging

@@ -124,8 +124,13 @@ class Eventfd(object):
         else:
             raise ValueError("I/O operation on closed file")
 
+    def __repr__(self):
+        fd = self._fd or "closed"
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
+
 def _main():
     ev = Eventfd(30)
+    print(ev)
     
     print('First Read:', int(ev))
     # read blocks if 0
@@ -154,6 +159,7 @@ def _main():
     else:
         print("Closed closed FD, this is bad")
     
+    print(ev)
     
 if __name__ == "__main__":
     _main()

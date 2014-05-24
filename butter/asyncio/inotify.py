@@ -107,11 +107,16 @@ class Inotify_async:
         
     def close(self):
         self._inotify.close()
+    
+    def __repr__(self):
+        fd = self._inotify._fd or "closed"
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
 
 def _watcher(loop):
     from ..inotify import IN_ALL_EVENTS
     
     inotify = Inotify_async(loop=loop)
+    print(inotify)
     wd = inotify.watch('/tmp', IN_ALL_EVENTS)
 
     for i in range(5):
@@ -124,6 +129,8 @@ def _watcher(loop):
     event = yield from inotify.get_event()
     print(event)
 
+    inotify.close()
+    print(inotify)
 
 def _main():
     import logging

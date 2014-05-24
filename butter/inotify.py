@@ -356,7 +356,8 @@ class Inotify(object):
         return events
         
     def __repr__(self):
-        return '<Inotify fd={}>'.format(self._fd)
+        fd = self._fd or 'closed'
+        return '<{} fd={}>'.format(self.__class__.__name__, fd)
 
     def __iter__(self):
         while True:
@@ -440,11 +441,13 @@ def main():
     dir = (sys.argv + ["/tmp"])[1]
     
     notifier = Inotify()
+    print(notifier)    
     notifier.watch(dir, IN_ALL_EVENTS)
     
     print("Watching {} for file changes".format(dir))
     
     for i, event in enumerate(notifier):
+        print(event)
         print('The following file has been modified: "{}" mask=0x{:04X} cookie={}'.format(
                     os.path.join(dir, event.filename.decode()), event.mask, event.cookie))
         if event.attrib_event:
@@ -472,7 +475,8 @@ def main():
         print("Unable to close a closed FD, OK")
     else:
         print("Attempted to close a closed FD and it sucseeded, FAILED")
-    
+
+    print(notifier)    
 
 if __name__ == "__main__":
     main()

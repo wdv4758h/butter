@@ -64,13 +64,20 @@ class Eventfd_async:
     def close(self):
         self._eventfd.close()
 
+    def __repr__(self):
+        fd = self._eventfd._fd or 'closed'
+        return "<{} fd={} value={}>".format(self.__class__.__name__, fd, self._value)
+
 def _watcher(loop):
     ev = Eventfd_async(10)
+    print(ev)
     print('Waiting read:', (yield from ev.read()))
     ev.increment(2)
     ev.increment(2)
     print('Waiting read:', (yield from ev.read()))
     print('No wait read:', ev.read_nowait())
+    ev.close()
+    print(ev)
     print('done')
 
 def _main():

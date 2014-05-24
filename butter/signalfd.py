@@ -292,6 +292,10 @@ class Signalfd(object):
         
         return Signal(siginfo)
 
+    def __repr__(self):
+        fd = self._fd or "closed"
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
+
 class Signal(object):
     """Proxy object for data returned by signalfd when a signal is recived
     
@@ -367,6 +371,7 @@ class Signal(object):
         signame = signum_to_signame.get(self.signal, self.signal)
         return "<{} signal={} uid={} pid={}>".format(self.__class__.__name__, signame, self.uid, self.pid)
 
+
 signum_to_signame = {val:key for key, val in _signal.__dict__.items()
                      if isinstance(val, int) and "_" not in key}
 
@@ -374,20 +379,23 @@ def _main():
     import signal
     import os
     
+    test_signal = signal.SIGUSR1
+    
     print("creating signalfd")
     sfd = Signalfd()
+    print(sfd)
     print("Enabling keyboard interrupt via signalfd")
-    sfd.enable(signal.SIGINT)
+    sfd.enable(test_signal)
 
-    print("Ignoring SIGINT via normal channels")
-#    signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT])
-    pthread_sigmask(SIG_BLOCK, [signal.SIGINT])
-    print("Sending self SIGINT")
-    os.kill(os.getpid(), signal.SIGINT)
+    print("Ignoring SIGUSR1 via normal channels")
+#    signal.pthread_sigmask(signal.SIG_BLOCK, [test_signal])
+    pthread_sigmask(SIG_BLOCK, [test_signal])
+    print("Sending self SIGUSR1")
+    os.kill(os.getpid(), test_signal)
 
-    print("Waiting for SIGINT")
+    print("Waiting for SIGUSR1")
     s = sfd.wait()
-    if s.signal == signal.SIGINT:
+    if s.signal == test_signal:
         print("We get signal")
     else:
         print("Bomb not set up")
@@ -401,6 +409,7 @@ def _main():
         print("Attempted to close closed signalfd and failed, OK")
     else:
         print("Attempted to close closed signalfd and succseeded, ERROR")
+    print(sfd)
     
     
 if __name__ == "__main__":
