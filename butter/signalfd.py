@@ -296,6 +296,22 @@ class Signalfd(object):
         fd = self._fd or "closed"
         return "<{} fd={}>".format(self.__class__.__name__, fd)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd == self._fd:
+                return True
+        return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd != self._fd:
+                return True
+        return False
+
+    def __hash__(self):
+        return hash(self.__class__) ^ hash(self._fd)
+
+
 class Signal(object):
     """Proxy object for data returned by signalfd when a signal is recived
     

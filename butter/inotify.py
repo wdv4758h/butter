@@ -363,6 +363,23 @@ class Inotify(object):
         while True:
             yield self.read_event()
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd == self._fd:
+                return True
+        return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd != self._fd:
+                return True
+        return False
+
+    def __hash__(self):
+        return hash(self.__class__) ^ hash(self._fd)
+
+
+
 InotifyEvent = namedtuple("InotifyEvent", "wd mask cookie filename")
 class InotifyEvent(InotifyEvent):
     __slots__ = []

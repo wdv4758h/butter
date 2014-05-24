@@ -204,6 +204,21 @@ class Fanotify(object):
         while True:
             yield self.read_event()
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd == self._fd:
+                return True
+        return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd != self._fd:
+                return True
+        return False
+
+    def __hash__(self):
+        return hash(self.__class__) ^ hash(self._fd)
+
     
 def fanotify_init(flags, event_flags=O_RDONLY):
     """Create a fanotify handle
