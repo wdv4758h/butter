@@ -16,6 +16,7 @@ Release History
 - Added pthread_sigmask
 - Added Signalfd
 - Added Signalfd asyncio support
+- Added Test Suite
 
 **Bug Fixes**
 
