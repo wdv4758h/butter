@@ -19,7 +19,7 @@ class Eventfd_async:
         self._eventfd.increment(value)
 
     @_asyncio.coroutine
-    def read(self):
+    def wait(self):
         """Read the current value of the counter and zero the counter
 
         Returns
@@ -35,7 +35,7 @@ class Eventfd_async:
 
         return (yield from waiter)
 
-    def read_nowait(self):
+    def get_last(self):
         return self._value
 
     def _consume_done_getters(self):
@@ -71,11 +71,11 @@ class Eventfd_async:
 def _watcher(loop):
     ev = Eventfd_async(10)
     print(ev)
-    print('Waiting read:', (yield from ev.read()))
+    print('Waiting read:', (yield from ev.wait()))
     ev.increment(2)
     ev.increment(2)
-    print('Waiting read:', (yield from ev.read()))
-    print('No wait read:', ev.read_nowait())
+    print('Waiting read:', (yield from ev.wait()))
+    print('No wait read:', ev.get_last())
     ev.close()
     print(ev)
     print('done')
