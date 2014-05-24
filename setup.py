@@ -63,7 +63,7 @@ setup(
     long_description = readme,
     license = "MIT BSD",
     keywords = "linux splice tee fanotify inotify eventfd signalfd timerfd aio clone unshare asyncio",
-    download_url = "http://code.pocketnix.org/butter/archive/tip.tar.bz2",
+    download_url = "http://blitz.works/butter/archive/tip.tar.bz2",
     classifiers = [
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
@@ -79,7 +79,7 @@ setup(
         "Intended Audience :: Developers",
         ],
     platforms=None,
-    url = "http://code.pocketnix.org/butter/file/tip",
+    url = "http://blitz.works/butter/file/tip",
 #    entry_points = {"console_scripts":["hammerhead=hammerhead:main",
 #                                       "hammerhead-enter=hammerhead:setns"],
 #                   },
