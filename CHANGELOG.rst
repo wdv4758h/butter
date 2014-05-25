@@ -19,6 +19,7 @@ Release History
 - Added Test Suite
 - Converted all high level event objects to Eventlike objects
 - Inotify events now have an is_dir_event property
+- Added test suite
 
 **Bug Fixes**
 
