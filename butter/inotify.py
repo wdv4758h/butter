@@ -330,6 +330,9 @@ class InotifyEvent(InotifyEvent):
     def move_self_event(self):
         return True if self.mask & IN_MOVE_SELF else False
 
+    @property
+    def is_dir_event(self):
+        return True if self.mask & IN_ISDIR else False
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
