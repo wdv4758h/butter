@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+from .utils import Eventlike as _Eventlike
+
 from os import read as _read, close as _close
 from select import select as _select
 from cffi import FFI as _FFI
@@ -200,7 +202,7 @@ def pthread_sigmask(how, signals):
             raise ValueError("Unknown Error: {}".format(err))
 
 
-class Signalfd(object):
+class Signalfd(_Eventlike):
     def __init__(self, sigmask=set(), flags=0):
         """Create a new Signalfd object
 
@@ -214,6 +216,8 @@ class Signalfd(object):
         SFD_CLOEXEC: Close the signalfd when executing a new program
         SFD_NONBLOCK: Open the socket in non-blocking mode
         """
+        super(self.__class__, self).__init__()
+        
         self._flags = flags
 
         self._sigmask = sigmask = _ffi.new('sigset_t[1]')
@@ -267,49 +271,14 @@ class Signalfd(object):
         _C.sigemptyset(self._sigmask)
         self._update()
         
-    def wait(self):
-        _select([self.fileno()], [], [])
-        event = self._read_signal()
-        
-        return event
-    
-    def close(self):
-        _close(self.fileno())
-        self._fd = None
-    
-    def fileno(self):
-        if self._fd:
-            return self._fd
-        else:
-            raise ValueError("I/O operation on closed file")
-        
-    def _read_signal(self):
+    def _read_events(self):
         SIGNALFD_SIGINFO_LENGTH = 128 # Bytes
         buf = _read(self.fileno(), SIGNALFD_SIGINFO_LENGTH)
         siginfo = _ffi.new('struct signalfd_siginfo *')
 
         _ffi.buffer(siginfo)[0:SIGNALFD_SIGINFO_LENGTH] = buf
         
-        return Signal(siginfo)
-
-    def __repr__(self):
-        fd = self._fd or "closed"
-        return "<{} fd={}>".format(self.__class__.__name__, fd)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd == self._fd:
-                return True
-        return False
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd != self._fd:
-                return True
-        return False
-
-    def __hash__(self):
-        return hash(self.__class__) ^ hash(self._fd)
+        return [Signal(siginfo)]
 
 
 class Signal(object):
