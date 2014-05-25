@@ -243,9 +243,8 @@ def str_to_events(str):
 
 
 class Inotify(_Eventlike):
-    _fd = None
-
     def __init__(self, flags=0):
+        super(self.__class__, self).__init__()
         fd = inotify_init(flags)
         self._fd = fd
         
