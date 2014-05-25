@@ -169,7 +169,7 @@ def _main():
     ev.close()
     try:
         ev.close()
-    except OSError:
+    except ValueError:
         print("Could not close closed FD, OK")
     else:
         print("Closed closed FD, this is bad")
