@@ -115,7 +115,7 @@ class Eventlike(object):
     ### Event like behavior ###
     def __iter__(self):
         while True:
-            yield self.read_event()
+            yield self.wait()
 
     def read_event(self):
         """Return a single event, may read more than one event from the kernel and cache the values
