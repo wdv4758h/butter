@@ -6,7 +6,6 @@ from __future__ import print_function
 from .utils import Eventlike as _Eventlike
 
 from os import write as _write, read as _read, close as _close
-from select import select as _select
 from cffi import FFI as _FFI
 import errno as _errno
 import math as _math

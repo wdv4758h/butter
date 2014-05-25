@@ -10,7 +10,6 @@ from os import fdopen as _fdopen, close as _close
 from os import read as _read
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os.path import join as _path_join
-from select import select as _select
 from collections import namedtuple
 from cffi import FFI as _FFI
 import errno as _errno
@@ -118,12 +117,8 @@ class Fanotify(_Eventlike):
 
     def _read_events(self):
         fd = self.fileno()
-        if self.blocking:
-            _select([fd], [], [])
-            buf_len = _get_buffered_length(fd)
-        else:
-            buf_len = _get_buffered_length(fd)
-            assert buf_len > 0, "_read_event called in non blocking mode when nothing to read"
+
+        buf_len = _get_buffered_length(fd)
         raw_events = _read(fd, buf_len)
 
         events = str_to_events(raw_events)
