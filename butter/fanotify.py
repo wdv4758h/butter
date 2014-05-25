@@ -276,41 +276,6 @@ def str_to_events(str):
 
     return events
 
-
-def main():
-    path = "/tmp"
-    
-    notifier = Fanotify(FAN_CLASS_NOTIF)
-    FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
-    notifier.watch(0, FLAGS, path)
-
-    print("Listening for events in {}".format(path))
-    for i, event in enumerate(notifier):
-        print("================================")
-        print('Version:        ', event.version)
-        print('Mask:            0x{:08X}'.format(event.mask))
-        print('Writer PID:     ', event.pid)
-        print('fd:             ', event.fd)
-        print('filename:       ', event.filename)
-        if event.access_event:
-            print("This is an access event")
-        if event.open_event:
-            print("This is an open event")
-        event.close()
-        
-        if i > 5:
-            break
-    
-    print("Caught 5 events")
-    print("Closing fanotify")
-    notifier.close()
-    try:
-        notifier.close()
-    except ValueError:
-        print("Tried to close closed file descriptor, OK")
-    else:
-        print("Was able to close a closed file decriptor, ERROR")
-
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
 # Make the fanotify flags more easily accessible by hoisting them out of the _C object
@@ -324,8 +289,3 @@ for key, value in _C.__dict__.items():
 # -_- <(This never happened, what you just saw was light reflecting off Venus)
 del l
 del key, value # python 2.x has vars escape from the scope of the loop, clean this up
-
-    
-if __name__ == "__main__":
-    main()
-

@@ -448,38 +448,3 @@ class Timerfd(_Eventlike):
         return [value[0]] # value's container is not a list
                           # lets make it one to expose a fammliar
                           # interface
-
-
-def _main():
-    from time import time, sleep
-    t = Timerfd()
-    
-    time_val = 0.5
-    t.set_reoccuring(time_val)
-    print("Setting time interval to {:.2f} seconds".format(time_val))
-    
-    for i in range(5):
-        old_time = time()
-        num_events = t.wait()
-        new_time = time()
-        assert num_events == 1, "Too many events"
-        print("Woke up after {:.2f} seconds".format(new_time - old_time))
-        
-    print("Got all 5 events")
-    
-    print("Sleeping for 0.3s")
-    sleep(0.3)
-    print("Next event:", t.get_current())
-
-    print("Closing timer")
-    t.close()
-    try:
-        t.close()
-    except ValueError:
-        print("Was unable to close closed FD, OK")
-    else:
-        print("Attemtped to close closed FD and succseeded, ERROR")
-    
-    
-if __name__ == "__main__":
-    _main()
