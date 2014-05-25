@@ -52,37 +52,3 @@ class Eventfd(_Eventlike):
 
     def __int__(self):
         return self.read_event()
-
-
-def _main():
-    ev = Eventfd(30)
-    
-    print('First Read:', int(ev))
-    # read blocks if 0
-    #print('Second Read:', int(ev))
-    
-    print("Adding 30 to zero'd counter")
-    ev.increment(30)
-    
-    print("Read value back:", int(ev))
-
-    print("Incrementing value 5 times")
-    ev.increment(30)
-    ev.increment(30)
-    ev.increment(30)
-    ev.increment(30)
-    ev.increment(30)
-    
-    print("Read value back:", int(ev))
-
-    print("Closing FD")    
-    ev.close()
-    try:
-        ev.close()
-    except ValueError:
-        print("Could not close closed FD, OK")
-    else:
-        print("Closed closed FD, this is bad")
-    
-if __name__ == "__main__":
-    _main()
