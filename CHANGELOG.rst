@@ -17,6 +17,7 @@ Release History
 - Added Signalfd
 - Added Signalfd asyncio support
 - Added Test Suite
+- Converted all high level event objects to Eventlike objects
 
 **Bug Fixes**
 
