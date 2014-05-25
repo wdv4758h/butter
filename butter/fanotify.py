@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 from .utils import get_buffered_length as _get_buffered_length
+from .utils import Eventlike as _Eventlike
 
 from os import getpid as _getpid, readlink as _readlink
 from os import fdopen as _fdopen, close as _close
@@ -85,17 +86,24 @@ _C = _ffi.verify("""
 #include <sys/fanotify.h>
 """, libraries=[])
 
-class Fanotify(object):
-    _fd = None
+class Fanotify(_Eventlike):
     blocking = True
+    
     def __init__(self, flags, event_flags=O_RDONLY):
-        fd = fanotify_init(flags, event_flags)
-        self._fd = fd
+        super(self.__class__, self).__init__()
+        self._fd = fanotify_init(flags, event_flags)
 
         self._events = []
 
         if flags & FAN_NONBLOCK:
             self.blocking = false
+        
+        if event_flags & O_RDWR|O_WRONLY:
+            self._mode = 'w+'
+        elif event_flags & O_WRONLY:
+            self._mode = 'w'
+        else:
+            self._mode = 'r'
 
     def watch(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_ADD
@@ -107,80 +115,6 @@ class Fanotify(object):
     def ignore(self, flags, mask, path, dfd=0):
         flags |= FAN_MARK_REMOVE
         fanotify_mark(self.fileno(), flags, mask, path, dfd)
-
-    def fileno(self):
-        if self._fd:
-            return self._fd
-        else:
-            raise ValueError("I/O operation on closed file")
-
-    def close(self):
-        _close(self.fileno())
-        self._fd = None
-
-    def closed(self):
-        return False if self._fd else True
-
-    def isatty(self):
-        return False
-
-    def mode(self):
-        return "r"
-
-    def name(self):
-        return "<fanotify fd:{}>".format(self._fd)
-
-    def read(self):
-        raise NotImplemented
-
-    def readable(self):
-        return False
-
-    def readlines(self):
-        raise NotImplemented
-
-    def seek(self):
-        raise NotImplemented
-
-    def seekable(self):
-        return False
-
-    def tell(self):
-        return 0
-
-    def truncate(self):
-        """Discard all events in the queue"""
-        self._events = []
-
-    def write(self):
-        raise NotImplemented
-
-    def writable(self):
-        return False
-
-    def writelines(self):
-        raise NotImplemented
-
-    def read_event(self):
-        """Return a single event, may read more than one event from the kernel and cache the values
-        """
-        try:
-            event = self._events.pop(0)
-        except IndexError:
-            events = self._read_events()
-            event = events.pop(0)
-            self._events = events
-
-        return event
-
-    def read_events(self):
-        """Read and return multiple events from the kernel"""
-        events = self._events
-        self._events = []
-        if len(events) > 0:
-            return events
-        else:
-            return self._read_events()
 
     def _read_events(self):
         fd = self.fileno()
@@ -196,28 +130,6 @@ class Fanotify(object):
 
         return events
 
-    def __repr__(self):
-        fd = self._fd or "closed"
-        return '<{} fd={}>'.format(self.__class__.__name__, fd)
-
-    def __iter__(self):
-        while True:
-            yield self.read_event()
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd == self._fd:
-                return True
-        return False
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd != self._fd:
-                return True
-        return False
-
-    def __hash__(self):
-        return hash(self.__class__) ^ hash(self._fd)
 
     
 def fanotify_init(flags, event_flags=O_RDONLY):

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+from select import select as _select
 from cffi import FFI as _FFI
+from os import close as _close
+from collections import deque
 import fcntl
 import array
 
@@ -18,3 +21,121 @@ def get_buffered_length(fd):
     fcntl.ioctl(fd, _C.FIONREAD, buf)
     return buf[0]
             
+
+class Eventlike(object):
+    _fd = None
+    def __init__(self, *args, **kwargs):
+        """*** This is a cooprative superclass, ensure you use super in the subclass's __init__ ***
+        eg: super(self.__class__, self).__init__(*args, **kwargs)
+        """
+        self._events = []
+        super(Eventlike, self).__init__()
+    
+    def close(self):
+        _close(self.fileno())
+        self._fd = None
+
+    def fileno(self):
+        if self._fd:
+            return self._fd
+        else:
+            raise ValueError("I/O operation on closed file")
+
+    def wait(self):
+        # we use select here as the FD may be opened in non blocking mode
+        _select([self.fileno()], [], [])
+
+        return self.read_event()
+
+    def closed(self):
+        return False if self._fd else True
+
+    def isatty(self):
+        return False
+
+    def mode(self):
+        return getattr(self, '_mode', "r")
+
+    def name(self):
+        return repr(self)
+
+    def read(self):
+        raise NotImplemented
+
+    def readable(self):
+        mode = getattr(self, '_mode', "r")
+        return True if 'r' in mode or '+' in mode else False
+
+    def readlines(self):
+        raise NotImplemented
+
+    def seek(self):
+        raise NotImplemented
+
+    def seekable(self):
+        return False
+
+    def tell(self):
+        return 0
+
+    def truncate(self):
+        """Discard all events in the queue"""
+        self._events = []
+
+    def write(self):
+        raise NotImplemented
+
+    def writable(self):
+        mode = getattr(self, '_mode', "r")
+        return True if 'w' in mode else False
+
+    def writelines(self):
+        raise NotImplemented
+
+    def __repr__(self):
+        fd = "closed" if self.closed() else self.fileno()
+        return "<{} fd={}>".format(self.__class__.__name__, fd)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd == self._fd:
+                return True
+        return False
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            if other._fd != self._fd:
+                return True
+        return False
+
+    def __hash__(self):
+        return hash(self.__class__) ^ hash(self._fd)
+
+
+    ### Event like behavior ###
+    def __iter__(self):
+        while True:
+            yield self.read_event()
+
+    def read_event(self):
+        """Return a single event, may read more than one event from the kernel and cache the values
+        """
+        try:
+            event = self._events.pop(0)
+        except IndexError:
+            events = self._read_events()
+            event = events.pop(0)
+            self._events = events
+
+        return event
+
+    def read_events(self):
+        """Read and return multiple events from the kernel
+        """
+        events = self._events
+        self._events = []
+        if len(events) > 0:
+            return events
+        else:
+            return self._read_events(count=count)
+
