@@ -60,17 +60,17 @@ class Eventlike(object):
         return repr(self)
 
     def read(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def readable(self):
         mode = getattr(self, '_mode', "r")
         return True if 'r' in mode or '+' in mode else False
 
     def readlines(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def seek(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def seekable(self):
         return False
@@ -83,14 +83,14 @@ class Eventlike(object):
         self._events = []
 
     def write(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def writable(self):
         mode = getattr(self, '_mode', "r")
         return True if 'w' in mode else False
 
     def writelines(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def __repr__(self):
         fd = "closed" if self.closed() else self.fileno()
