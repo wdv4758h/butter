@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+from .utils import Eventlike as _Eventlike
+
 from os import write as _write, read as _read, close as _close
 from cffi import FFI as _FFI
 import errno as _errno
@@ -72,7 +74,7 @@ EFD_CLOEXEC = _C.EFD_CLOEXEC
 EFD_NONBLOCK = _C.EFD_NONBLOCK
 EFD_SEMAPHORE = _C.EFD_SEMAPHORE
 
-class Eventfd(object):
+class Eventfd(_Eventlike):
     def __init__(self, inital_value=0, flags=0):
         """Create a new Eventfd object
 
@@ -87,6 +89,7 @@ class Eventfd(object):
         EFD_NONBLOCK: Open the socket in non-blocking mode
         EFD_SEMAPHORE: Provide semaphore like semantics for read operations
         """
+        super(self.__class__, self).__init__()
         self._fd = eventfd(inital_value, flags)
         
     def increment(self, value=1):
@@ -98,7 +101,7 @@ class Eventfd(object):
         packed_value = _ffi.buffer(packed_value)[:]
         _write(self.fileno(), packed_value)
 
-    def read(self):
+    def _read_events(self):
         """Read the current value of the counter and zero the counter
 
         Returns
@@ -109,39 +112,13 @@ class Eventfd(object):
         data = _read(self.fileno(), 8)
         value = _ffi.new('uint64_t[1]')
         _ffi.buffer(value, 8)[0:8] = data
-        
-        return value[0]
+
+        return [value[0]] # this may seem redundent but the original
+                          # container is not actually a list
 
     def __int__(self):
-        return self.read()
+        return self.read_event()
 
-    def close(self):
-        _close(self.fileno())
-
-    def fileno(self):
-        if self._fd:
-            return self._fd
-        else:
-            raise ValueError("I/O operation on closed file")
-
-    def __repr__(self):
-        fd = self._fd or "closed"
-        return "<{} fd={}>".format(self.__class__.__name__, fd)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd == self._fd:
-                return True
-        return False
-        
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd != self._fd:
-                return True
-        return False
-        
-    def __hash__(self):
-        return hash(self.__class__) ^ hash(self._fd)
 
 def _main():
     ev = Eventfd(30)
