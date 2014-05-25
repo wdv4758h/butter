@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+from .utils import Eventlike as _Eventlike
+
 from os import write as _write, read as _read, close as _close
 from select import select as _select
 from cffi import FFI as _FFI
@@ -366,7 +368,7 @@ TFD_TIMER_ABSTIME = _C.TFD_TIMER_ABSTIME
 CLOCK_REALTIME = _C.CLOCK_REALTIME
 CLOCK_MONOTONIC = _C.CLOCK_MONOTONIC
 
-class Timerfd(object):
+class Timerfd(_Eventlike):
     def __init__(self, clock_type=CLOCK_REALTIME, flags=0):
         """Create a new Timerfd object
 
@@ -382,6 +384,7 @@ class Timerfd(object):
         TFD_CLOEXEC: Close the timerfd when executing a new program
         TFD_NONBLOCK: Open the socket in non-blocking mode
         """
+        super(self.__class__, self).__init__()
         self._fd = timerfd(clock_type, flags)
         self._timerspec = TimerSpec()
     
@@ -424,35 +427,6 @@ class Timerfd(object):
         
         return old_timer
     
-    def _read(self):
-        data = _read(self.fileno(), 8)
-        value = _ffi.new('uint64_t[1]')
-        _ffi.buffer(value, 8)[0:8] = data
-
-        return value[0]
-
-    def wait(self):
-        """Wait for the next timer event (ethier one off or periodic)
-        
-        Returns
-        --------
-        :return: The amount of timerfd events that have fired since the last read()
-        :rtype: int
-        """
-        _select([self.fileno()], [], [])
-
-        return self._read()        
-    
-    def close(self):
-        _close(self.fileno())
-        self._fd = None
-
-    def fileno(self):
-        if self._fd:
-            return self._fd
-        else:
-            raise ValueError("I/O operation on closed file")
-
     @property
     def enabled(self):
         return self.get_current().enabled
@@ -467,24 +441,14 @@ class Timerfd(object):
 
         self._update(timer)
 
-    def __repr__(self):
-        fd = self._fd or "closed"
-        return "<{} fd={}>".format(self.__class__.__name__, fd)
+    def _read_events(self):
+        data = _read(self.fileno(), 8)
+        value = _ffi.new('uint64_t[1]')
+        _ffi.buffer(value, 8)[0:8] = data
 
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd == self._fd:
-                return True
-        return False
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            if other._fd != self._fd:
-                return True
-        return False
-
-    def __hash__(self):
-        return hash(self.__class__) ^ hash(self._fd)
+        return [value[0]] # value's container is not a list
+                          # lets make it one to expose a fammliar
+                          # interface
 
 
 def _main():
