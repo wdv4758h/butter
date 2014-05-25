@@ -353,7 +353,6 @@ def main():
     dir = (sys.argv + ["/tmp"])[1]
     
     notifier = Inotify()
-    print(notifier)    
     notifier.watch(dir, IN_ALL_EVENTS)
     
     print("Watching {} for file changes".format(dir))
@@ -387,8 +386,6 @@ def main():
         print("Unable to close a closed FD, OK")
     else:
         print("Attempted to close a closed FD and it sucseeded, FAILED")
-
-    print(notifier)    
 
 if __name__ == "__main__":
     main()

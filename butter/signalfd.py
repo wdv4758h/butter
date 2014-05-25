@@ -367,7 +367,6 @@ def _main():
     
     print("creating signalfd")
     sfd = Signalfd()
-    print(sfd)
     print("Enabling keyboard interrupt via signalfd")
     sfd.enable(test_signal)
 
@@ -393,7 +392,6 @@ def _main():
         print("Attempted to close closed signalfd and failed, OK")
     else:
         print("Attempted to close closed signalfd and succseeded, ERROR")
-    print(sfd)
     
     
 if __name__ == "__main__":

@@ -453,7 +453,6 @@ class Timerfd(_Eventlike):
 def _main():
     from time import time, sleep
     t = Timerfd()
-    print(t)
     
     time_val = 0.5
     t.set_reoccuring(time_val)
@@ -480,7 +479,6 @@ def _main():
         print("Was unable to close closed FD, OK")
     else:
         print("Attemtped to close closed FD and succseeded, ERROR")
-    print(t)
     
     
 if __name__ == "__main__":

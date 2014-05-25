@@ -122,7 +122,6 @@ class Eventfd(_Eventlike):
 
 def _main():
     ev = Eventfd(30)
-    print(ev)
     
     print('First Read:', int(ev))
     # read blocks if 0
@@ -150,8 +149,6 @@ def _main():
         print("Could not close closed FD, OK")
     else:
         print("Closed closed FD, this is bad")
-    
-    print(ev)
     
 if __name__ == "__main__":
     _main()

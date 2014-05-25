@@ -281,7 +281,6 @@ def main():
     path = "/tmp"
     
     notifier = Fanotify(FAN_CLASS_NOTIF)
-    print(notifier)
     FLAGS = FAN_MODIFY|FAN_ONDIR|FAN_ACCESS|FAN_EVENT_ON_CHILD|FAN_OPEN|FAN_CLOSE
     notifier.watch(0, FLAGS, path)
 
@@ -311,8 +310,6 @@ def main():
         print("Tried to close closed file descriptor, OK")
     else:
         print("Was able to close a closed file decriptor, ERROR")
-
-    print(notifier)
 
 # Provide a nice ID to NAME mapping for debugging
 signal_name = {}
