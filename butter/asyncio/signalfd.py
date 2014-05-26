@@ -37,7 +37,7 @@ class Signalfd_async:
             self._getters.popleft()
 
     def _read_event(self):
-        value = self._signalfd._read_events()[0]
+        value = self._signalfd.read_event()
         self._put_event(value)
     
     def _put_event(self, value):

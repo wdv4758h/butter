@@ -44,7 +44,7 @@ class Eventfd_async:
             self._getters.popleft()
 
     def _read_event(self):
-        value = self._eventfd.read()
+        value = self._eventfd.read_event()
         self._put_event(value)
     
     def _put_event(self, value):
