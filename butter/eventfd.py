@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """eventfd: maintain an atomic counter inside a file descriptor"""
 
-from __future__ import print_function
-
 from .utils import Eventlike as _Eventlike
 
 from ._eventfd import EFD_CLOEXEC, EFD_NONBLOCK, EFD_SEMAPHORE
