@@ -41,7 +41,7 @@ class Timerfd_async:
             self._getters.popleft()
 
     def _read_event(self):
-        value = self._timerfd._read()
+        value = self._timerfd._read_events()[0]
         self._put_event(value)
     
     def _put_event(self, value):
