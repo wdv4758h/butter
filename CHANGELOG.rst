@@ -7,13 +7,13 @@ Release History
 ++++++++++++++++
 
 - Added eventfd support
-- Added eventfd asyncio support
+- Added eventfd AsyncIO support
 - Added timerfd support
-- Added timerfd asyncio support
+- Added timerfd AsyncIO support
 - Added Signalfd
-- Added Signalfd asyncio support
+- Added Signalfd AsyncIO support
 - Added pthread_sigmask
-- asyncio objects now have a close() method
+- AsyncIO objects now have a close() method
 - Converted all high level event objects to Eventlike objects
 - Inotify events now have an is_dir_event property
 - Added test suite
