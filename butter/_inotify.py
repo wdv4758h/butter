@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
-from __future__ import print_function
-
-from .utils import get_buffered_length as _get_buffered_length
-from .utils import Eventlike as _Eventlike
 
 from collections import namedtuple
-from os import read as _read, close as _close
-from cffi import FFI as _FFI
-import errno as _errno
+from cffi import FFI
+import errno
 
 
-_ffi = _FFI()
-_ffi.cdef("""
+ffi = FFI()
+ffi.cdef("""
 /*
  * struct inotify_event - structure read from the inotify device for each event
  *
@@ -75,7 +70,7 @@ int inotify_add_watch(int fd, const char *pathname, uint32_t mask);
 int inotify_rm_watch(int fd, int wd);
 """)
 
-C = _ffi.verify("""
+C = ffi.verify("""
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
 """, libraries=[])
@@ -93,14 +88,14 @@ def inotify_init(flags=0):
     fd = C.inotify_init1(flags)
     
     if fd < 0:
-        err = _ffi.errno
-        if err == _errno.EINVAL:
+        err = ffi.errno
+        if err == errno.EINVAL:
             raise ValueError("Invalid argument or flag")
-        elif err == _errno.EMFILE:
+        elif err == errno.EMFILE:
             raise OSError("Maximum inotify instances reached")
-        elif err == _errno.ENFILE:
+        elif err == errno.ENFILE:
             raise OSError("File descriptor limit hit")
-        elif err == _errno.ENOMEM:
+        elif err == errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory avalible")
         else:
             # If you are here, its a bug. send us the traceback
@@ -168,20 +163,20 @@ def inotify_add_watch(fd, path, mask):
     wd = C.inotify_add_watch(fd, path, mask)
 
     if wd < 0:
-        err = _ffi.errno
-        if err == _errno.EINVAL:
+        err = ffi.errno
+        if err == errno.EINVAL:
             raise ValueError("The event mask contains no valid events; or fd is not an inotify file descriptor")
-        elif err == _errno.EACCES:
+        elif err == errno.EACCES:
             raise OSError("You do not have permission to read the specified path")
-        elif err == _errno.EBADF:
+        elif err == errno.EBADF:
             raise OSError("fd is not a valid file descriptor")
-        elif err == _errno.EFAULT:
+        elif err == errno.EFAULT:
             raise OSError("path points to a file/folder outside the processes accessible address space")
-        elif err == _errno.ENOENT:
+        elif err == errno.ENOENT:
             raise OSError("File/Folder pointed to by path does not exist")
-        elif err == _errno.ENOSPC:
+        elif err == errno.ENOSPC:
             raise OSError("Maximum number of watches hit or insufficent kernel resources")
-        elif err == _errno.ENOMEM:
+        elif err == errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory avalible")
         else:
             # If you are here, its a bug. send us the traceback
@@ -209,10 +204,10 @@ def inotify_rm_watch(fd, wd):
     ret = C.inotify_rm_watch(fd, wd)
 
     if ret < 0:
-        err = _ffi.errno
-        if err == _errno.EINVAL:
+        err = ffi.errno
+        if err == errno.EINVAL:
             raise ValueError("wd is invalid or fd is not an inotify File Descriptor")
-        elif err == _errno.EBADF:
+        elif err == errno.EBADF:
             raise OSError("fd is not a valid file descriptor")
         else:
             # If you are here, its a bug. send us the traceback
@@ -220,20 +215,20 @@ def inotify_rm_watch(fd, wd):
 
 
 def str_to_events(str):
-    event_struct_size = _ffi.sizeof('struct inotify_event')
+    event_struct_size = ffi.sizeof('struct inotify_event')
 
     events = []
 
-    str_buf = _ffi.new('char[]', len(str))
+    str_buf = ffi.new('char[]', len(str))
     str_buf[0:len(str)] = str
 
     i = 0
     while i < len(str_buf):
-        event = _ffi.cast('struct inotify_event *', str_buf[i:i+event_struct_size])
+        event = ffi.cast('struct inotify_event *', str_buf[i:i+event_struct_size])
 
         filename_start = i + event_struct_size
         filename_end = filename_start + event.len
-        filename = _ffi.string(str_buf[filename_start:filename_end])
+        filename = ffi.string(str_buf[filename_start:filename_end])
         
         events.append(InotifyEvent(event.wd, event.mask, event.cookie, filename))
         
