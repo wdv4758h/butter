@@ -19,7 +19,7 @@ struct inotify_event {
         uint32_t      mask;
         uint32_t      cookie;
         uint32_t      len;
-//        char          name[0];
+//        char          name[0]; # we calculate this manually in str_to_event
 };
 
 /* the following are legal, implemented events that user-space can watch for */
