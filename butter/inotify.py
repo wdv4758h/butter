@@ -16,7 +16,7 @@ _l = locals()
 for key in dir(_C):
     if key.startswith('IN_'):
         _l[key] = getattr(_C, key)
-
+del key
 
 class Inotify(_Eventlike):
     def __init__(self, flags=0):
