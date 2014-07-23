@@ -66,7 +66,7 @@ functionality
 AsyncIO
 ++++++++
 Some syscalls (ones that deal with fd's) have been made to work with the 
-asyncio framework that baecame avalible in python3.4. The asyncio enabled
+asyncio framework that became avalible in python3.4. The asyncio enabled
 object is named after the normal Event-like object equivlent with '_async'
 after it, eg Inotify => Inotify_async. These asyncio Eventlike objects are
 designed to act and behave like the asyncio.Queue object without the ability
