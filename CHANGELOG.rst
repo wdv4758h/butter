@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+0.9.1 (2015-01-05)
+++++++++++++++++++
+
+**Bug Fixes**
+
+- read_events was passing an undefined variable to actual implementations
+
 0.9 (2014-05-24)
 ++++++++++++++++
 
