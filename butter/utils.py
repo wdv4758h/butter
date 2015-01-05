@@ -137,5 +137,5 @@ class Eventlike(object):
         if len(events) > 0:
             return events
         else:
-            return self._read_events(count=count)
+            return self._read_events()
 
