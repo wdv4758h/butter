@@ -54,7 +54,7 @@ for readme_name in ("README", "README.rst", "README.md",
 setup(
     name = name,
     version = get_version(),
-    packages = [path], # corresponds to a dir 'epicworld' with a __init__.py in it
+    packages = [path, path + "/asyncio"], # corresponds to a dir 'epicworld' with a __init__.py in it
     author = "Da_Blitz",
     author_email = "code@pocketnix.org",
     maintainer=None,
