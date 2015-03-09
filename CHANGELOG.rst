@@ -6,6 +6,8 @@ Release History
 0.9.2 (2015-03-10)
 ++++++++++++++++++
 
+- Deprecating seccomp support in favour of official libseccomp python bindings
+
 **Bug Fixes**
 
 - Add __init__.py to asyncio dir so that async methods can be imported
