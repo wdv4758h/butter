@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+0.9.2 (2015-03-10)
+++++++++++++++++++
+
+**Bug Fixes**
+
+- Add __init__.py to asyncio dir so that async methods can be imported
+
 0.9.1 (2015-01-05)
 ++++++++++++++++++
 
