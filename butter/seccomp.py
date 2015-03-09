@@ -7,6 +7,10 @@ from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import fdopen
 import errno as _errno
 
+from warnings import warn
+
+warn(PendingDeprecationWarning(), "The seccomp module is deprecated in favour of the official bindings, please consider upgrading")
+
 READ_EVENTS_MAX = 10
 
 _ffi = _FFI()
