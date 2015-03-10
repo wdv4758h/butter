@@ -6,6 +6,8 @@ Release History
 0.9.3 (2015-03-10)
 ++++++++++++++++++
 
+- Added testing of syscall errno to Exception raising tests
+
 **Bug Fixes**
 
 - Fixed up the name of an exception in error handling code leading to double exception
