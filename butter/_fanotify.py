@@ -96,7 +96,7 @@ def fanotify_init(flags, event_flags=O_RDONLY):
         elif err == errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory avalible")
         elif err == errno.EPERM:
-            raise OSError("Operation not permitted")
+            raise PermissionError("Operation not permitted")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
