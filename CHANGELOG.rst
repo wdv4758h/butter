@@ -9,6 +9,7 @@ Release History
 **Bug Fixes**
 
 - Fixed up the name of an exception in error handling code leading to double exception
+- fanotify now raises PermissionError on EPERM instead of OSError (of which it is a subclass)
 
 0.9.2 (2015-03-10)
 ++++++++++++++++++
