@@ -87,7 +87,7 @@ setup(
     zip_safe = False,
     setup_requires = [],
     install_requires = ['cffi>=0.7.2'],
-    tests_require = ['tox', 'pytest', 'pytest-cov', 'pytest-mock'],
+    tests_require = ['tox', 'pytest', 'pytest-cov', 'pytest-mock', 'mock'],
     cmdclass = {'test': PyTest},
     ext_package = name,
 )
