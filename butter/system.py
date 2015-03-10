@@ -164,10 +164,10 @@ def mount(src, target, fs, flags=0, data=""):
     :raises ValueError: `src` is already mounted
     :raises ValueError: Filesystem cannot be mounted read only as it still holds files open for writing
     :raises ValueError: Target is busy (it is the working directory of some thread, the mount point of another device, has open files, etc.)
-    :raises OsError: `src` has an invalid superblock
-    :raises OsError: MS_REMOUNT was attempted but `src` is not mounted on `target`
-    :raises OsError: MS_MOVE attempted but `src` is not a mount point or is '/'
-    :raises OsError: Filesystem not available in the kernel
+    :raises OSError: `src` has an invalid superblock
+    :raises OSError: MS_REMOUNT was attempted but `src` is not mounted on `target`
+    :raises OSError: MS_MOVE attempted but `src` is not a mount point or is '/'
+    :raises OSError: Filesystem not available in the kernel
     :raises ValueError: Too many links encountered during pathname resolution
     :raises ValueError: MS_MOVE attempted while `target` is a descendent of `src`
     :raises ValueError: `src` or `target` longer than MAXPATHLEN

@@ -255,7 +255,7 @@ def timerfd(clock_type=0, flags=0):
         elif err == errno.ENFILE:
             raise OSError("Max system FD limit reached")
         elif err == errno.ENODEV:
-            raise OsError("Could not mount (internal) anonymous inode device")
+            raise OSError("Could not mount (internal) anonymous inode device")
         elif err == errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory available")
         else:
@@ -356,7 +356,7 @@ def timerfd_settime(fd, timer_spec, flags=0):
         elif err == errno.ENFILE:
             raise OSError("Max system FD limit reached")
         elif err == errno.ENODEV:
-            raise OsError("Could not mount (internal) anonymous inode device")
+            raise OSError("Could not mount (internal) anonymous inode device")
         elif err == errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory available")
         else:
