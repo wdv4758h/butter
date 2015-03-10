@@ -7,6 +7,13 @@ from collections import deque
 import fcntl
 import array
 
+import platform
+
+# Hack to backport PermissionError to older python versions
+if platform.python_version_tuple() < ('3', '0', '0'):
+    class PermissionError(OSError): pass
+PermissionError = PermissionError
+
 _ffi = _FFI()
 _ffi.cdef("""
 #define FIONREAD ...

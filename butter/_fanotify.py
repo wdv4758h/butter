@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
 
+from .utils import PermissionError
 from collections import namedtuple
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import getpid, readlink
