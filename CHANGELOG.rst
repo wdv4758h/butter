@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+0.9.3 (2015-03-10)
+++++++++++++++++++
+
+**Bug Fixes**
+
+- Fixed up the name of an exception in error handling code leading to double exception
+
 0.9.2 (2015-03-10)
 ++++++++++++++++++
 
