@@ -30,6 +30,7 @@ import errno
                          ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
+    """Test the mapping of kernel returned error codes to python Exceptions"""
     # patch the underlying function as exposed by cffi
     m = mocker.patch(path)
     # -1 forces most of our code to check ffi.errno
