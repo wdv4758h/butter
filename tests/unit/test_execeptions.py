@@ -2,6 +2,7 @@
 
 from butter import eventfd, _eventfd
 from butter import fanotify, _fanotify
+from butter import inotify, _inotify
 from butter.utils import PermissionError
 from pytest import raises
 import pytest
@@ -27,6 +28,25 @@ import errno
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOMEM, MemoryError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOSPC, OSError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+
+ ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EINVAL, ValueError),
+ ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EMFILE, OSError),
+ ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.ENFILE, OSError), # errno is diffrent to above
+ ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.ENOMEM, MemoryError),
+ ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EINVAL, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EACCES, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EBADF, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EFAULT, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOENT, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOSPC, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOMEM, MemoryError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+
+ ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EINVAL, ValueError),
+ ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EBADF, OSError),
+ ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
