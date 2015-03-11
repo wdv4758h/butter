@@ -3,8 +3,11 @@
 from butter import eventfd, _eventfd
 from butter import fanotify, _fanotify
 from butter import inotify, _inotify
+from butter import signalfd, _signalfd
+from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
 from butter.utils import PermissionError
 from pytest import raises
+from signal import SIGKILL
 import pytest
 import errno
 
@@ -47,6 +50,19 @@ import errno
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EINVAL, ValueError),
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EBADF, OSError),
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, 0xffff ^ (SFD_CLOEXEC|SFD_NONBLOCK)),  errno.EINVAL, ValueError),
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, SFD_CLOEXEC|SFD_NONBLOCK),  errno.EINVAL, OSError), # FD is invalid (set flags just to ensure nothing blows up)
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EBADF,  ValueError),
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENFILE, OSError),
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EMFILE, OSError),
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENODEV, OSError),
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENOMEM, MemoryError),
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+
+ ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
+ ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
+ ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
