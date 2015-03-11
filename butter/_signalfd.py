@@ -152,7 +152,7 @@ def pthread_sigmask(how, signals):
     
     Arguments
     ----------
-    :param int how: The mask of signals to listen for
+    :param int how: The action to take on the supplied signals (bitmask)
     :param list signals: An iterable of signals
     :param int signals: A single signal
     
