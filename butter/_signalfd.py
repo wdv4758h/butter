@@ -128,7 +128,7 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0):
         if err == errno.EBADF:
             raise ValueError("FD is not a valid file descriptor")
         elif err == errno.EINVAL:
-            if not (flags & (SFD_CLOEXEC|SFD_NONBLOCK)):
+            if (flags & (0xffffffff ^ (SFD_CLOEXEC|SFD_NONBLOCK))):
                 raise ValueError("Mask contains invalid values")
             else:
                 raise OSError("FD is not a signalfd")
