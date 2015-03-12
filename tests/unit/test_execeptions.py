@@ -5,6 +5,8 @@ from butter import fanotify, _fanotify
 from butter import inotify, _inotify
 from butter import signalfd, _signalfd
 from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
+from butter import timerfd, _timerfd
+from butter._timerfd import PointerError, TimerSpec
 from butter.utils import PermissionError
 from pytest import raises
 from signal import SIGKILL
@@ -63,6 +65,26 @@ import errno
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EHOSTDOWN, ValueError),
+
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EMFILE, OSError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENFILE, OSError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENODEV, OSError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENOMEM, MemoryError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EHOSTDOWN, ValueError),
+
+ ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EBADF, ValueError),
+ ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EFAULT, PointerError),
+ ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EHOSTDOWN, ValueError),
+
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerSpec()), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EFAULT, PointerError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EMFILE, OSError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENFILE, OSError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENODEV, OSError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENOMEM, MemoryError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
