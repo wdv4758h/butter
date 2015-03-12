@@ -352,7 +352,7 @@ def timerfd_settime(fd, timer_spec, flags=0):
             else:
                 raise ValueError('flags is invalid or fd not a timerfd')
         elif err == errno.EFAULT:
-            raise IOError("timer_spec does not point to a valid timer specfication")
+            raise PointerError("timer_spec does not point to a valid timer specfication")
         elif err == errno.EMFILE:
             raise OSError("Max per process FD limit reached")
         elif err == errno.ENFILE:
