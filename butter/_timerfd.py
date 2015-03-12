@@ -5,6 +5,8 @@ from cffi import FFI
 import errno
 import math
 
+class PointerError(Exception): pass
+
 ffi = FFI()
 ffi.cdef("""
 #define TFD_CLOEXEC ...
@@ -293,7 +295,7 @@ def timerfd_gettime(fd):
         if err == errno.EBADF:
             raise ValueError("fd is not a valid file descriptor")
         elif err == errno.EFAULT:
-            raise MemoryError("curr_val is not a valid pointer (internal/bug, let us know)")
+            raise PointerError("curr_val is not a valid pointer (internal/bug, let us know)")
         elif err == errno.EINVAL:
             raise ValueError("fd is not a valid timerfd")
         else:
