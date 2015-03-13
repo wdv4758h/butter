@@ -9,10 +9,14 @@ from butter import timerfd, _timerfd
 from butter._timerfd import PointerError, TimerSpec
 from butter.utils import PermissionError
 from butter import clone
+from butter import splice
 from pytest import raises
 from signal import SIGKILL
 import pytest
 import errno
+
+# monkey patch modeuls so we dont need to special case out code
+splice.ffi = splice._ffi
 
 @pytest.mark.parametrize('path,module,func,args,errno,exception', [
  ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.EINVAL, ValueError),
@@ -92,6 +96,23 @@ import errno
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EUSERS, PermissionError),
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.ENOMEM, MemoryError),
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EHOSTDOWN, ValueError),
+
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EINVAL, ValueError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0, 20), errno.EINVAL, ValueError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EBADF, OSError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EPIPE, OSError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.ENOMEM, MemoryError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EAGAIN, OSError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EHOSTDOWN, ValueError),
+
+ ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.EINVAL, ValueError),
+ ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.ENOMEM, MemoryError),
+ ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.EHOSTDOWN, ValueError),
+
+ ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EINVAL, ValueError),
+ ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EBADF, ValueError),
+ ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.ENOMEM, MemoryError),
+ ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
