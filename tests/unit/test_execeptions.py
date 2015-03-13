@@ -8,6 +8,7 @@ from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
 from butter import timerfd, _timerfd
 from butter._timerfd import PointerError, TimerSpec
 from butter.utils import PermissionError
+from butter import clone
 from pytest import raises
 from signal import SIGKILL
 import pytest
@@ -85,6 +86,12 @@ import errno
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENODEV, OSError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENOMEM, MemoryError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EHOSTDOWN, ValueError),
+
+ ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EINVAL, ValueError),
+ ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EPERM, PermissionError),
+ ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EUSERS, PermissionError),
+ ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.ENOMEM, MemoryError),
+ ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
