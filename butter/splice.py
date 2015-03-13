@@ -100,7 +100,7 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
         elif err == _errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory available")
         elif err == _errno.EAGAIN:
-            raise IOError("No writers on fd_in or a fd is open in BLOCKING mode and NON_BLOCK specified to splice()")
+            raise OSError("No writers on fd_in or a fd is open in BLOCKING mode and NON_BLOCK specified to splice()")
         else:
             # If you are here, its a bug. send us the traceback
             raise ValueError("Unknown Error: {}".format(err))
