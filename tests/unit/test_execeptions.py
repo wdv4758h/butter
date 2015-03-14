@@ -14,6 +14,7 @@ from butter import system
 from butter.system import Retry
 from pytest import raises
 from signal import SIGKILL
+from os import devnull
 import pytest
 import errno
 
@@ -142,6 +143,14 @@ system.ffi = system._ffi
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOMEM, MemoryError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EPERM, PermissionError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EHOSTDOWN, ValueError),
+
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EINVAL, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, (devnull, '/'), errno.ENOTDIR, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', devnull), errno.ENOTDIR, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.ENOTDIR, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EBUSY, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EPERM, PermissionError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
