@@ -10,6 +10,7 @@ from butter._timerfd import PointerError, TimerSpec
 from butter.utils import PermissionError
 from butter import clone
 from butter import splice
+from butter import system
 from pytest import raises
 from signal import SIGKILL
 import pytest
@@ -17,6 +18,7 @@ import errno
 
 # monkey patch modeuls so we dont need to special case out code
 splice.ffi = splice._ffi
+system.ffi = system._ffi
 
 @pytest.mark.parametrize('path,module,func,args,errno,exception', [
  ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.EINVAL, ValueError),
@@ -113,6 +115,22 @@ splice.ffi = splice._ffi
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EBADF, ValueError),
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.ENOMEM, MemoryError),
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EHOSTDOWN, ValueError),
+
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EACCES, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EBUSY, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EFAULT, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EINVAL, OSError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ELOOP, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EMFILE, OSError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENAMETOOLONG, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENODEV, OSError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOENT, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOMEM, MemoryError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOTBLK, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOTDIR, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENXIO, IOError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EPERM, PermissionError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
