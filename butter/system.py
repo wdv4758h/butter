@@ -173,7 +173,7 @@ def mount(src, target, fs, flags=0, data=""):
     :raises ValueError: `src` is nto a valid block device and a block device is required by this filesystem
     :raises ValueError: `target` or prefix of `src` is nto a directory
     :raises IOError: The major number of `src` is out of the range for valid block devices
-    :raises MemError: Kernel could not allocate enough memory to handle the request
+    :raises MemoryError: Kernel could not allocate enough memory to handle the request
     :raises PermissionError: No permission to pivot_root to new location
     """
     assert 0 < len(src) < MAXPATHLEN, "src is too long in length"
@@ -271,6 +271,7 @@ def umount(target, flags=0):
     :raises OSError: umount called with MNT_EXPIRE and ethier MNT_DETACH or MNT_FORCE
     :raises ValueError: Supplied path is too long
     :raises ValueError: Supplied path has an empty or non-existent component
+    :raises MemoryError: Kernel could not allocate enough memory to handle the request
     :raises PermissionError: No permission to pivot_root to new location
     """
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
@@ -298,7 +299,7 @@ def umount(target, flags=0):
         elif err == _errno.ENOENT:
             raise ValueError("A pathname was empty or had a nonexistent component")
         elif err == _errno.ENOMEM:
-            raise MemError("The kernel could not allocate a free page to copy filenames or data into")
+            raise MemoryError("The kernel could not allocate a free page to copy filenames or data into")
         elif err == _errno.EPERM:
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
