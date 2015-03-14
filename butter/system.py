@@ -371,10 +371,6 @@ def sethostname(hostname):
     ----------
     :param str hostname: The hostname to set
 
-    Flags
-    ------
-    SPLICE_F_GIFT: unused for splice() (vmsplice compatibility)
-
     Returns
     --------
     No return value
