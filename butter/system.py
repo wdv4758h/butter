@@ -396,9 +396,6 @@ def sethostname(hostname):
             # same as above, we check values and supply the right ones but just in case we 
             # handle the error case
             raise ValueError("length is negative or hostname is longer than allowed value")
-        elif err == _errno.ENAMETOOLONG:
-            # great, for some reason we did not allocate a long enough buffer
-            raise OSError("Supplied buffer not long enough")
         elif err == _errno.EPERM:
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
