@@ -424,6 +424,11 @@ def gethostname():
             raise ValueError("length is negative or hostname is longer than allowed value")
         elif err == _errno.ENAMETOOLONG:
             # great, for some reason we did not allocate a long enough buffer
+            # this is internal and is a bug in out code if reached
+            # we allocated HOST_NAME_MAX for the length above so this should
+            # be impossible to hit, using OSError rather than ValueError as the
+            # caller of this code did not provide an incorrect value but instead
+            # the platform/OS provided an invalid value
             raise OSError("Supplied buffer not long enough")
         elif err == _errno.EPERM:
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
