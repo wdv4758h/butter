@@ -11,6 +11,7 @@ Release History
 **Bug Fixes**
 
 - Fixed up the name of an exception in error handling code leading to double exception
+- pivot_root would return OSError rather than ValueError when incorect arguments were provided
 - system.py was using its own definition of PermissionError, unify this with utils.py
 - fanotify now raises PermissionError on EPERM instead of OSError (of which it is a subclass)
 
