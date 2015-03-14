@@ -343,18 +343,18 @@ def pivot_root(new, old):
     if err < 0:
         err = _ffi.errno
         if err == _errno.EINVAL:
-            raise ValueError("{} does not refer to a directory under {}".format(old, new))
+            raise ValueError("{} is not a sub-directory of {}".format(old, new))
         elif err == _errno.EBUSY:
             raise ValueError("old or new are on the current root filesystem or filesystem already mounted on {}".format(old))
         elif err == _errno.ENOTDIR:
             if _isdir(new):
-                raise OSError("{} is not a Directory".format(new))
+                raise ValueError("{} is not a Directory".format(new))
             elif _isdir(old):
-                raise OSError("{} is not a Directory".format(old))
+                raise ValueError("{} is not a Directory".format(old))
             else:
                 # this is a bug but testing for this case just in case, let us know if you
                 # hit it
-                raise OSError("old or new is not a dir but could not work out which one")
+                raise ValueError("old or new is not a dir but could not work out which one")
         elif err == _errno.EPERM:
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
