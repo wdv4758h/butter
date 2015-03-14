@@ -6,11 +6,12 @@ Release History
 0.9.3 (2015-03-10)
 ++++++++++++++++++
 
-- Added testing of syscall errno to Exception raising tests
+- errno to Exception mapping became a fixed part of the API (and unit tested)
 
 **Bug Fixes**
 
 - Fixed up the name of an exception in error handling code leading to double exception
+- system.py was using its own definition of PermissionError, unify this with utils.py
 - fanotify now raises PermissionError on EPERM instead of OSError (of which it is a subclass)
 
 0.9.2 (2015-03-10)
