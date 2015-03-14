@@ -226,7 +226,7 @@ def mount(src, target, fs, flags=0, data=""):
         elif err == _errno.ENOENT:
             raise ValueError("A pathname was empty or had a nonexistent component")
         elif err == _errno.ENOMEM:
-            raise MemError("The kernel could not allocate a free page to copy filenames or data into")
+            raise MemoryError("The kernel could not allocate a free page to copy filenames or data into")
         elif err == _errno.ENOTBLK:
             raise ValueError("source is not a block device and a device was required")
         elif err == _errno.ENOTDIR:
