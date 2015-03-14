@@ -118,9 +118,6 @@ getppid = _C.getppid
 class Retry(Exception):
     """Filesystem now marked as expired"""
 
-class PermissionError(Exception):
-    """You do not have the required pemissions to use this syscall (CAP_SYS_ADMIN)"""
-
 
 def mount(src, target, fs, flags=0, data=""):
     """Mount the specified filesystem at `target`

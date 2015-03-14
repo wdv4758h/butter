@@ -11,7 +11,9 @@ import platform
 
 # Hack to backport PermissionError to older python versions
 if platform.python_version_tuple() < ('3', '0', '0'):
-    class PermissionError(OSError): pass
+    class PermissionError(OSError):
+        """You do not have the required pemissions to use this syscall (CAP_SYS_ADMIN)"""
+        pass
 PermissionError = PermissionError
 
 _ffi = _FFI()
