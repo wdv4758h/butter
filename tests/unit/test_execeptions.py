@@ -11,6 +11,7 @@ from butter.utils import PermissionError
 from butter import clone
 from butter import splice
 from butter import system
+from butter.system import Retry
 from pytest import raises
 from signal import SIGKILL
 import pytest
@@ -131,6 +132,16 @@ system.ffi = system._ffi
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENXIO, IOError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EPERM, PermissionError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EHOSTDOWN, ValueError),
+
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EAGAIN, Retry),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EBUSY, ValueError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EFAULT, ValueError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EINVAL, OSError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENAMETOOLONG, ValueError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOENT, ValueError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOMEM, MemoryError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EPERM, PermissionError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
