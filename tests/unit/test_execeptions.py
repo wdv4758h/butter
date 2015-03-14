@@ -151,6 +151,17 @@ system.ffi = system._ffi
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EBUSY, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EPERM, PermissionError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EHOSTDOWN, ValueError),
+
+ ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EFAULT, ValueError),
+ ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EINVAL, ValueError),
+ ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EPERM, PermissionError),
+ ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EHOSTDOWN, ValueError),
+
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.EFAULT, ValueError),
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.EINVAL, ValueError),
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.ENAMETOOLONG, OSError),
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.EPERM, PermissionError),
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.EHOSTDOWN, ValueError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):
