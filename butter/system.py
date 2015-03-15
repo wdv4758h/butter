@@ -174,7 +174,7 @@ def mount(src, target, fs, flags=0, data=""):
     :raises ValueError: `target` or prefix of `src` is nto a directory
     :raises IOError: The major number of `src` is out of the range for valid block devices
     :raises MemoryError: Kernel could not allocate enough memory to handle the request
-    :raises PermissionError: No permission to pivot_root to new location
+    :raises PermissionError: No permission to mount filesystem
     """
     assert 0 < len(src) < MAXPATHLEN, "src is too long in length"
     assert 0 < len(target) < MAXPATHLEN, "target is too long in length"
