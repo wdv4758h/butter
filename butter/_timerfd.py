@@ -249,7 +249,7 @@ def timerfd(clock_type=CLOCK_MONOTONIC, flags=0):
     if fd < 0:
         err = ffi.errno
         if err == errno.EINVAL:
-            if not (clock_type & CLOCK_MONOTONIC) or not (clock_type & CLOCK_REALTIME):
+            if not (clock_type & CLOCK_MONOTONIC) and not (clock_type & CLOCK_REALTIME):
                 raise ValueError("clock_type is not one of CLOCK_MONOTONIC or CLOCK_REALTIME")
             raise ValueError("Invalid value in flags")
         elif err == errno.EMFILE:

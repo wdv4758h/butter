@@ -6,7 +6,7 @@ from butter import inotify, _inotify
 from butter import signalfd, _signalfd
 from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
 from butter import timerfd, _timerfd
-from butter._timerfd import PointerError, TimerSpec
+from butter._timerfd import PointerError, TimerSpec, CLOCK_REALTIME, CLOCK_MONOTONIC
 from butter.utils import PermissionError
 from butter import clone
 from butter import splice
@@ -75,7 +75,8 @@ system.ffi = system._ffi
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EHOSTDOWN, ValueError),
 
- ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (0xffff ^ (CLOCK_REALTIME | CLOCK_MONOTONIC),), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (0xffff,), errno.EINVAL, ValueError),
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EMFILE, OSError),
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENFILE, OSError),
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENODEV, OSError),
@@ -147,7 +148,7 @@ system.ffi = system._ffi
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EINVAL, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, (devnull, '/'), errno.ENOTDIR, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', devnull), errno.ENOTDIR, ValueError),
- ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.ENOTDIR, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, (devnull, devnull), errno.ENOTDIR, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EBUSY, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EPERM, PermissionError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EHOSTDOWN, ValueError),
