@@ -7,6 +7,7 @@ Release History
 ++++++++++++++++++
 
 - errno to Exception mapping became a fixed part of the API (and unit tested)
+- timerfd is not CLOCK_MONOTONIC by default
 
 **Bug Fixes**
 

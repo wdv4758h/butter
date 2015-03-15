@@ -215,7 +215,7 @@ class TimerSpec(object):
         return "<{} next={:.3f}s reoccuring={:.3f}s>".format(self.__class__.__name__, self.next_event, self.reoccuring)
 
 
-def timerfd(clock_type=0, flags=0):
+def timerfd(clock_type=CLOCK_MONOTONIC, flags=0):
     """Create a new timerfd
     
     Arguments
@@ -249,7 +249,7 @@ def timerfd(clock_type=0, flags=0):
     if fd < 0:
         err = ffi.errno
         if err == errno.EINVAL:
-            if not clock_type  & (CLOCK_MONOTONIC|CLOCK_REALTIME):
+            if not (clock_type & CLOCK_MONOTONIC) or not (clock_type & CLOCK_REALTIME):
                 raise ValueError("clock_type is not one of CLOCK_MONOTONIC or CLOCK_REALTIME")
             raise ValueError("Invalid value in flags")
         elif err == errno.EMFILE:
