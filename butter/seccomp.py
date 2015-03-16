@@ -210,7 +210,7 @@ uint64_t _SCMP_ACT_TRACE(uint64_t code) {
     return 0x00050000U | (code & 0x0000ffffU);
 }
 
-""", libraries=['seccomp'])
+""", libraries=['seccomp'], ext_package="butter")
 
 
 def condition(arg=0, comparison=_C.SCMP_CMP_EQ, arg1=_ffi.NULL, arg2=_ffi.NULL):

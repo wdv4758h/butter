@@ -73,7 +73,7 @@ int inotify_rm_watch(int fd, int wd);
 C = ffi.verify("""
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 def inotify_init(flags=0):
     """Initialise an inotify instnace and return a File Descriptor to refrence is

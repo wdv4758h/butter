@@ -15,7 +15,7 @@ int eventfd(unsigned int initval, int flags);
 C = ffi.verify("""
 #include <sys/eventfd.h>
 #include <stdint.h> /* Definition of uint64_t */
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 def eventfd(inital_value=0, flags=0):
     """Create a new eventfd

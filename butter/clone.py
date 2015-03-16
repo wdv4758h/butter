@@ -35,7 +35,7 @@ C = ffi.verify("""
 long __clone(unsigned long flags, void *child_stack,
              void *ptid, void *ctid,
              void *regs);
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 CLONE_ALL = C.CLONE_NEWIPC  | \
             C.CLONE_NEWNET  | \

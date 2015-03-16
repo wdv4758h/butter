@@ -79,7 +79,7 @@ int fanotify_mark (int fanotify_fd, unsigned int flags, uint64_t mask, int dfd, 
 C = ffi.verify("""
 #include <linux/fcntl.h>
 #include <sys/fanotify.h>
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 def fanotify_init(flags, event_flags=O_RDONLY):
     """Create a fanotify handle

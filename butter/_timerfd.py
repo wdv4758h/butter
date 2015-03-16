@@ -42,7 +42,7 @@ C = ffi.verify("""
 #include <sys/timerfd.h>
 #include <stdint.h> /* Definition of uint64_t */
 #include <time.h>
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 
 TFD_CLOEXEC = C.TFD_CLOEXEC

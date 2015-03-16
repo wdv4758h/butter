@@ -66,7 +66,7 @@ C = ffi.verify("""
 #include <sys/signalfd.h>
 #include <stdint.h> /* Definition of uint64_t */
 #include <signal.h>
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 SFD_CLOEXEC = C.SFD_CLOEXEC
 SFD_NONBLOCK = C.SFD_NONBLOCK

@@ -89,7 +89,7 @@ int32_t getpid(void){
 int32_t getppid(void){
     return syscall(SYS_getppid);
 };
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 MS_BIND = _C.MS_BIND
 MS_DIRSYNC = _C.MS_DIRSYNC

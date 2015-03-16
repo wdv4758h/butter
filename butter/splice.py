@@ -41,7 +41,7 @@ void * convert_str_to_void(char * buf){
     /* While simple, this is a work around for the cffi lib in python */
     return (void *)buf;
 };
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
     """Take data from fd_in and pass it to fd_out without going through userspace

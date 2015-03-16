@@ -23,7 +23,7 @@ _ffi.cdef("""
 
 _C = _ffi.verify("""
 #include <sys/ioctl.h>
-""", libraries=[])
+""", libraries=[], ext_package="butter")
 
 def get_buffered_length(fd):
     buf = array.array("I", [0])
