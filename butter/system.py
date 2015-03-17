@@ -19,11 +19,6 @@ intergrarated into butter in this module
           it performs
 * getppid: Call the syscall `getppid` directly, bypassing glibc and any caching 
            it performs
-
-
-For example usage of the above functions look at thier docstrings of the 
-function body of _main() in this module which includes short examples for 
-quick testing
 """
 
 from __future__ import print_function
@@ -439,44 +434,3 @@ def gethostname():
     hostname = _ffi.string(hostname, HOST_NAME_MAX)
 
     return hostname
-    
-
-def _main():
-    import os
-    
-    path = "/tmp/test"
-    print("Mounting temp filesystem at {}".format(path))
-    try:
-        os.mkdir(path)
-    except OSError:
-        pass
-    mount('tmpfs-testing', path, 'tmpfs')
-    
-    #print("Pivoting to temp filesystem")
-    #pivot_root('/tmp', '/tmp')
-    
-    print("Unmounting temp filesystem")
-    umount(path)
-    
-    hostname = gethostname()
-    print("Old Hostname:", hostname)
-    try:
-        sethostname('dsadsa')
-    except OSError:
-        print("Error: Could not set hostname")
-    print("New Hostname:", gethostname())
-    print("Resorting old hostname")
-    try:
-        sethostname(hostname)
-    except OSError:
-        print("Error: Could not restore hostname")
-    
-    print()
-    
-    print("{}".format("Syscall PID:"), getpid())
-    print("os PID: ", os.getpid())
-    print("Syscall PPID: ", _C.getppid())
-    print("os PPID: ", os.getppid())
-
-if __name__ == "__main__":
-    _main()
