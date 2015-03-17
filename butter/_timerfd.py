@@ -346,9 +346,13 @@ def timerfd_settime(fd, timer_spec, flags=0):
         err = ffi.errno
         if err == errno.EINVAL:
             if timer_spec.it_interval.tv_sec > 999999999:
-                raise ValueError("Nano seconds in it_interval is > 999,999,999")
+                raise ValueError("Repeat Seconds > 999,999,999")
+            elif timer_spec.it_interval.tv_nsec > 999999999:
+                raise ValueError("Repeat Nano seconds > 999,999,999")
+            elif timer_spec.it_value.tv_sec > 999999999:
+                raise ValueError("Offset Seconds > 999,999,999")
             elif timer_spec.it_value.tv_nsec > 999999999:
-                raise ValueError("Nano seconds in it_value is > 999,999,999")
+                raise ValueError("Offset Nano seconds > 999,999,999")
             else:
                 raise ValueError('flags is invalid or fd not a timerfd')
         elif err == errno.EFAULT:
