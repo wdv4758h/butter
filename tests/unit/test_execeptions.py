@@ -71,8 +71,8 @@ system.ffi = system._ffi
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENOMEM, MemoryError),
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
 
- ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
- ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EMFILE, ValueError),
+ ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EINVAL, ValueError),
+ ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EFAULT, ValueError),
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EHOSTDOWN, ValueError),
 
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (0xffff ^ (CLOCK_REALTIME | CLOCK_MONOTONIC),), errno.EINVAL, ValueError),
