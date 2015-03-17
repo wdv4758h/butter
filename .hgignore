@@ -12,3 +12,5 @@ __pycache__
 .tox/
 
 .coverage
+
+_cffi__*.so
