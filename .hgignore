@@ -14,3 +14,4 @@ __pycache__
 .coverage
 
 _cffi__*.so
+*,cover
