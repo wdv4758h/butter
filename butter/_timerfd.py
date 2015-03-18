@@ -77,8 +77,10 @@ class TimerVal(object):
         if nano_seconds:
             self._timerspec.it_interval.tv_nsec = nano_seconds
         return self
+        
     def repeat(self, seconds=None, nano_seconds=None):
         return self.every(seconds, nano_seconds)
+        
     def repeats(self, seconds=None, nano_seconds=None):
         return self.every(seconds, nano_seconds)
     
@@ -88,6 +90,7 @@ class TimerVal(object):
         if nano_seconds:
             self._timerspec.it_value.tv_nsec = nano_seconds
         return self
+        
     def offset(self, seconds=None, nano_seconds=None):
         return self.after(seconds, nano_seconds)
 
