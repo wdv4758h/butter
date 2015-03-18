@@ -135,7 +135,7 @@ system.ffi = system._ffi
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOMEM, MemoryError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOTBLK, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOTDIR, ValueError),
- ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENXIO, IOError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENXIO, OSError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EPERM, PermissionError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EHOSTDOWN, ValueError),
 
