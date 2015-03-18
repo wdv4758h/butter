@@ -167,7 +167,7 @@ def mount(src, target, fs, flags=0, data=""):
     :raises ValueError: `src` or `target` contains an empty or non existent component
     :raises ValueError: `src` is nto a valid block device and a block device is required by this filesystem
     :raises ValueError: `target` or prefix of `src` is nto a directory
-    :raises IOError: The major number of `src` is out of the range for valid block devices
+    :raises OSError: The major number of `src` is out of the range for valid block devices
     :raises MemoryError: Kernel could not allocate enough memory to handle the request
     :raises PermissionError: No permission to mount filesystem
     """
@@ -224,7 +224,7 @@ def mount(src, target, fs, flags=0, data=""):
         elif err == _errno.ENOTDIR:
             raise ValueError("target, or a prefix of source, is not a directory")
         elif err == _errno.ENXIO:
-            raise IOError("The major number of the block device source is out of range")
+            raise OSError("The major number of the block device source is out of range")
         elif err == _errno.EPERM:
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:

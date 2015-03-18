@@ -75,8 +75,8 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
     :raises OSError: supplied fd does not refer to a file
     :raises OSError: Incorrect mode for file
     :raises MemoryError: Insufficient kernel memory
-    :raises IOError: No writers waiting on fd_in
-    :raises IOError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
+    :raises OSError: No writers waiting on fd_in
+    :raises OSError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
     """
     fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
     fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
