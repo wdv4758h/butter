@@ -9,6 +9,8 @@ Release History
 - errno to Exception mapping became a fixed part of the API (and unit tested)
 - timerfd is now CLOCK_MONOTONIC by default
 - Added Simplier TimerVal to replace Timerspec for timerfd
+- Deprecated TimerStruct (will print a DeprecationWarning if such warnings have been turned on)
+- OSError now returned instead of IOError. on python3 IOError = OSError so identical behavior will be observed
 
 **Bug Fixes**
 
