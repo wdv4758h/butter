@@ -6,7 +6,7 @@ from butter import inotify, _inotify
 from butter import signalfd, _signalfd
 from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
 from butter import timerfd, _timerfd
-from butter._timerfd import PointerError, TimerSpec, CLOCK_REALTIME, CLOCK_MONOTONIC
+from butter._timerfd import PointerError, TimerVal, CLOCK_REALTIME, CLOCK_MONOTONIC
 from butter.utils import PermissionError
 from butter import clone
 from butter import splice
@@ -88,11 +88,11 @@ system.ffi = system._ffi
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EINVAL, ValueError),
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EHOSTDOWN, ValueError),
 
- ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerSpec()), errno.EINVAL, ValueError),
- ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerSpec(reoccuring_seconds=999999999+1)), errno.EINVAL, ValueError),
- ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerSpec(reoccuring_nano_seconds=999999999+1)), errno.EINVAL, ValueError),
- ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerSpec(one_off_seconds=999999999+1)), errno.EINVAL, ValueError),
- ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerSpec(one_off_nano_seconds=999999999+1)), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal()), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal().repeats(seconds=999999999+1)), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal().repeats(nano_seconds=999999999+1)), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal().offset(seconds=999999999+1)), errno.EINVAL, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal().offset(nano_seconds=999999999+1)), errno.EINVAL, ValueError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EFAULT, PointerError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EMFILE, OSError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENFILE, OSError),

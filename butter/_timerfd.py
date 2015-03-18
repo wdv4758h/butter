@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-"""timerfd: recive timing events on a file descriptor"""
+"""timerfd: recive timing events on a file descriptor
+
+For new code use TimerVal instead of TimerSpec as TimerSpec is slated to be removed 
+after the 1.0 release and provides a simplier and faster interface that is easier
+to interpret
+"""
 
 from cffi import FFI
 import errno
@@ -52,6 +57,61 @@ TFD_TIMER_ABSTIME = C.TFD_TIMER_ABSTIME
 CLOCK_REALTIME = C.CLOCK_REALTIME
 CLOCK_MONOTONIC = C.CLOCK_MONOTONIC
 
+class TimerVal(object): 
+    """ timer = TimerVal()
+    timer.occuring.every(mins=5, nano_seconds=3).after(seconds=5)
+    timer.offset(seconds=3).and_repeats.every(seconds=5)
+    """
+    def __init__(self):
+        self._timerspec = ffi.new('struct itimerspec *')
+
+    @property
+    def occuring(self):
+        return self
+    def and_repeats(self):
+        return self
+    
+    def every(self, seconds=None, nano_seconds=None):
+        if seconds:
+            self._timerspec.it_interval.tv_sec = seconds
+        if nano_seconds:
+            self._timerspec.it_interval.tv_nsec = nano_seconds
+        return self
+    def repeat(self, seconds=None, nano_seconds=None):
+        return self.every(seconds, nano_seconds)
+    def repeats(self, seconds=None, nano_seconds=None):
+        return self.every(seconds, nano_seconds)
+    
+    def after(self, seconds=None, nano_seconds=None):
+        if seconds:
+            self._timerspec.it_value.tv_sec = seconds
+        if nano_seconds:
+            self._timerspec.it_value.tv_nsec = nano_seconds
+        return self
+    def offset(self, seconds=None, nano_seconds=None):
+        return self.after(seconds, nano_seconds)
+
+    def __timerspec__(self):
+        return self._timerspec
+
+    def __bool__(self):
+        return bool(self.it_value.tv_sec or self.it_value.tv_nsec)
+    
+    @property
+    def enabled(self):
+        """Will this timer fire if used?, returns a bool"""
+        return bool(self)
+    
+    @property
+    def next_event(self):
+        """Convenience accessor for results returned by timerfd_gettime"""
+        return (self.it_value.tv_sec, self.it_value.tv_nsec)
+    
+    def __repr__(self):
+        return "<{} offset=({}s, ()ns) reoccuring=({}s, {}ns)>".format(self.__class__.__name__,
+                                                                       self.it_value.tv_sec, self.it_value.tv_nsec,
+                                                                       self.it_interval.tv_sec, self.it_interval.tv_nsec)
+
 
 class TimerSpec(object):
     """Thin wrapper around the itimerspec c struct providing convience methods"""
@@ -74,6 +134,10 @@ class TimerSpec(object):
         :param int one_off_nanon_seconds: set a one off intervals nano seconds field
         :param int timerspec: set the timerspec to an exisiting timerspec
         """
+        from warnings import warn
+        
+        warn(PendingDeprecationWarning(), "TimerSpec has been replaced by TimerVal")
+        
         self._timerspec = ffi.new('struct itimerspec *')
         # cheap clone (this is harder than it appears at fist glance)
         if timerspec:
