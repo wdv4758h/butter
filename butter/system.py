@@ -197,7 +197,7 @@ def mount(src, target, fs, flags=0, data=""):
     if err < 0:
         err = _ffi.errno
         if err == _errno.EACCES:
-            raise ValueError("A component of a path was not searchable. (See also path_resolution(7).) Or, mounting a read-only filesystem was attempted without giving the MS_RDONLYflag. Or, the block device source is located on a filesystem mounted with the MS_NODEV option")
+            raise PermissionError("A component of a path was not searchable. (See also path_resolution(7).) Or, mounting a read-only filesystem was attempted without giving the MS_RDONLYflag. Or, the block device source is located on a filesystem mounted with the MS_NODEV option")
         elif err == _errno.EBUSY:
             raise ValueError("source is already mounted. Or, it cannot be remounted read-only, because it still holds files open for writing. Or, it cannot be mounted on target because target is still busy (it is the working directory of some thread, the mount point of another device, has open files, etc.)")
         elif err == _errno.EFAULT:
