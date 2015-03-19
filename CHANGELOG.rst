@@ -11,6 +11,8 @@ Release History
 - Added Simplier TimerVal to replace Timerspec for timerfd
 - Deprecated TimerStruct (will print a DeprecationWarning if such warnings have been turned on)
 - OSError now returned instead of IOError. on python3 IOError = OSError so identical behavior will be observed
+- Identical Error codes now return Indetical Exceptions, excepet where there is a clear reason not o (eg InternalError)
+- Errors due to incorrect arguments now all raise ValueError instead orf ValueError or OSError
 
 **Bug Fixes**
 
