@@ -2,7 +2,7 @@
 """timerfd: recive timing events on a file descriptor"""
 
 from .utils import Eventlike as _Eventlike
-from ._timerfd import TimerSpec, timerfd, timerfd_gettime, timerfd_settime
+from ._timerfd import TimerVal, TimerSpec, timerfd, timerfd_gettime, timerfd_settime
 from ._timerfd import TFD_CLOEXEC, TFD_NONBLOCK, TFD_TIMER_ABSTIME
 from ._timerfd import CLOCK_REALTIME, CLOCK_MONOTONIC
 from ._timerfd import ffi as _ffi
