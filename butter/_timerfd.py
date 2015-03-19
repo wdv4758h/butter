@@ -406,6 +406,8 @@ def timerfd_settime(fd, timer_spec, flags=0):
     """
     if hasattr(timer_spec, '__timerspec__'):
         timer_spec = timer_spec.__timerspec__()
+
+    assert isinstance(timer_spec, FFI.CData) # ensure passed in value is what we want
     
     if hasattr(fd, 'fileno'):
         fd = fd.fileno()
