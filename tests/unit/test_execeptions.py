@@ -7,7 +7,7 @@ from butter import signalfd, _signalfd
 from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
 from butter import timerfd, _timerfd
 from butter._timerfd import PointerError, TimerVal, CLOCK_REALTIME, CLOCK_MONOTONIC
-from butter.utils import PermissionError
+from butter.utils import PermissionError, InternalError
 from butter import clone
 from butter import splice
 from butter import system
@@ -164,7 +164,7 @@ system.ffi = system._ffi
 
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EFAULT, ValueError),
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EINVAL, ValueError),
- ('butter.system._C.gethostname', system, system.gethostname, (), errno.ENAMETOOLONG, OSError),
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.ENAMETOOLONG, InternalError),
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EPERM, PermissionError),
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EHOSTDOWN, ValueError),
  ])

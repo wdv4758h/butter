@@ -23,7 +23,7 @@ intergrarated into butter in this module
 
 from __future__ import print_function
 
-from .utils import PermissionError
+from .utils import PermissionError, InternalError
 from os.path import isdir as _isdir
 from cffi import FFI as _FFI
 import errno as _errno
@@ -421,10 +421,10 @@ def gethostname():
             # great, for some reason we did not allocate a long enough buffer
             # this is internal and is a bug in out code if reached
             # we allocated HOST_NAME_MAX for the length above so this should
-            # be impossible to hit, using OSError rather than ValueError as the
+            # be impossible to hit, using InternalError rather than ValueError as the
             # caller of this code did not provide an incorrect value but instead
             # the platform/OS provided an invalid value
-            raise OSError("Supplied buffer not long enough")
+            raise InternalError("Supplied buffer not long enough")
         elif err == _errno.EPERM:
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
