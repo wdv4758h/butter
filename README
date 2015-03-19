@@ -3,8 +3,20 @@
 ========
 Butter is a library to integrate some of Linux's low level features into python
 eg signalfd, eventfd and timerfd. most of these functions are handy if you are 
-looking into creating non-blocking servers, anything using select/poll and 
-derivatives or writing server code
+looking into creating non-blocking servers, dealing with event loops or writing
+high performance services
+
+Features
+---------
+ * Full testing of all error conditions in unit tests
+ * Small set of exceptions to deal with
+ * asyncio compatible versions of calls
+ * Emulationa nd reuse of built in objects wherever possible
+ * Both low level 1:1 calls and a high level interface available
+ * Default values chosen follow 'least surprise' principle (eg CLOCK_MONOTONIC
+   instead of CLOCK_REALTIME to avoid issues with clock updates)
+ * Single codebase supporting python 2 and python 3 without modifcation for 
+   easier forward migration
 
 Whats Available
 ----------------
@@ -80,10 +92,10 @@ Butter was designed to have a small set of easily catchable exceptions and to
 reuse the builtin exceptions wherever possible. The list below is a rough
 guide of what exceptions you can expect to receive
 
-OSError/MemoryError: The Operating system was unable to fulfill your request
-ValueError: One of the arguments is invalid
-PermissionError: You do not have sufficient Privileges to use this call
-InternalError: The function hit an internal bug that was never expected to
-  be hit but is tested for just in case. Please consider filing a bug report
-UnknownError: The Error is not specifically handled and unexpected, see 
-  exception.errno for the Error code that generated this exception
+ * OSError/MemoryError: The Operating system was unable to fulfill your request
+ * ValueError: One of the arguments is invalid
+ * PermissionError: You do not have sufficient Privileges to use this call
+ * InternalError: The function hit an internal bug that was never expected to
+   be hit but is tested for just in case. Please consider filing a bug report
+ * UnknownError: The Error is not specifically handled and unexpected, see 
+   exception.errno for the Error code that generated this exception
