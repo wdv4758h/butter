@@ -74,8 +74,14 @@ class TimerVal(object):
     def every(self, seconds=None, nano_seconds=None):
         if seconds:
             self._timerspec.it_interval.tv_sec = seconds
+            # arm the timer
+            if not self._timerspec.it_value.tv_sec:
+                self._timerspec.it_value.tv_sec = seconds
         if nano_seconds:
             self._timerspec.it_interval.tv_nsec = nano_seconds
+            # arm the timer
+            if not self._timerspec.it_value.tv_nsec:
+                self._timerspec.it_value.tv_nsec = nano_seconds
         return self
         
     def repeat(self, seconds=None, nano_seconds=None):
