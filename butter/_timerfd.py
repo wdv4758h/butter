@@ -369,7 +369,7 @@ def timerfd_gettime(fd):
         if err == errno.EBADF:
             raise ValueError("fd is not a valid file descriptor")
         elif err == errno.EFAULT:
-            raise PointerError("curr_val is not a valid pointer (internal/bug, let us know)")
+            raise InternalError("curr_val is not a valid pointer (internal/bug, let us know)")
         elif err == errno.EINVAL:
             raise ValueError("fd is not a valid timerfd")
         else:
