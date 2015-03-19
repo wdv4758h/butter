@@ -7,7 +7,7 @@ from butter import signalfd, _signalfd
 from butter.signalfd import SFD_CLOEXEC, SFD_NONBLOCK
 from butter import timerfd, _timerfd
 from butter._timerfd import PointerError, TimerVal, CLOCK_REALTIME, CLOCK_MONOTONIC
-from butter.utils import PermissionError, InternalError
+from butter.utils import PermissionError, InternalError, UnknownError
 from butter import clone
 from butter import splice
 from butter import system
@@ -28,26 +28,26 @@ system.ffi = system._ffi
  ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.ENFILE, OSError), # errno is diffrent to above
  ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.ENODEV, OSError),
  ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.ENOMEM, MemoryError),
- ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._eventfd.C.eventfd', _eventfd, _eventfd.eventfd, (), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EINVAL, ValueError),
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EMFILE, OSError),
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.ENOMEM, MemoryError),
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EPERM,  PermissionError),
- ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EINVAL, ValueError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EBADF,  OSError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOENT, OSError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOMEM, MemoryError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOSPC, OSError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EINVAL, ValueError),
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EMFILE, OSError),
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.ENFILE, OSError), # errno is diffrent to above
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.ENOMEM, MemoryError),
- ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EINVAL, ValueError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EACCES, PermissionError), 
@@ -56,11 +56,11 @@ system.ffi = system._ffi
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOENT, OSError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOSPC, OSError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOMEM, MemoryError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EINVAL, ValueError),
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EBADF, OSError),
- ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, 0xffff ^ (SFD_CLOEXEC|SFD_NONBLOCK)),  errno.EINVAL, ValueError),
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, SFD_CLOEXEC|SFD_NONBLOCK),  errno.EINVAL, OSError), # FD is invalid (set flags just to ensure nothing blows up)
@@ -69,11 +69,11 @@ system.ffi = system._ffi
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EMFILE, OSError),
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENODEV, OSError),
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENOMEM, MemoryError),
- ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EINVAL, ValueError),
  ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EFAULT, ValueError),
- ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EHOSTDOWN, ValueError),
+ ('butter._signalfd.C.pthread_sigmask', _signalfd, _signalfd.pthread_sigmask, (0, SIGKILL), errno.EHOSTDOWN, UnknownError),
 
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (0xffff ^ (CLOCK_REALTIME | CLOCK_MONOTONIC),), errno.EINVAL, ValueError),
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (0xffff,), errno.EINVAL, ValueError),
@@ -81,12 +81,12 @@ system.ffi = system._ffi
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENFILE, OSError),
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENODEV, OSError),
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.ENOMEM, MemoryError),
- ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EHOSTDOWN, ValueError),
+ ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EHOSTDOWN, UnknownError),
 
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EBADF, ValueError),
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EFAULT, PointerError),
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EINVAL, ValueError),
- ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EHOSTDOWN, ValueError),
+ ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EHOSTDOWN, UnknownError),
 
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal()), errno.EINVAL, ValueError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, TimerVal().repeats(seconds=999999999+1)), errno.EINVAL, ValueError),
@@ -98,13 +98,13 @@ system.ffi = system._ffi
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENFILE, OSError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENODEV, OSError),
  ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.ENOMEM, MemoryError),
- ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EHOSTDOWN, ValueError),
+ ('butter._timerfd.C.timerfd_settime', _timerfd, _timerfd.timerfd_settime, (0, 0), errno.EHOSTDOWN, UnknownError),
 
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EINVAL, ValueError),
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EPERM, PermissionError),
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EUSERS, PermissionError),
  ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.ENOMEM, MemoryError),
- ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EHOSTDOWN, ValueError),
+ ('butter.clone.C.unshare', clone, clone.unshare, (0,), errno.EHOSTDOWN, UnknownError),
 
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EINVAL, ValueError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0, 20), errno.EINVAL, ValueError),
@@ -112,16 +112,16 @@ system.ffi = system._ffi
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EPIPE, OSError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.ENOMEM, MemoryError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EAGAIN, OSError),
- ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EHOSTDOWN, ValueError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EHOSTDOWN, UnknownError),
 
  ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.EINVAL, ValueError),
  ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.ENOMEM, MemoryError),
- ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.EHOSTDOWN, ValueError),
+ ('butter.splice._C.tee', splice, splice.tee, (0, 0), errno.EHOSTDOWN, UnknownError),
 
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EINVAL, ValueError),
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EBADF, ValueError),
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.ENOMEM, MemoryError),
- ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EHOSTDOWN, ValueError),
+ ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EHOSTDOWN, UnknownError),
 
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EACCES, PermissionError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EBUSY, ValueError),
@@ -137,7 +137,7 @@ system.ffi = system._ffi
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENOTDIR, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENXIO, OSError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EPERM, PermissionError),
- ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EHOSTDOWN, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EHOSTDOWN, UnknownError),
 
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EAGAIN, Retry),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EBUSY, ValueError),
@@ -147,7 +147,7 @@ system.ffi = system._ffi
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOENT, ValueError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOMEM, MemoryError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EPERM, PermissionError),
- ('butter.system._C.umount2', system, system.umount, ('/'), errno.EHOSTDOWN, ValueError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EHOSTDOWN, UnknownError),
 
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EINVAL, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, (devnull, '/'), errno.ENOTDIR, ValueError),
@@ -155,18 +155,18 @@ system.ffi = system._ffi
  ('butter.system._C.pivot_root', system, system.pivot_root, (devnull, devnull), errno.ENOTDIR, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EBUSY, ValueError),
  ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EPERM, PermissionError),
- ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EHOSTDOWN, ValueError),
+ ('butter.system._C.pivot_root', system, system.pivot_root, ('/', '/'), errno.EHOSTDOWN, UnknownError),
 
  ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EFAULT, ValueError),
  ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EINVAL, ValueError),
  ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EPERM, PermissionError),
- ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EHOSTDOWN, ValueError),
+ ('butter.system._C.sethostname', system, system.sethostname, ('foobar',), errno.EHOSTDOWN, UnknownError),
 
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EFAULT, ValueError),
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EINVAL, ValueError),
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.ENAMETOOLONG, InternalError),
  ('butter.system._C.gethostname', system, system.gethostname, (), errno.EPERM, PermissionError),
- ('butter.system._C.gethostname', system, system.gethostname, (), errno.EHOSTDOWN, ValueError),
+ ('butter.system._C.gethostname', system, system.gethostname, (), errno.EHOSTDOWN, UnknownError),
  ])
 @pytest.mark.unit
 def test_exception(mocker, path, module, func, args, errno, exception):

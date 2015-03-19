@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 
+from .utils import UnknownError
 from cffi import FFI as _FFI
 import errno as _errno
 
@@ -103,7 +104,7 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
             raise OSError("No writers on fd_in or a fd is open in BLOCKING mode and NON_BLOCK specified to splice()")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return size
 
@@ -149,7 +150,7 @@ def tee(fd_in, fd_out, len=0, flags=0):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return size
 
@@ -201,7 +202,7 @@ def vmsplice(fd, vec, flags=0):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return size
 

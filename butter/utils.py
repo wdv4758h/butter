@@ -27,7 +27,7 @@ class UnknownError(Exception):
     
     def __str__(self):
         error_name = errno.errorcode.get(self.errno, "UNKNOWN")
-        return "{}: Error:{} ({})".format(self.__doc__, self.errno, error_name)
+        return "{}: Error: {} ({})".format(self.__doc__, self.errno, error_name)
 
 _ffi = _FFI()
 _ffi.cdef("""

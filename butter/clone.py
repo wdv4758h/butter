@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from .utils import PermissionError
+from .utils import PermissionError, UnknownError
 from cffi import FFI
 import errno
 
@@ -89,7 +89,7 @@ def unshare(flags):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return fd
 

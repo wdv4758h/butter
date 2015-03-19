@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """eventfd: maintain an atomic counter inside a file descriptor"""
+from .utils import UnknownError
 from cffi import FFI
 import errno
 
@@ -60,7 +61,7 @@ def eventfd(inital_value=0, flags=0):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return fd
 

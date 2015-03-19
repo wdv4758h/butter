@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """signalfd: Recive signals over a file descriptor"""
 
+from .utils import UnknownError
 from cffi import FFI
 import signal
 import errno
@@ -142,7 +143,7 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return ret_fd
 
@@ -195,7 +196,7 @@ def pthread_sigmask(how, signals):
             raise ValueError("sigmask is not a valid sigset_t")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 
 signum_to_signame = {val:key for key, val in signal.__dict__.items()

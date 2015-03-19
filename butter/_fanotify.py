@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
 
-from .utils import PermissionError
+from .utils import PermissionError, UnknownError
 from collections import namedtuple
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import getpid, readlink
@@ -100,7 +100,7 @@ def fanotify_init(flags, event_flags=O_RDONLY):
             raise PermissionError("Operation not permitted")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
                                             
     return fd
 
@@ -137,7 +137,7 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
             raise OSError("Too many marks")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 class FanotifyEvent(object):
     __slots__ = ['_filename', 'version', 'mask', 'fd', 'pid']

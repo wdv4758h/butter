@@ -2,7 +2,7 @@
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
 
 from collections import namedtuple
-from .utils import PermissionError
+from .utils import PermissionError, UnknownError
 from cffi import FFI
 import errno
 
@@ -100,7 +100,7 @@ def inotify_init(flags=0):
             raise MemoryError("Insufficent kernel memory avalible")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return fd
     
@@ -181,7 +181,7 @@ def inotify_add_watch(fd, path, mask):
             raise MemoryError("Insufficent kernel memory avalible")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
             
     return wd
     
@@ -212,7 +212,7 @@ def inotify_rm_watch(fd, wd):
             raise OSError("fd is not a valid file descriptor")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 
 def str_to_events(str):

@@ -23,7 +23,7 @@ intergrarated into butter in this module
 
 from __future__ import print_function
 
-from .utils import PermissionError, InternalError
+from .utils import PermissionError, InternalError, UnknownError
 from os.path import isdir as _isdir
 from cffi import FFI as _FFI
 import errno as _errno
@@ -229,7 +229,7 @@ def mount(src, target, fs, flags=0, data=""):
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 
 def umount(target, flags=0):
@@ -299,7 +299,7 @@ def umount(target, flags=0):
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 
 def pivot_root(new, old):
@@ -354,7 +354,7 @@ def pivot_root(new, old):
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 
 def sethostname(hostname):
@@ -395,7 +395,7 @@ def sethostname(hostname):
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
 def gethostname():
     """Retrive the specified hostname of the system
@@ -429,7 +429,7 @@ def gethostname():
             raise PermissionError("Permission denied, CAP_SYS_ADMIN not in capability bits")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
     
     hostname = _ffi.string(hostname, HOST_NAME_MAX)
 

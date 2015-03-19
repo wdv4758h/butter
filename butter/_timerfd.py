@@ -6,6 +6,7 @@ after the 1.0 release and provides a simplier and faster interface that is easie
 to interpret
 """
 
+from .utils import UnknownError
 from cffi import FFI
 import errno
 import math
@@ -335,7 +336,7 @@ def timerfd(clock_type=CLOCK_MONOTONIC, flags=0):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     return fd
 
@@ -373,7 +374,7 @@ def timerfd_gettime(fd):
             raise ValueError("fd is not a valid timerfd")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
 
     curr_val = TimerSpec(timerspec=curr_val)
     return curr_val
@@ -440,7 +441,7 @@ def timerfd_settime(fd, timer_spec, flags=0):
             raise MemoryError("Insufficent kernel memory available")
         else:
             # If you are here, its a bug. send us the traceback
-            raise ValueError("Unknown Error: {}".format(err))
+            raise UnknownError(err)
             
     old_timer_spec = TimerSpec(timerspec=old_timer_spec)
     return old_timer_spec
