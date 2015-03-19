@@ -73,3 +73,17 @@ designed to act and behave like the asyncio.Queue object without the ability
 to write events to the queue (ie they can only be read from and events are
 injected from the fd as required)
 
+
+Exceptions
++++++++++++
+Butter was designed to have a small set of easily catchable exceptions and to 
+reuse the builtin exceptions wherever possible. The list below is a rough
+guide of what exceptions you can expect to receive
+
+OSError/MemoryError: The Operating system was unable to fulfill your request
+ValueError: One of the arguments is invalid
+PermissionError: You do not have sufficient Privileges to use this call
+InternalError: The function hit an internal bug that was never expected to
+  be hit but is tested for just in case. Please consider filing a bug report
+UnknownError: The Error is not specifically handled and unexpected, see 
+  exception.errno for the Error code that generated this exception
