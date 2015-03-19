@@ -3,8 +3,8 @@
 Release History
 ---------------
 
-0.9.3 (2015-03-10)
-++++++++++++++++++
+0.10 (2015-03-20)
++++++++++++++++++
 
 - errno to Exception mapping became a fixed part of the API (and unit tested)
 - timerfd is now CLOCK_MONOTONIC by default
