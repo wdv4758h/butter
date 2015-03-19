@@ -62,10 +62,10 @@ setup(
     author_email = "code@pocketnix.org",
     maintainer=None,
     maintainer_email=None,
-    description = "Library to interface to low level linux features (inotify, fanotify, timerfd, signalfd, eventfd) with asyncio support",
+    description = "Library to interface to low level linux features (inotify, fanotify, timerfd, signalfd, eventfd, containers) with asyncio support",
     long_description = readme,
     license = "MIT BSD",
-    keywords = "linux splice tee fanotify inotify eventfd signalfd timerfd aio clone unshare asyncio",
+    keywords = "linux splice tee fanotify inotify eventfd signalfd timerfd aio clone unshare asyncio container server async",
     download_url = "http://blitz.works/butter/archive/tip.tar.bz2",
     classifiers = [
         "Programming Language :: Python :: 3",
