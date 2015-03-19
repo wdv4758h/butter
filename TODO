@@ -1,6 +1,11 @@
-look at fanotify and inotify args and ensure they are in a 'sane' order and have 'sane' defaults (eg why is flags not set to 0 by default?)
+Improve and standardise docstrings and module level docstrings
+finish clone() and prctl call
+asserts on all applicable input values
+double check function arg ordering
+review 'high level' interface details and check to see if there is a simplier interface
+examples for all code
+sphinx documentation
+upload sphinx documentation to read the docs and docs.blitz.works
 Make close on exec the default for all 'fd' operations to be in line with python 3.4
-Define low and high level API and document this with examples
-more examples
-unify the level of documentation of all functions (args/return codes and exceptions raised)
-upload to docs.blitz.works
+check function call arg order and ensure they are in sane order
+check args and see if sane default args can be provided in most cases
