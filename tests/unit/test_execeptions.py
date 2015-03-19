@@ -63,7 +63,7 @@ system.ffi = system._ffi
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, 0xffff ^ (SFD_CLOEXEC|SFD_NONBLOCK)),  errno.EINVAL, ValueError),
- ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, SFD_CLOEXEC|SFD_NONBLOCK),  errno.EINVAL, OSError), # FD is invalid (set flags just to ensure nothing blows up)
+ ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, SFD_CLOEXEC|SFD_NONBLOCK),  errno.EINVAL, ValueError), # FD is invalid (set flags just to ensure nothing blows up)
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EBADF,  ValueError),
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.ENFILE, OSError),
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([],), errno.EMFILE, OSError),
@@ -126,7 +126,7 @@ system.ffi = system._ffi
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EACCES, PermissionError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EBUSY, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EFAULT, ValueError),
- ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EINVAL, OSError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EINVAL, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ELOOP, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EMFILE, OSError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.ENAMETOOLONG, ValueError),
@@ -142,7 +142,7 @@ system.ffi = system._ffi
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EAGAIN, Retry),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EBUSY, ValueError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.EFAULT, ValueError),
- ('butter.system._C.umount2', system, system.umount, ('/'), errno.EINVAL, OSError),
+ ('butter.system._C.umount2', system, system.umount, ('/'), errno.EINVAL, ValueError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENAMETOOLONG, ValueError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOENT, ValueError),
  ('butter.system._C.umount2', system, system.umount, ('/'), errno.ENOMEM, MemoryError),

@@ -132,7 +132,7 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0):
             if (flags & (0xffffffff ^ (SFD_CLOEXEC|SFD_NONBLOCK))):
                 raise ValueError("Mask contains invalid values")
             else:
-                raise OSError("FD is not a signalfd")
+                raise ValueError("FD is not a signalfd")
         elif err == errno.EMFILE:
             raise OSError("Max system FD limit reached")
         elif err == errno.ENFILE:

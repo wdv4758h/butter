@@ -205,7 +205,7 @@ def mount(src, target, fs, flags=0, data=""):
             # data, this is a bug so report it if you can
             raise ValueError("One of the pointer arguments points outside the user address space")
         elif err == _errno.EINVAL:
-            raise OSError("source had an invalid superblock. Or, a remount (MS_REMOUNT) was attempted, but source was not already mounted on target. Or, a move (MS_MOVE) was attempted, but source was not a mount point, or was '/'")
+            raise ValueError("source had an invalid superblock. Or, a remount (MS_REMOUNT) was attempted, but source was not already mounted on target. Or, a move (MS_MOVE) was attempted, but source was not a mount point, or was '/'")
         elif err == _errno.ELOOP:
             raise ValueError("Too many links encountered during pathname resolution. Or, a move was attempted, while target is a descendant of source")
         elif err == _errno.EMFILE:
@@ -288,7 +288,7 @@ def umount(target, flags=0):
         elif err == _errno.EFAULT:
             raise ValueError("target points outside the user address space")
         elif err == _errno.EINVAL:
-            raise OSError("target is not a mount point. Or, umount2() was called with MNT_EXPIRE and either MNT_DETACH or MNT_FORCE")
+            raise ValueError("target is not a mount point. Or, umount2() was called with MNT_EXPIRE and either MNT_DETACH or MNT_FORCE")
         elif err == _errno.ENAMETOOLONG:
             raise ValueError("A pathname was longer than MAXPATHLEN")
         elif err == _errno.ENOENT:
