@@ -6,6 +6,7 @@ from os import close as _close
 from collections import deque
 import fcntl
 import array
+import errno
 
 import platform
 
@@ -15,6 +16,18 @@ if platform.python_version_tuple() < ('3', '0', '0'):
         """You do not have the required pemissions to use this syscall (CAP_SYS_ADMIN)"""
         pass
 PermissionError = PermissionError
+
+class InternalError(Exception):
+    """This Error occured due to an internal bug or OS misconfiguration"""
+
+class UnknownError(Exception):
+    """This error is not handled and is unexpected by this library"""
+    def __init__(self, errno):
+        self.errno = errno
+    
+    def __str__(self):
+        error_name = errno.errorcode.get(self.errno, "UNKNOWN")
+        return "{}: Error:{} ({})".format(self.__doc__, self.errno, error_name)
 
 _ffi = _FFI()
 _ffi.cdef("""
