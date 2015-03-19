@@ -37,8 +37,8 @@ system.ffi = system._ffi
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EINVAL, ValueError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EBADF,  OSError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOENT, OSError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EBADF,  ValueError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOENT, ValueError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOMEM, MemoryError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOSPC, OSError),
  ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
@@ -51,15 +51,15 @@ system.ffi = system._ffi
 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EINVAL, ValueError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EACCES, PermissionError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EBADF, OSError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EFAULT, OSError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOENT, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EBADF, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EFAULT, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOENT, ValueError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOSPC, OSError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOMEM, MemoryError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EINVAL, ValueError),
- ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EBADF, OSError),
+ ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EBADF, ValueError),
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._signalfd.C.signalfd', _signalfd, _signalfd.signalfd, ([], 0, 0xffff ^ (SFD_CLOEXEC|SFD_NONBLOCK)),  errno.EINVAL, ValueError),
@@ -108,8 +108,8 @@ system.ffi = system._ffi
 
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EINVAL, ValueError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0, 20), errno.EINVAL, ValueError),
- ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EBADF, OSError),
- ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EPIPE, OSError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EBADF, ValueError),
+ ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EPIPE, ValueError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.ENOMEM, MemoryError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EAGAIN, OSError),
  ('butter.splice._C.splice', splice, splice.splice, (0, 0), errno.EHOSTDOWN, UnknownError),

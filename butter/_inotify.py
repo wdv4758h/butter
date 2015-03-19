@@ -170,11 +170,11 @@ def inotify_add_watch(fd, path, mask):
         elif err == errno.EACCES:
             raise PermissionError("You do not have permission to read the specified path")
         elif err == errno.EBADF:
-            raise OSError("fd is not a valid file descriptor")
+            raise ValueError("fd is not a valid file descriptor")
         elif err == errno.EFAULT:
-            raise OSError("path points to a file/folder outside the processes accessible address space")
+            raise ValueError("path points to a file/folder outside the processes accessible address space")
         elif err == errno.ENOENT:
-            raise OSError("File/Folder pointed to by path does not exist")
+            raise ValueError("File/Folder pointed to by path does not exist")
         elif err == errno.ENOSPC:
             raise OSError("Maximum number of watches hit or insufficent kernel resources")
         elif err == errno.ENOMEM:
@@ -209,7 +209,7 @@ def inotify_rm_watch(fd, wd):
         if err == errno.EINVAL:
             raise ValueError("wd is invalid or fd is not an inotify File Descriptor")
         elif err == errno.EBADF:
-            raise OSError("fd is not a valid file descriptor")
+            raise ValueError("fd is not a valid file descriptor")
         else:
             # If you are here, its a bug. send us the traceback
             raise UnknownError(err)

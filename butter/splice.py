@@ -95,9 +95,9 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
             else:
                 raise ValueError("Target filesystem does not support slicing or file may be in append mode")
         elif err == _errno.EBADF:
-            raise OSError("fds are invalid or incorrect mode for file")
+            raise ValueError("fds are invalid or incorrect mode for file")
         elif err == _errno.EPIPE:
-            raise OSError("offset specified but one of the fds is a pipe")
+            raise ValueError("offset specified but one of the fds is a pipe")
         elif err == _errno.ENOMEM:
             raise MemoryError("Insufficent kernel memory available")
         elif err == _errno.EAGAIN:
