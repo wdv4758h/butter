@@ -84,7 +84,7 @@ system.ffi = system._ffi
  ('butter._timerfd.C.timerfd_create', _timerfd, _timerfd.timerfd, (), errno.EHOSTDOWN, UnknownError),
 
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EBADF, ValueError),
- ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EFAULT, PointerError),
+ ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EFAULT, InternalError),
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EINVAL, ValueError),
  ('butter._timerfd.C.timerfd_gettime', _timerfd, _timerfd.timerfd_gettime, (0,), errno.EHOSTDOWN, UnknownError),
 

@@ -6,7 +6,7 @@ after the 1.0 release and provides a simplier and faster interface that is easie
 to interpret
 """
 
-from .utils import UnknownError
+from .utils import UnknownError, InternalError
 from cffi import FFI
 import errno
 import math
