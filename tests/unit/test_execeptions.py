@@ -50,7 +50,7 @@ system.ffi = system._ffi
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EHOSTDOWN, ValueError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EINVAL, ValueError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EACCES, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EACCES, PermissionError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EBADF, OSError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EFAULT, OSError), 
  ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOENT, OSError), 
@@ -123,7 +123,7 @@ system.ffi = system._ffi
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.ENOMEM, MemoryError),
  ('butter.splice._C.vmsplice', splice, splice.vmsplice, (0, []), errno.EHOSTDOWN, ValueError),
 
- ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EACCES, ValueError),
+ ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EACCES, PermissionError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EBUSY, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EFAULT, ValueError),
  ('butter.system._C.mount', system, system.mount, ('/dev/null', '/', 'auto'), errno.EINVAL, OSError),

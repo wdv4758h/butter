@@ -2,6 +2,7 @@
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
 
 from collections import namedtuple
+from .utils import PermissionError
 from cffi import FFI
 import errno
 
@@ -167,7 +168,7 @@ def inotify_add_watch(fd, path, mask):
         if err == errno.EINVAL:
             raise ValueError("The event mask contains no valid events; or fd is not an inotify file descriptor")
         elif err == errno.EACCES:
-            raise OSError("You do not have permission to read the specified path")
+            raise PermissionError("You do not have permission to read the specified path")
         elif err == errno.EBADF:
             raise OSError("fd is not a valid file descriptor")
         elif err == errno.EFAULT:
