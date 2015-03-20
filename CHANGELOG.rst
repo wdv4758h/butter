@@ -16,7 +16,7 @@ Release History
 
 **Bug Fixes**
 
-- C code now gets compiled at installation rather then first use
+- C code now gets compiled at installation rather than first use
 - Fixed up the name of an exception in error handling code leading to double exception
 - pivot_root would return OSError rather than ValueError when incorect arguments were provided
 - system.py was using its own definition of PermissionError, unify this with utils.py
