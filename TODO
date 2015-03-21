@@ -5,4 +5,3 @@ review 'high level' interface details and check to see if there is a simplier in
 examples for all code
 sphinx documentation
 upload sphinx documentation to read the docs and docs.blitz.works
-check args and see if sane default args can be provided in most cases
