@@ -32,6 +32,8 @@ class Eventfd(_Eventlike):
         
         :param int value: The value to increment the counter by (default=1)
         """
+        assert value >= 0, "Value must be a positive number"
+        
         packed_value = event_to_str(value)
         _os.write(self.fileno(), packed_value)
 
