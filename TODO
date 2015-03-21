@@ -6,6 +6,5 @@ review 'high level' interface details and check to see if there is a simplier in
 examples for all code
 sphinx documentation
 upload sphinx documentation to read the docs and docs.blitz.works
-Make close on exec the default for all 'fd' operations to be in line with python 3.4
 check function call arg order and ensure they are in sane order
 check args and see if sane default args can be provided in most cases
