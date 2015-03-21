@@ -293,6 +293,7 @@ def timerfd(clock_type=CLOCK_MONOTONIC, flags=0, closefd=CLOEXEC_DEFAULT):
     Arguments
     ----------
     :param int clock_type: The type of clock to use internally
+                           DEFAULT: CLOCK_MONOTONIC
     :param int flags: Flags to specify extra options
     
     Flags
@@ -302,6 +303,12 @@ def timerfd(clock_type=CLOCK_MONOTONIC, flags=0, closefd=CLOEXEC_DEFAULT):
     CLOCK_MONOTONIC: Use a Monotonically increasing clock value
     TFD_CLOEXEC: Close the timerfd when executing a new program
     TFD_NONBLOCK: Open the socket in non-blocking mode
+
+    in nearly all simple cases you will want CLOCK_MONOTONIC. When
+    using CLOCK_REALTIME you will need to be aware of and adjust for
+    the clock moving back and forwards (eg ntp, admins, daylight savings,
+    leap seconds, clock drift, time dilation as you approach the speed
+    of light)
     
     Returns
     --------
