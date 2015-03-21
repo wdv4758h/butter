@@ -117,6 +117,9 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
     ENOMEM: no mem avalible
     ENOSPC: Too many marks
     """
+    if hasattr(fd, 'fileno'):
+        fd = fd.fileno()
+
     assert isinstance(fd, int), 'FD must be an integer'
     assert isinstance(dfd, int), 'DFD must be an integer'
     assert isinstance(flags, int), 'Flags must be an integer'

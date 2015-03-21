@@ -160,6 +160,7 @@ def inotify_add_watch(fd, path, mask):
     """
     if hasattr(fd, "fileno"):
         fd = fd.fileno()
+
     assert isinstance(fd, int), "fd must by an integer"
     assert isinstance(path, (str, bytes)), "path is not a string"
     assert len(path) > 0, "Path must be longer than 0 chars"
@@ -209,6 +210,9 @@ def inotify_rm_watch(fd, wd):
     ValueError: Returned if supplied watch is not valid or if the file descriptor is not an inotify file descriptor
     OSError: File descriptor is invalid
     """
+    if hasattr(fd, 'fileno'):
+        fd = fd.fileno()
+            
     assert isinstance(fd, int), "fd must by an integer"
     assert isinstance(wd, int), "wd must be an integer"
 

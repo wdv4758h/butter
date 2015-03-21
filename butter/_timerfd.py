@@ -365,6 +365,9 @@ def timerfd_gettime(fd):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if hasattr(fd, 'fileno'):
+        fd = fd.fileno()
+
     assert isinstance(fd, int), 'fd must be an integer'
     
     curr_val = ffi.new('struct itimerspec *')
@@ -412,6 +415,9 @@ def timerfd_settime(fd, timer_spec, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if hasattr(fd, 'fileno'):
+        fd = fd.fileno()
+
     assert isinstance(fd, int), 'fd must be an integer'
     assert isinstance(flags, int), 'flags must be an integer'
     
@@ -419,9 +425,6 @@ def timerfd_settime(fd, timer_spec, flags=0):
         timer_spec = timer_spec.__timerspec__()
 
     assert isinstance(timer_spec, FFI.CData) # ensure passed in value is what we want
-    
-    if hasattr(fd, 'fileno'):
-        fd = fd.fileno()
     
     old_timer_spec = ffi.new('struct itimerspec *')
 

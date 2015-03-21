@@ -7,6 +7,7 @@ Release History
 +++++++++++++++++
 
 - Make close on exec the default behavior for python 3 platforms
+- Low level functions now accept a file-like or event-like object in addition to a fd
 
 0.10 (2015-03-20)
 +++++++++++++++++

@@ -79,8 +79,10 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
     :raises OSError: No writers waiting on fd_in
     :raises OSError: one or both fd's are in blocking mode and SPLICE_F_NONBLOCK specified
     """
-    fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
-    fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
+    if hasattr(fd_in, 'fileno'):
+        fd_in = fd_in.fileno()
+    if hasattr(fd_out, 'fileno'):
+        fd_out = fd_out.fileno()
 
     assert isinstance(fd_in, int), 'fd_in must be an integer'
     assert isinstance(fd_out, int), 'fd_in must be an integer'
@@ -144,8 +146,10 @@ def tee(fd_in, fd_out, len=0, flags=0):
     :raises ValueError: Both file descriptors refer to the same pipe
     :raises MemoryError: Insufficient kernel memory
     """
-    fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
-    fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
+    if hasattr(fd_in, 'fileno'):
+        fd_in = fd_in.fileno()
+    if hasattr(fd_out, 'fileno'):
+        fd_out = fd_out.fileno()
     
     assert isinstance(fd_in, int), 'fd_in must be an integer'
     assert isinstance(fd_out, int), 'fd_in must be an integer'
@@ -196,7 +200,8 @@ def vmsplice(fd, vec, flags=0):
     :raises ValueError: Both file descriptors refer to the same pipe
     :raises MemoryError: Insufficient kernel memory
     """
-    fd = getattr(fd, 'fileno', lambda: fd)()
+    if hasattr(fd, 'fileno'):
+        fd = fd.fileno()
 
     assert isinstance(fd, int), 'fd must be an integer'
     assert isinstance(flags, int), 'flags must be an integer'

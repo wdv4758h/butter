@@ -108,6 +108,9 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0, closefd=CLOEXEC_DEFAULT):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if hasattr(fd, 'fileno'):
+        fd = fd.fileno()
+
     assert isinstance(fd, int), 'fd must be an integer'
     assert isinstance(flags, int), 'Flags must be an integer'
 
