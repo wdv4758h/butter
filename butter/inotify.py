@@ -28,7 +28,9 @@ class Inotify(_Eventlike):
         self._events = []
 
         if flags & IN_NONBLOCK:
-            self.blocking = false
+            self._blocking = False
+        else:
+            self._blocking = True
         
     def watch(self, path, events):
         wd = inotify_add_watch(self.fileno(), path, events)

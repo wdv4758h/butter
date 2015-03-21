@@ -13,6 +13,10 @@ Release History
 
 - Argument order to fanotify_mark and high level API changed to have a more logical flow
 
+**Bug Fixes**
+
+- 'blocking' on Inotify objects was an internal flag and is now prefixed with '_' to denote its status
+
 0.10 (2015-03-20)
 +++++++++++++++++
 
