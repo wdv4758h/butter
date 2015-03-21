@@ -158,7 +158,10 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0, closefd=CLOEXEC_DEFAULT):
 
 
 def pthread_sigmask(action, signals):
-    """Create a new signalfd
+    """Block and Unblock signals from being delivered to an application
+    
+    This is required as this function/functionality does not exist in 
+    python2.x
     
     Arguments
     ----------
@@ -179,7 +182,7 @@ def pthread_sigmask(action, signals):
     
     Exceptions
     -----------
-    :raises ValueError: Invalid value in 'how'
+    :raises ValueError: Invalid value in 'action'
     :raises ValueError: sigmask is not a valid sigmask_t
     """
     assert isinstance(action, int), '"How" must be an integer'
