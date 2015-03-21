@@ -6,7 +6,7 @@ after the 1.0 release and provides a simplier and faster interface that is easie
 to interpret
 """
 
-from .utils import UnknownError, InternalError
+from .utils import UnknownError, InternalError, CLOEXEC_DEFAULT
 from cffi import FFI
 import errno
 import math
@@ -287,7 +287,7 @@ class TimerSpec(object):
         return "<{} next={:.3f}s reoccuring={:.3f}s>".format(self.__class__.__name__, self.next_event, self.reoccuring)
 
 
-def timerfd(clock_type=CLOCK_MONOTONIC, flags=0):
+def timerfd(clock_type=CLOCK_MONOTONIC, flags=0, closefd=CLOEXEC_DEFAULT):
     """Create a new timerfd
     
     Arguments
@@ -316,6 +316,9 @@ def timerfd(clock_type=CLOCK_MONOTONIC, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if closefd:
+        flags |= TFD_CLOEXEC
+        
     fd = C.timerfd_create(clock_type, flags)
     
     if fd < 0:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """fanotify: wrapper around the fanotify family of syscalls for watching for file modifcation"""
 
-from .utils import PermissionError, UnknownError
+from .utils import PermissionError, UnknownError, CLOEXEC_DEFAULT
 from collections import namedtuple
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import getpid, readlink
@@ -81,13 +81,17 @@ C = ffi.verify("""
 #include <sys/fanotify.h>
 """, libraries=[], ext_package="butter")
 
-def fanotify_init(flags, event_flags=O_RDONLY):
+def fanotify_init(flags=0, event_flags=O_RDONLY, closefd=CLOEXEC_DEFAULT):
     """Create a fanotify handle
     """
     assert isinstance(flags, int), 'Flags must be an integer'
     assert isinstance(event_flags, int), 'Event flags must be an integer'
 
+    if closefd:
+        flags |= FAN_CLOEXEC
+
     fd = C.fanotify_init(flags, event_flags)
+
     if fd < 0:
         err = ffi.errno
         if err == errno.EINVAL:

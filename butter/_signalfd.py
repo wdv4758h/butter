@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """signalfd: Recive signals over a file descriptor"""
 
-from .utils import UnknownError
+from .utils import UnknownError, CLOEXEC_DEFAULT
 from cffi import FFI
 import signal
 import errno
@@ -79,7 +79,7 @@ SIG_SETMASK = C.SIG_SETMASK
 NEW_SIGNALFD = -1 # Create a new signal rather than modify an exsisting one
 
 
-def signalfd(signals, fd=NEW_SIGNALFD, flags=0):
+def signalfd(signals, fd=NEW_SIGNALFD, flags=0, closefd=CLOEXEC_DEFAULT):
     """Create a new signalfd
     
     Arguments
@@ -108,6 +108,9 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if closefd:
+        flags |= SFD_CLOEXEC
+
     if isinstance(signals, ffi.CData):
         mask = signals
     else:

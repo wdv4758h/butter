@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """eventfd: maintain an atomic counter inside a file descriptor"""
-from .utils import UnknownError
+from .utils import UnknownError, CLOEXEC_DEFAULT
 from cffi import FFI
 import errno
 
@@ -18,14 +18,19 @@ C = ffi.verify("""
 #include <stdint.h> /* Definition of uint64_t */
 """, libraries=[], ext_package="butter")
 
-def eventfd(inital_value=0, flags=0):
+EFD_CLOEXEC = C.EFD_CLOEXEC
+EFD_NONBLOCK = C.EFD_NONBLOCK
+EFD_SEMAPHORE = C.EFD_SEMAPHORE
+
+def eventfd(inital_value=0, flags=0, closefd=CLOEXEC_DEFAULT):
     """Create a new eventfd
     
     Arguments
     ----------
     :param int inital_value: The inital value to set the eventfd to
     :param int flags: Flags to specify extra options
-    
+    :param bool closefd: Close the fd when a new process is exec'd
+        
     Flags
     ------
     EFD_CLOEXEC: Close the eventfd when executing a new program
@@ -45,6 +50,9 @@ def eventfd(inital_value=0, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    if closefd:
+        flags |= EFD_CLOEXEC
+        
     fd = C.eventfd(inital_value, flags)
     
     if fd < 0:
@@ -79,7 +87,3 @@ def event_to_str(event):
     packed_event = ffi.buffer(event)[:]
     
     return packed_event
-
-EFD_CLOEXEC = C.EFD_CLOEXEC
-EFD_NONBLOCK = C.EFD_NONBLOCK
-EFD_SEMAPHORE = C.EFD_SEMAPHORE

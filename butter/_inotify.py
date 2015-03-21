@@ -2,7 +2,7 @@
 """inotify: Wrapper around the inotify syscalls providing both a function based and file like interface"""
 
 from collections import namedtuple
-from .utils import PermissionError, UnknownError
+from .utils import PermissionError, UnknownError, CLOEXEC_DEFAULT
 from cffi import FFI
 import errno
 
@@ -76,7 +76,8 @@ C = ffi.verify("""
 #include <sys/ioctl.h>
 """, libraries=[], ext_package="butter")
 
-def inotify_init(flags=0):
+
+def inotify_init(flags=0, closefd=CLOEXEC_DEFAULT):
     """Initialise an inotify instnace and return a File Descriptor to refrence is
     
     Arguments:
@@ -86,6 +87,9 @@ def inotify_init(flags=0):
     IN_CLOEXEC: Automatically close the inotify handle on exec()
     IN_NONBLOCK: Place the file descriptor in non blocking mode
     """
+    if closefd:
+        flags |= IN_CLOEXEC
+
     fd = C.inotify_init1(flags)
     
     if fd < 0:

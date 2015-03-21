@@ -15,6 +15,10 @@ if platform.python_version_tuple() < ('3', '0', '0'):
     class PermissionError(OSError):
         """You do not have the required pemissions to use this syscall (CAP_SYS_ADMIN)"""
         pass
+    CLOEXEC_DEFAULT = True
+else:
+    CLOEXEC_DEFAULT = False
+
 PermissionError = PermissionError
 
 class InternalError(Exception):
