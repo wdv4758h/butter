@@ -1,6 +1,5 @@
 Improve and standardise docstrings and module level docstrings
 finish clone() and prctl call
-double check function arg ordering
 review 'high level' interface details and check to see if there is a simplier interface
 examples for all code
 sphinx documentation
