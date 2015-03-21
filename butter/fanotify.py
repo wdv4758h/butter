@@ -3,6 +3,7 @@
 
 from .utils import get_buffered_length as _get_buffered_length
 from .utils import Eventlike as _Eventlike
+from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
 
 from os import O_RDONLY, O_WRONLY, O_RDWR
 from os import read as _read
@@ -20,9 +21,9 @@ del key, _C, _l
 class Fanotify(_Eventlike):
     blocking = True
     
-    def __init__(self, flags, event_flags=O_RDONLY):
+    def __init__(self, flags, event_flags=O_RDONLY, closefd=_CLOEXEC_DEFAULT):
         super(self.__class__, self).__init__()
-        self._fd = fanotify_init(flags, event_flags)
+        self._fd = fanotify_init(flags, event_flags, closefd=closefd)
 
         self._events = []
 
