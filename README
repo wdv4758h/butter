@@ -1,6 +1,8 @@
 ========
  Butter
 ========
+"Making things that little bit butter under linux"
+
 Butter is a library to integrate some of Linux's low level features into python
 eg signalfd, eventfd and timerfd. most of these functions are handy if you are 
 looking into creating non-blocking servers, dealing with event loops or writing
