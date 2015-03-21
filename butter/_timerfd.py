@@ -316,6 +316,9 @@ def timerfd(clock_type=CLOCK_MONOTONIC, flags=0, closefd=CLOEXEC_DEFAULT):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    assert isinstance(clock_type, int), 'Clock Type must be an integer'
+    assert isinstance(flags, int), 'Flags must be an integer'
+
     if closefd:
         flags |= TFD_CLOEXEC
         
@@ -362,6 +365,8 @@ def timerfd_gettime(fd):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    assert isinstance(fd, int), 'fd must be an integer'
+    
     curr_val = ffi.new('struct itimerspec *')
     ret = C.timerfd_gettime(fd, curr_val)
     
@@ -407,6 +412,9 @@ def timerfd_settime(fd, timer_spec, flags=0):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    assert isinstance(fd, int), 'fd must be an integer'
+    assert isinstance(flags, int), 'flags must be an integer'
+    
     if hasattr(timer_spec, '__timerspec__'):
         timer_spec = timer_spec.__timerspec__()
 

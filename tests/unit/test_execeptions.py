@@ -49,14 +49,14 @@ system.ffi = system._ffi
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.ENOMEM, MemoryError),
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EINVAL, ValueError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EACCES, PermissionError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EBADF, ValueError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EFAULT, ValueError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOENT, ValueError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOSPC, OSError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.ENOMEM, MemoryError), 
- ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '', 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.EINVAL, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.EACCES, PermissionError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.EBADF, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.EFAULT, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.ENOENT, ValueError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.ENOSPC, OSError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.ENOMEM, MemoryError), 
+ ('butter._inotify.C.inotify_add_watch', _inotify, _inotify.inotify_add_watch, (0, '/', 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EINVAL, ValueError),
  ('butter._inotify.C.inotify_rm_watch', _inotify, _inotify.inotify_rm_watch, (0, 0), errno.EBADF, ValueError),

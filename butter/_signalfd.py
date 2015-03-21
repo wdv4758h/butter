@@ -108,6 +108,9 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0, closefd=CLOEXEC_DEFAULT):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    assert isinstance(fd, int), 'fd must be an integer'
+    assert isinstance(flags, int), 'Flags must be an integer'
+
     if closefd:
         flags |= SFD_CLOEXEC
 
@@ -176,6 +179,8 @@ def pthread_sigmask(how, signals):
     :raises ValueError: Invalid value in 'how'
     :raises ValueError: sigmask is not a valid sigmask_t
     """
+    assert isinstance(how, int), '"How" must be an integer'
+
     new_sigmask = ffi.new('sigset_t[1]')
     old_sigmask = ffi.new('sigset_t[1]')
 

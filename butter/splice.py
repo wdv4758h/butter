@@ -81,6 +81,13 @@ def splice(fd_in, fd_out, in_offset=0, out_offset=0, len=0, flags=0):
     """
     fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
     fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
+
+    assert isinstance(fd_in, int), 'fd_in must be an integer'
+    assert isinstance(fd_out, int), 'fd_in must be an integer'
+    assert isinstance(in_offset, int), 'in_offset must be an integer'
+    assert isinstance(out_offset, int), 'out_offset must be an integer'
+    assert isinstance(len, int), 'len must be an integer'
+    assert isinstance(flags, int), 'flags must be an integer'
     
     in_offset = _ffi.cast("long long *", in_offset)
     out_offset = _ffi.cast("long long *", out_offset)
@@ -140,6 +147,11 @@ def tee(fd_in, fd_out, len=0, flags=0):
     fd_in = getattr(fd_in, 'fileno', lambda: fd_in)()
     fd_out = getattr(fd_out, 'fileno', lambda: fd_out)()
     
+    assert isinstance(fd_in, int), 'fd_in must be an integer'
+    assert isinstance(fd_out, int), 'fd_in must be an integer'
+    assert isinstance(len, int), 'len must be an integer'
+    assert isinstance(flags, int), 'flags must be an integer'
+
     size = _C.tee(fd_in, fd_out, len, flags)
     
     if size < 0:
@@ -172,7 +184,7 @@ def vmsplice(fd, vec, flags=0):
     SPLICE_F_GIFT: Pass ownership of the pages to the kernel. You must not modify data in place
                    if using this option as the pages now belong to the kernel and bad things (tm)
                    will happen
-                   if used, pages must be page alighned in both length and position
+                   if used, pages must be page aligned in both length and position
     Returns
     --------
     :return: Number of bytes written
@@ -185,6 +197,10 @@ def vmsplice(fd, vec, flags=0):
     :raises MemoryError: Insufficient kernel memory
     """
     fd = getattr(fd, 'fileno', lambda: fd)()
+
+    assert isinstance(fd, int), 'fd must be an integer'
+    assert isinstance(flags, int), 'flags must be an integer'
+
     n_vec =_ffi.new('struct iovec[]', len(vec))
     for str, v in zip(vec, n_vec) :
         v.iov_base = _C.convert_str_to_void(str)

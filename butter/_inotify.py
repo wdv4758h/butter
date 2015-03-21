@@ -87,6 +87,8 @@ def inotify_init(flags=0, closefd=CLOEXEC_DEFAULT):
     IN_CLOEXEC: Automatically close the inotify handle on exec()
     IN_NONBLOCK: Place the file descriptor in non blocking mode
     """
+    assert isinstance(flags, int), 'Flags must be an integer'
+
     if closefd:
         flags |= IN_CLOEXEC
 
@@ -160,6 +162,7 @@ def inotify_add_watch(fd, path, mask):
         fd = fd.fileno()
     assert isinstance(fd, int), "fd must by an integer"
     assert isinstance(path, (str, bytes)), "path is not a string"
+    assert len(path) > 0, "Path must be longer than 0 chars"
     assert isinstance(mask, int), "mask must be an integer"
     
     if isinstance(path, str):
@@ -206,6 +209,9 @@ def inotify_rm_watch(fd, wd):
     ValueError: Returned if supplied watch is not valid or if the file descriptor is not an inotify file descriptor
     OSError: File descriptor is invalid
     """
+    assert isinstance(fd, int), "fd must by an integer"
+    assert isinstance(wd, int), "wd must be an integer"
+
     ret = C.inotify_rm_watch(fd, wd)
 
     if ret < 0:

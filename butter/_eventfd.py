@@ -50,6 +50,10 @@ def eventfd(inital_value=0, flags=0, closefd=CLOEXEC_DEFAULT):
     :raises OSError: Could not mount (internal) anonymous inode device
     :raises MemoryError: Insufficient kernel memory
     """
+    assert isinstance(inital_value, int), "Inital value must be an integer"
+    assert inital_value >= 0, "Inital value must be a positive number"
+    assert isinstance(flags, int), "Flags must be an integer"
+    
     if closefd:
         flags |= EFD_CLOEXEC
         
