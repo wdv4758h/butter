@@ -157,16 +157,16 @@ def signalfd(signals, fd=NEW_SIGNALFD, flags=0, closefd=CLOEXEC_DEFAULT):
     return ret_fd
 
 
-def pthread_sigmask(how, signals):
+def pthread_sigmask(action, signals):
     """Create a new signalfd
     
     Arguments
     ----------
-    :param int how: The action to take on the supplied signals (bitmask)
+    :param int action: The action to take on the supplied signals (bitmask)
     :param list signals: An iterable of signals
     :param int signals: A single signal
     
-    Flags: how
+    Flags: action
     -----------
     SIG_BLOCK: Block the signals in sigmask from being delivered
     SIG_UNBLOCK: Unblock the signals in the supplied sigmask
@@ -182,7 +182,7 @@ def pthread_sigmask(how, signals):
     :raises ValueError: Invalid value in 'how'
     :raises ValueError: sigmask is not a valid sigmask_t
     """
-    assert isinstance(how, int), '"How" must be an integer'
+    assert isinstance(action, int), '"How" must be an integer'
 
     new_sigmask = ffi.new('sigset_t[1]')
     old_sigmask = ffi.new('sigset_t[1]')
@@ -197,12 +197,12 @@ def pthread_sigmask(how, signals):
     for signal in signals:
         C.sigaddset(new_sigmask, signal)
     
-    ret = C.pthread_sigmask(how, new_sigmask, ffi.NULL)
+    ret = C.pthread_sigmask(action, new_sigmask, ffi.NULL)
     
     if ret < 0:
         err = ffi.errno
         if err == errno.EINVAL:
-            raise ValueError("'how' is an invalid value (not one of SIG_BLOCK, SIG_UNBLOCK or SIG_SETMASK)")
+            raise ValueError("Action is an invalid value (not one of SIG_BLOCK, SIG_UNBLOCK or SIG_SETMASK)")
         elif err == errno.EFAULT:
             raise ValueError("sigmask is not a valid sigset_t")
         else:
