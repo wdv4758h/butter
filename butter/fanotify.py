@@ -37,16 +37,16 @@ class Fanotify(_Eventlike):
         else:
             self._mode = 'r'
 
-    def watch(self, flags, mask, path, dfd=0):
+    def watch(self, path, mask, flags=0, dfd=0):
         flags |= FAN_MARK_ADD
-        fanotify_mark(self.fileno(), flags, mask, path, dfd)
+        fanotify_mark(self.fileno(), path, mask, flags, dfd)
 
-    def del_watch(self, flags, mask, path, dfd=0):
-        self.ignore(flags, mask, path, dfd)
+    def del_watch(self, path, mask, flags=0, dfd=0):
+        self.ignore(path, mask, flags, dfd)
         
-    def ignore(self, flags, mask, path, dfd=0):
+    def ignore(self, path, mask, flags=0, dfd=0):
         flags |= FAN_MARK_REMOVE
-        fanotify_mark(self.fileno(), flags, mask, path, dfd)
+        fanotify_mark(self.fileno(), path, mask, flags, dfd)
 
     def _read_events(self):
         fd = self.fileno()

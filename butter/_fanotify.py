@@ -108,7 +108,7 @@ def fanotify_init(flags=0, event_flags=O_RDONLY, closefd=CLOEXEC_DEFAULT):
                                             
     return fd
 
-def fanotify_mark(fd, flags, mask, path, dfd=0):
+def fanotify_mark(fd, path, mask, flags, dfd=0):
     """Add a file to a fanotify context"""
     """
     EINVAL: an invalid flag or mask was passed in
@@ -125,6 +125,7 @@ def fanotify_mark(fd, flags, mask, path, dfd=0):
     assert isinstance(flags, int), 'Flags must be an integer'
     assert isinstance(mask, int), 'Mask must be an integer'
     assert isinstance(path, (str, bytes)), 'Path must be a string'
+    assert len(path) > 0, 'Path cannot be 0 chars'
     
     if isinstance(path, str):
         path = path.encode()

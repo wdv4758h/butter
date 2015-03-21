@@ -36,12 +36,12 @@ system.ffi = system._ffi
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EPERM,  PermissionError),
  ('butter._fanotify.C.fanotify_init', _fanotify, _fanotify.fanotify_init, (0,), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EINVAL, ValueError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EBADF,  ValueError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOENT, ValueError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOMEM, MemoryError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.ENOSPC, OSError),
- ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, 0, 0, ''), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, '/', 0, 0), errno.EINVAL, ValueError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, '/', 0, 0), errno.EBADF,  ValueError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, '/', 0, 0), errno.ENOENT, ValueError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, '/', 0, 0), errno.ENOMEM, MemoryError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, '/', 0, 0), errno.ENOSPC, OSError),
+ ('butter._fanotify.C.fanotify_mark', _fanotify, _fanotify.fanotify_mark, (0, '/', 0, 0), errno.EHOSTDOWN, UnknownError), # errno chosen as unused in our code
 
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EINVAL, ValueError),
  ('butter._inotify.C.inotify_init1', _inotify, _inotify.inotify_init, (), errno.EMFILE, OSError),

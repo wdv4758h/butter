@@ -9,6 +9,10 @@ Release History
 - Make close on exec the default behavior for python 3 platforms
 - Low level functions now accept a file-like or event-like object in addition to a fd
 
+**API Changes**
+
+- Argument order to fanotify_mark and high level API changed to have a more logical flow
+
 0.10 (2015-03-20)
 +++++++++++++++++
 
