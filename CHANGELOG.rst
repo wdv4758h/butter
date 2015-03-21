@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.11 (2015-03-20)
++++++++++++++++++
+
+- Make close on exec the default behavior for python 3 platforms
+
 0.10 (2015-03-20)
 +++++++++++++++++
 
