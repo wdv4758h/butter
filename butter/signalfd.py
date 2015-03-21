@@ -2,6 +2,7 @@
 """signalfd: Recive signals over a file descriptor"""
 
 from .utils import Eventlike as _Eventlike
+from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
 from ._signalfd import SFD_CLOEXEC, SFD_NONBLOCK, NEW_SIGNALFD
 from ._signalfd import SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK
 from ._signalfd import signalfd, pthread_sigmask
@@ -11,7 +12,7 @@ import os as _os
 
 
 class Signalfd(_Eventlike):
-    def __init__(self, sigmask=set(), flags=0):
+    def __init__(self, sigmask=set(), flags=0, closefd=_CLOEXEC_DEFAULT):
         """Create a new Signalfd object
 
         Arguments

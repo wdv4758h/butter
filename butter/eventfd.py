@@ -6,10 +6,11 @@ from .utils import Eventlike as _Eventlike
 from ._eventfd import EFD_CLOEXEC, EFD_NONBLOCK, EFD_SEMAPHORE
 from ._eventfd import str_to_events, event_to_str
 from ._eventfd import eventfd
+from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
 import os as _os
 
 class Eventfd(_Eventlike):
-    def __init__(self, inital_value=0, flags=0):
+    def __init__(self, inital_value=0, flags=0, closefd=_CLOEXEC_DEFAULT):
         """Create a new Eventfd object
 
         Arguments
@@ -24,7 +25,7 @@ class Eventfd(_Eventlike):
         EFD_SEMAPHORE: Provide semaphore like semantics for read operations
         """
         super(self.__class__, self).__init__()
-        self._fd = eventfd(inital_value, flags)
+        self._fd = eventfd(inital_value, flags, closefd=closefd)
         
     def increment(self, value=1):
         """Increment the counter by the specified value

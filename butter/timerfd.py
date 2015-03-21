@@ -2,6 +2,7 @@
 """timerfd: recive timing events on a file descriptor"""
 
 from .utils import Eventlike as _Eventlike
+from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
 from ._timerfd import TimerVal, TimerSpec, timerfd, timerfd_gettime, timerfd_settime
 from ._timerfd import TFD_CLOEXEC, TFD_NONBLOCK, TFD_TIMER_ABSTIME
 from ._timerfd import CLOCK_REALTIME, CLOCK_MONOTONIC
@@ -9,7 +10,7 @@ from ._timerfd import ffi as _ffi
 import os as _os
 
 class Timerfd(_Eventlike):
-    def __init__(self, clock_type=CLOCK_REALTIME, flags=0):
+    def __init__(self, clock_type=CLOCK_REALTIME, flags=0, closefd=_CLOEXEC_DEFAULT):
         """Create a new Timerfd object
 
         Arguments
@@ -25,7 +26,7 @@ class Timerfd(_Eventlike):
         TFD_NONBLOCK: Open the socket in non-blocking mode
         """
         super(self.__class__, self).__init__()
-        self._fd = timerfd(clock_type, flags)
+        self._fd = timerfd(clock_type, flags, closefd=closefd)
         self._timerspec = TimerSpec()
     
     def set_one_off(self, seconds, nano_seconds=0, absolute=False):

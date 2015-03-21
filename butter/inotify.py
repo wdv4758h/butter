@@ -3,6 +3,7 @@
 
 from .utils import get_buffered_length as _get_buffered_length
 from .utils import Eventlike as _Eventlike
+from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
 
 from ._inotify import inotify_init, inotify_add_watch, inotify_rm_watch
 from ._inotify import str_to_events
@@ -19,9 +20,9 @@ for key in dir(_C):
 del key, _C, _l
 
 class Inotify(_Eventlike):
-    def __init__(self, flags=0):
+    def __init__(self, flags=0, closefd=_CLOEXEC_DEFAULT):
         super(self.__class__, self).__init__()
-        fd = inotify_init(flags)
+        fd = inotify_init(flags, closefd=closefd)
         self._fd = fd
         
         self._events = []
