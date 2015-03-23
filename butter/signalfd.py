@@ -5,6 +5,7 @@ from .utils import Eventlike as _Eventlike
 from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
 from ._signalfd import SFD_CLOEXEC, SFD_NONBLOCK, NEW_SIGNALFD
 from ._signalfd import SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK
+from ._signalfd import SIGINFO_LENGTH as _SIGINFO_LENGTH
 from ._signalfd import signalfd, pthread_sigmask
 from ._signalfd import signum_to_signame
 from ._signalfd import ffi as _ffi, C as _C
@@ -81,11 +82,10 @@ class Signalfd(_Eventlike):
         self._update()
         
     def _read_events(self):
-        SIGNALFD_SIGINFO_LENGTH = 128 # Bytes
-        buf = _os.read(self.fileno(), SIGNALFD_SIGINFO_LENGTH)
+        buf = _os.read(self.fileno(), _SIGINFO_LENGTH)
         siginfo = _ffi.new('struct signalfd_siginfo *')
 
-        _ffi.buffer(siginfo)[0:SIGNALFD_SIGINFO_LENGTH] = buf
+        _ffi.buffer(siginfo)[0:_SIGINFO_LENGTH] = buf
         
         return [Signal(siginfo)]
 

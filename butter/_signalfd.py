@@ -215,3 +215,8 @@ def pthread_sigmask(action, signals):
 
 signum_to_signame = {val:key for key, val in signal.__dict__.items()
                      if isinstance(val, int) and "_" not in key}
+
+
+#SIGINFO_LENGTH = 128 # Bytes
+SIGINFO_LENGTH = ffi.sizeof('struct signalfd_siginfo')
+
