@@ -116,9 +116,11 @@ class TimerVal(object):
         return (self.it_value.tv_sec, self.it_value.tv_nsec)
     
     def __repr__(self):
-        return "<{} offset=({}s, ()ns) reoccuring=({}s, {}ns)>".format(self.__class__.__name__,
-                                                                       self.it_value.tv_sec, self.it_value.tv_nsec,
-                                                                       self.it_interval.tv_sec, self.it_interval.tv_nsec)
+        return "<{} offset=({}s, {}ns) reoccuring=({}s, {}ns)>".format(self.__class__.__name__,
+                                                                       self._timerspec.it_value.tv_sec, 
+                                                                       self._timerspec.it_value.tv_nsec,
+                                                                       self._timerspec.it_interval.tv_sec, 
+                                                                       self._timerspec.it_interval.tv_nsec)
 
 
 class TimerSpec(object):
