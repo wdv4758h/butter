@@ -8,6 +8,7 @@ Release History
 
 - Make close on exec the default behavior for python 3 platforms
 - Low level functions now accept a file-like or event-like object in addition to a fd
+- New 'watch' function as a simple wrapper around inotify for ultra simple uses cases
 
 **API Changes**
 
