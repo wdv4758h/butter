@@ -52,3 +52,37 @@ class Inotify(_Eventlike):
         events = str_to_events(raw_events)
 
         return events
+
+def watch(path, events=IN_ALL_EVENTS):
+    """Quick Convience function to watch a file or dir for any changes
+
+    If a dir argument is provided this call will not recursively watch the directories
+    due to limitations in inotify's API. if you wish to watch directories recursively
+    you will need to recurs it yourself and add the watches manually
+
+    Warning: if using this function to watch a file or dir repeatedly you may miss events
+    due to a race condition, consider using the Inotify object instead to get all the 
+    file events
+    
+    This function will not watch directories recursively if given a directory as an 
+    argument and will only return events occurring in that directory
+    
+    Arguments
+    ----------
+    :param str path: the file/dir to watch for events to occur on
+    :param int events: The inotify IN_* events to watch path for
+
+    Returns
+    --------
+    :return: The file descriptor representing the signalfd
+    :rtype: int
+
+    """
+    inotify = Inotify()
+    try:
+        wd = inotify.watch(path, events)
+        event = inotify.wait()
+    finally:
+        inotify.close()
+    
+    return event
