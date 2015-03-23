@@ -9,6 +9,8 @@ from ._inotify import inotify_init, inotify_add_watch, inotify_rm_watch
 from ._inotify import str_to_events
 from ._inotify import event_name
 
+from errno import EINVAL as _EINVAL
+
 import os as _os
 
 # Import all the constants
@@ -46,7 +48,22 @@ class Inotify(_Eventlike):
     def _read_events(self):
         fd = self.fileno()
         
+        # The following code is complex but required to get the same values with
+        # expected behavior with blocking/non-blocking fd's
+        # blockers will block, non-blockers will return []
         buf_len = _get_buffered_length(fd)
+        if buf_len == 0:
+            try:
+                _os.read(fd, 0)
+            except OSError as err:
+                # eat the OS error as the ammount of bytes in the buffer may have increased from 0
+                # between the _get_buffered_length and here, we eat the exception and try again
+                # so the caller does not ahve to deal with it. if there is a greater issue
+                # the second read should blow up
+                if err.errno != _EINVAL:
+                    raise
+                pass
+            buf_len = _get_buffered_length(fd)
         raw_events = _os.read(fd, buf_len)
 
         events = str_to_events(raw_events)
