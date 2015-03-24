@@ -3,13 +3,33 @@
 
 from .utils import Eventlike as _Eventlike
 from .utils import CLOEXEC_DEFAULT as _CLOEXEC_DEFAULT
-from ._timerfd import TimerVal, TimerSpec, timerfd, timerfd_gettime, timerfd_settime
+from ._timerfd import TimerVal, timerfd, timerfd_gettime, timerfd_settime
 from ._timerfd import TFD_CLOEXEC, TFD_NONBLOCK, TFD_TIMER_ABSTIME
 from ._timerfd import CLOCK_REALTIME, CLOCK_MONOTONIC
 from ._timerfd import ffi as _ffi
 import os as _os
 
-class Timerfd(_Eventlike):
+class Timer(_Eventlike, TimerVal):
+    """Timer is both an event like object providing the file-like/event-like interface as well
+    as a TimerVal object to allow setting of the periodicity and offset of the timer in a single
+    interface without creating a separate throw away TimerVal object
+    
+    To use, instance an instance as per normal:
+    
+    >>> t = Timer()
+    
+    Then manipulate the timer using the TimerVal like interface:
+    
+    >>> t.occuring.every(seconds=1).after(seconds=500000000)
+    
+    Finally, use the Timer object as you would normally for an event like object:
+    
+    >>> # zip(x, range(2)) used to limit execution time in doctests
+    >>> for event in zip(t, range(2):
+    ...     print ("Timer Fired")
+    
+    This should print 'Timer Fired' after 0.5s followed by 1s after that
+    """
     def __init__(self, clock_type=CLOCK_MONOTONIC, flags=0, closefd=_CLOEXEC_DEFAULT):
         """Create a new Timerfd object
 
@@ -27,61 +47,36 @@ class Timerfd(_Eventlike):
         """
         super(self.__class__, self).__init__()
         self._fd = timerfd(clock_type, flags, closefd=closefd)
-        self._timerspec = TimerSpec()
     
-    def set_one_off(self, seconds, nano_seconds=0, absolute=False):
-        timer = TimerSpec()
-        timer.one_off = seconds
-        timer.one_off = nano_seconds
-        
-        old_val = self._update(timer, absolute=absolute)
-        
-        return old_val
-        
-    def set_reoccuring(self, seconds, nano_seconds=0, 
-                             next_seconds=0, next_nano_seconds=0,
-                             absolute=False):
-        timer = TimerSpec()
-        # set nano seconds first, if seconds is a float it
-        # will get overidden. this was we dont need any
-        # if conditionals/guards
-        timer.reoccuring_nano = nano_seconds
-        timer.reoccuring = seconds
-        
-        if next_seconds or next_nano_seconds:
-            timer.one_off = next_nano_seconds
-            timer.one_off = next_seconds
-        else:
-            timer.one_off = nano_seconds
-            timer.one_off = seconds
-
-        old_val = self._update(timer, absolute=absolute)
-        
-        return old_val
-
     def get_current(self):
+        """Retrives the current values of the timer from the kernel
+        
+        Returns
+        --------
+        :return: The old timer value
+        :rtype: TimerVal
+        """
         return timerfd_gettime(self.fileno())
 
-    def _update(self, timerspec, absolute=False):
+    def update(self, absolute=False):
+        """Update the kernel with the current values for the timer
+        
+        Arguments
+        ---------
+        :param bool absolute: Determines if the values in the timer should be considered absolute
+        (seconds since UNIX epoch) or if they should be added to the current time to determine
+        when the next event occurs
+        
+        Returns
+        --------
+        :return: The old timer value
+        :rtype: TimerVal
+        """
         flags = TFD_TIMER_ABSTIME if absolute else 0
-        old_timer = timerfd_settime(self.fileno(), timerspec, flags)
+        old_timer = timerfd_settime(self.fileno(), self._timerspec, flags)
         
         return old_timer
     
-    @property
-    def enabled(self):
-        return self.get_current().enabled
-
-    @property
-    def disabled(self):
-        return not self.enabled
-
-    def disable(self):
-        timer = self.get_current()
-        timer.disable()
-
-        self._update(timer)
-
     def _read_events(self):
         data = _os.read(self.fileno(), 8)
         value = _ffi.new('uint64_t[1]')
