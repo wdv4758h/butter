@@ -2,11 +2,11 @@ from butter.eventfd import Eventfd
 from butter.fanotify import Fanotify
 from butter.inotify import Inotify
 from butter.signalfd import Signalfd
-from butter.timerfd import Timerfd, TimerVal, TimerSpec
+from butter.timerfd import Timer, TimerVal
 import pytest
 
 
-@pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timerfd])
+@pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timer])
 def obj(request):
     Obj = request.param
     o = Obj.__new__(Obj)
@@ -46,19 +46,3 @@ def test_timerval():
     assert '3s' in r, 'Value does not have units'
     assert '4' in r, 'Value not in output'
     assert '4ns' in r, 'Value does not have units'
-
-@pytest.mark.repr
-@pytest.mark.unit
-def test_timerspec():
-    t = TimerSpec(one_off_seconds=1,
-                    one_off_nano_seconds=200000000,
-                    reoccuring_seconds=3,
-                    reoccuring_nano_seconds=400000000,
-                   )
-    r = repr(t)
-    assert t.__class__.__name__ in r, 'Does not contain its own name'
-    assert '1' in r, 'Value not in output'
-    assert '2' in r, 'Value not in output'
-    assert '3' in r, 'Value not in output'
-    assert '4' in r, 'Value not in output'
-                   

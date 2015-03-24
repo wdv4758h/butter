@@ -2,11 +2,11 @@ from butter.eventfd import Eventfd
 from butter.fanotify import Fanotify
 from butter.inotify import Inotify
 from butter.signalfd import Signalfd
-from butter.timerfd import Timerfd
+from butter.timerfd import Timer
 import pytest
 import os
 
-@pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timerfd])
+@pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timer])
 def obj(request):
     Obj = request.param
     o = Obj.__new__(Obj)

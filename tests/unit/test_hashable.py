@@ -2,11 +2,11 @@ from butter.eventfd import Eventfd
 from butter.fanotify import Fanotify
 from butter.inotify import Inotify
 from butter.signalfd import Signalfd
-from butter.timerfd import Timerfd
+from butter.timerfd import Timer
 import pytest
 
 
-@pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timerfd])
+@pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timer])
 def obj(Obj):
     o = Obj.__new__(Obj)
     
@@ -17,7 +17,7 @@ def obj(Obj):
                          (obj(Fanotify), obj(Fanotify) ),
                          (obj(Inotify),  obj(Inotify)  ),
                          (obj(Signalfd), obj(Signalfd) ),
-                         (obj(Timerfd),  obj(Timerfd)  ),
+                         (obj(Timer),    obj(Timer)    ),
                          ])
 @pytest.mark.unit
 def test_equals_same(obj1, obj2):
@@ -32,7 +32,7 @@ def test_equals_same(obj1, obj2):
                          (obj(Fanotify), obj(Fanotify) ),
                          (obj(Inotify),  obj(Inotify)  ),
                          (obj(Signalfd), obj(Signalfd) ),
-                         (obj(Timerfd),  obj(Timerfd)  ),
+                         (obj(Timer),    obj(Timer)    ),
                          ])
 def test_equals_diffrent(obj1, obj2):
     obj1._fd = 1
@@ -45,7 +45,7 @@ def test_equals_diffrent(obj1, obj2):
                          (obj(Fanotify), obj(Fanotify) ),
                          (obj(Inotify),  obj(Inotify)  ),
                          (obj(Signalfd), obj(Signalfd) ),
-                         (obj(Timerfd),  obj(Timerfd)  ),
+                         (obj(Timer),    obj(Timer)    ),
                          ])
 def test_hashable(obj1, obj2):
     obj1._fd = 1

@@ -3,7 +3,7 @@ from butter.fanotify import FAN_MODIFY, FAN_ONDIR, FAN_ACCESS, FAN_EVENT_ON_CHIL
 from butter.fanotify import Fanotify, FAN_CLASS_NOTIF
 from butter.inotify import Inotify, IN_ALL_EVENTS
 from butter.signalfd import Signalfd, pthread_sigmask
-from butter.timerfd import Timerfd
+from butter.timerfd import Timer
 
 from tempfile import TemporaryDirectory
 from time import time, sleep
@@ -96,10 +96,15 @@ def test_signalfd_intergration():
 @pytest.mark.intergration
 @pytest.mark.timerfd
 def test_timerfd_intergration():
-    t = Timerfd()
-
-    time_val = 0.5
-    t.set_reoccuring(time_val)
+    "Check and confirm that a 0.5s timer fires roughly every 0.5s as a smoke test"
+    INTERVAL = 1
+    UPPER_BOUND = INTERVAL * 1.1
+    LOWER_BOUND = INTERVAL * 0.9
+    DELAY = 0.3
+    NANO_SECONDS_TO_SECONDS = 1000000000.0
+    
+    t = Timer()
+    t.repeats(seconds=INTERVAL).update()
 
     for i in range(5):
         old_time = time()
@@ -108,12 +113,18 @@ def test_timerfd_intergration():
 
         assert num_events == 1, "Too many events"
         period = new_time - old_time
-        assert time_val*0.9 < period < time_val*1.1, "timer fired too late or too early"
+        assert LOWER_BOUND < period < UPPER_BOUND, "timer fired too late or too early"
 
-    # Wait a bit anad ensure that the remaining time on the timerfd gets updated
-    delay = 0.3
-    sleep(delay)
-    new_val = time_val - delay
-    assert new_val * 0.9 < t.get_current().next_event < new_val * 1.1, "current timer does not match what we expect after a (known) time delay"
+    # Wait a bit and ensure that the remaining time on the timerfd gets updated
+    sleep(DELAY)
+    expected_value = INTERVAL - DELAY
+    
+    next_event = t.get_current().next_event
+    next_event = next_event.seconds + (next_event.nano_seconds/NANO_SECONDS_TO_SECONDS)
+    
+    LOWER_BOUND = expected_value * 0.9
+    UPPER_BOUND = expected_value * 1.1
+
+    assert LOWER_BOUND < next_event < UPPER_BOUND, "current timer does not match what we expect after a (known) time delay"
 
     t.close()
