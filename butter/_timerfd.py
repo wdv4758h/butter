@@ -67,6 +67,7 @@ class TimerVal(object):
     @property
     def occuring(self):
         return self
+    @property
     def and_repeats(self):
         return self
     
