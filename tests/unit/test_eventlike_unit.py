@@ -16,7 +16,7 @@ def obj(request):
 @pytest.mark.eventlike
 @pytest.mark.unit
 def test_fd_closed(obj):
-    """Ensure you cant close the same fd twice (as it may be reused"""
+    """Ensure you cant close the same fd twice (as it may be reused)"""
     old_close = os.close
     os.close = lambda fd: None
     obj._fd = 1
