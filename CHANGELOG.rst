@@ -13,6 +13,7 @@ Release History
 **API Changes**
 
 - Argument order to fanotify_mark and high level API changed to have a more logical flow
+- Timerfd code has been overhauled and is no longer compatible
 
 **Bug Fixes**
 
