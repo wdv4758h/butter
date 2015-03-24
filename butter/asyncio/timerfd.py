@@ -1,13 +1,13 @@
 #!/usr/bih/env python
 from ..timerfd import CLOCK_REALTIME as _CLOCK_REALTIME
-from ..timerfd import Timerfd as _Timerfd
+from ..timerfd import Timer as _Timer
 from collections import deque as _deque
 import asyncio as _asyncio
 
 class Timerfd_async:
     def __init__(self, clock_type=_CLOCK_REALTIME, flags=0, *, loop=None):
         self._loop = loop or _asyncio.get_event_loop()
-        self._timerfd = _Timerfd(clock_type, flags)
+        self._timerfd = _Timer(clock_type, flags)
         self._getters = _deque()
         
         self.set_one_off = self._timerfd.set_one_off
