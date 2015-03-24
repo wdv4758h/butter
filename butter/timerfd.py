@@ -24,9 +24,9 @@ class Timer(_Eventlike, TimerVal):
     
     Finally, use the Timer object as you would normally for an event like object:
     
-    >>> # zip(x, range(2)) used to limit execution time in doctests
-    >>> for event in zip(t, range(2):
+    >>> for i, event in enumerate(t):
     ...     print ("Timer Fired")
+    ...     if i >= 2: break
     
     This should print 'Timer Fired' after 0.5s followed by 1s after that
     """
