@@ -10,7 +10,7 @@ from ._timerfd import ffi as _ffi
 import os as _os
 
 class Timerfd(_Eventlike):
-    def __init__(self, clock_type=CLOCK_REALTIME, flags=0, closefd=_CLOEXEC_DEFAULT):
+    def __init__(self, clock_type=CLOCK_MONOTONIC, flags=0, closefd=_CLOEXEC_DEFAULT):
         """Create a new Timerfd object
 
         Arguments
