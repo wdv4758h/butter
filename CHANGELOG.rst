@@ -17,6 +17,7 @@ Release History
 **Bug Fixes**
 
 - 'blocking' on Inotify objects was an internal flag and is now prefixed with '_' to denote its status
+- Timerfd was created by default as CLOCK_MONOTONIC in contrast to other functions in butter
 
 0.10 (2015-03-20)
 +++++++++++++++++
