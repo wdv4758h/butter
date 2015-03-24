@@ -7,9 +7,12 @@ to interpret
 """
 
 from .utils import UnknownError, InternalError, CLOEXEC_DEFAULT
+from collections import namedtuple
 from cffi import FFI
 import errno
 import math
+
+TimePair = namedtuple('TimePair', 'seconds nanoseconds')
 
 ffi = FFI()
 ffi.cdef("""
@@ -61,8 +64,12 @@ class TimerVal(object):
     timer.occuring.every(mins=5, nano_seconds=3).after(seconds=5)
     timer.offset(seconds=3).and_repeats.every(seconds=5)
     """
-    def __init__(self):
-        self._timerspec = ffi.new('struct itimerspec *')
+    __slots__ = ['_timerspec']
+    def __init__(self, timerspec=None):
+        if timerspec:
+            self._timerspec = timerspec
+        else:
+            self._timerspec = ffi.new('struct itimerspec *')
 
     @property
     def occuring(self):
@@ -113,8 +120,13 @@ class TimerVal(object):
     
     @property
     def next_event(self):
-        """Convenience accessor for results returned by timerfd_gettime"""
-        return (self.it_value.tv_sec, self.it_value.tv_nsec)
+        """returns a tuple containg (seconds, nanoseconds) representing when the timer next expires"""
+        return TimePair(self._timerspec.it_value.tv_sec, self._timerspec.it_value.tv_nsec)
+
+    @property
+    def period(self):
+        """returns a tuple containg (seconds, nanoseconds) representing how freqently the timer expires"""
+        return TimePair(self._timerspec.it_interval.tv_sec, self._timerspec.it_interval.tv_nsec)
     
     def __repr__(self):
         return "<{} offset=({}s, {}ns) reoccuring=({}s, {}ns)>".format(self.__class__.__name__,
@@ -122,7 +134,6 @@ class TimerVal(object):
                                                                        self._timerspec.it_value.tv_nsec,
                                                                        self._timerspec.it_interval.tv_sec, 
                                                                        self._timerspec.it_interval.tv_nsec)
-
 
 class TimerSpec(object):
     """Thin wrapper around the itimerspec c struct providing convience methods"""
