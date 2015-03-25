@@ -29,6 +29,13 @@ class Timer(_Eventlike, TimerVal):
     ...     if i >= 2: break
     
     This should print 'Timer Fired' after 0.5s followed by 1s after that
+
+    read()ing and wait()ing on this socket returns an integer representing the amount
+    of timer expiration's since the last time the timer was read. This can be used to make
+    a high precision lower cpu over head timer by using a repeating event with an expiry
+    of 1ns and then using read() to get the amount of elapsed nano seconds. This has
+    near 0% cpu overhead. Using the timer in this manner is refered to as an 'interval
+    timer'
     """
     def __init__(self, clock_type=CLOCK_MONOTONIC, flags=0, closefd=_CLOEXEC_DEFAULT):
         """Create a new Timerfd object
