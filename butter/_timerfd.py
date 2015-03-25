@@ -79,12 +79,12 @@ class TimerVal(object):
         return self
     
     def every(self, seconds=None, nano_seconds=None):
-        if seconds:
+        if seconds is not None:
             self._timerspec.it_interval.tv_sec = seconds
             # arm the timer
             if not self._timerspec.it_value.tv_sec:
                 self._timerspec.it_value.tv_sec = seconds
-        if nano_seconds:
+        if nano_seconds is not None:
             self._timerspec.it_interval.tv_nsec = nano_seconds
             # arm the timer
             if not self._timerspec.it_value.tv_nsec:
@@ -98,9 +98,9 @@ class TimerVal(object):
         return self.every(seconds, nano_seconds)
     
     def after(self, seconds=None, nano_seconds=None):
-        if seconds:
+        if seconds is not None:
             self._timerspec.it_value.tv_sec = seconds
-        if nano_seconds:
+        if nano_seconds is not None:
             self._timerspec.it_value.tv_nsec = nano_seconds
         return self
         
