@@ -118,6 +118,10 @@ class TimerVal(object):
         """Will this timer fire if used?, returns a bool"""
         return bool(self)
     
+    def disable(self):
+        """Disable the timer from firing"""
+        return self.offset(0, 0)
+
     @property
     def next_event(self):
         """returns a tuple containg (seconds, nanoseconds) representing when the timer next expires"""
