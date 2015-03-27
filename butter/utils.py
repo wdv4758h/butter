@@ -68,8 +68,9 @@ class Eventlike(object):
             raise ValueError("I/O operation on closed file")
 
     def wait(self):
-        # we use select here as the FD may be opened in non blocking mode
-        _select([self.fileno()], [], [])
+        if not self._events:
+            # we use select here as the FD may be opened in non blocking mode
+            _select([self.fileno()], [], [])
 
         return self.read_event()
 
