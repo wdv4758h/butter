@@ -34,16 +34,10 @@ struct signalfd_siginfo {
     ...;
 };
 
-//# define _SIGSET_NWORDS     (1024 / (8 * sizeof (unsigned long int)))
-// 32bits: 1024 / 8 / 4  = 32
-// 64bits: 1024 / 8 / 4  = 16
-// however we can just cheat and define it as 32 as 16 fits in 32 and there
-// is no length arg for the functions
 //#define _SIGSET_NWORDS 32
 typedef struct
 {
-//    unsigned long int __val[_SIGSET_NWORDS];
-    unsigned long int __val[32];
+    unsigned long int __val[%d];
 } __sigset_t;
 
 typedef __sigset_t sigset_t;
@@ -61,7 +55,10 @@ int sigismember(const sigset_t *set, int signum);
 #define SIG_SETMASK ...
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
-""")
+""" % (16 if platform.architecture()[0] == "64bit" else 32)
+# define _SIGSET_NWORDS     (1024 / (8 * sizeof (unsigned long int)))
+# 32bits: 1024 / 8 / 4  = 32
+# 64bits: 1024 / 8 / 4  = 16
 
 C = ffi.verify("""
 #include <sys/signalfd.h>
