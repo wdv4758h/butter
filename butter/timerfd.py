@@ -52,7 +52,7 @@ class Timer(_Eventlike, TimerVal):
         TFD_CLOEXEC: Close the timerfd when executing a new program
         TFD_NONBLOCK: Open the socket in non-blocking mode
         """
-        super(self.__class__, self).__init__()
+        super(Timer, self).__init__()
         self._fd = timerfd(clock_type, flags, closefd=closefd)
     
     def get_current(self):

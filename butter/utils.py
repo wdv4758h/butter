@@ -59,7 +59,7 @@ class Eventlike(object):
         eg: super(self.__class__, self).__init__(*args, **kwargs)
         """
         self._events = []
-        super(Eventlike, self).__init__()
+        super(EventLike, self).__init__()
     
     def close(self):
         _close(self.fileno())

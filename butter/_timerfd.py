@@ -70,6 +70,8 @@ class TimerVal(object):
             self._timerspec = timerspec
         else:
             self._timerspec = ffi.new('struct itimerspec *')
+        
+        super(TimerVal, self).__init__()
 
     @property
     def occuring(self):
