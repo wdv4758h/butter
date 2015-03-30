@@ -92,3 +92,12 @@ class Timer(_Eventlike, TimerVal):
         return [value[0]] # value's container is not a list
                           # lets make it one to expose a fammliar
                           # interface
+    def __repr__(self):
+            fd = "closed" if self.closed() else self.fileno()
+            return "<{} fd={} offset=({}s, {}ns) reoccuring=({}s, {}ns)>".format(self.__class__.__name__,
+                                                                           fd,
+                                                                           self._timerspec.it_value.tv_sec,
+                                                                           self._timerspec.it_value.tv_nsec,
+                                                                           self._timerspec.it_interval.tv_sec,
+                                                                           self._timerspec.it_interval.tv_nsec)
+
