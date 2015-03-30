@@ -15,6 +15,9 @@ if platform.python_version_tuple() < ('3', '0', '0'):
     class PermissionError(OSError):
         """You do not have the required pemissions to use this syscall (CAP_SYS_ADMIN)"""
         pass
+    class TimeoutError(Exception):
+        """Timeout expired."""
+        pass
     CLOEXEC_DEFAULT = True
 else:
     CLOEXEC_DEFAULT = False
@@ -70,7 +73,9 @@ class Eventlike(object):
     def wait(self, timeout=None):
         if not self._events:
             # we use select here as the FD may be opened in non blocking mode
-            _select([self.fileno()], [], [], timeout)
+            rd, _, _ =_select([self], [], [], timeout)
+            if self not in rd:
+                raise TimeoutError("No event occured")
 
         return self.read_event()
 
