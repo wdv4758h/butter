@@ -3,6 +3,7 @@
 
 from .utils import UnknownError, CLOEXEC_DEFAULT
 from cffi import FFI
+import platform
 import signal
 import errno
 
@@ -55,7 +56,7 @@ int sigismember(const sigset_t *set, int signum);
 #define SIG_SETMASK ...
 
 int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
-""" % (16 if platform.architecture()[0] == "64bit" else 32)
+""" % (16 if platform.architecture()[0] == "64bit" else 32))
 # define _SIGSET_NWORDS     (1024 / (8 * sizeof (unsigned long int)))
 # 32bits: 1024 / 8 / 4  = 32
 # 64bits: 1024 / 8 / 4  = 16
