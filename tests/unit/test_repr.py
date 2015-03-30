@@ -34,8 +34,9 @@ def test_repr_fd_closed(obj):
 
 @pytest.mark.repr
 @pytest.mark.unit
-def test_timerval():
-    t = TimerVal().offset(1, 2).repeats(3, 4)
+@pytest.mark.parametrize('time_obj', [TimerVal, Timer])
+def test_timerval(time_obj):
+    t = time_obj().offset(1, 2).repeats(3, 4)
     r = repr(t)
     assert t.__class__.__name__ in r, 'Does not contain its own name'
     assert '1' in r, 'Value not in output'
