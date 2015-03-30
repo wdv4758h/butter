@@ -5,10 +5,12 @@ place
 
 this was only visible if a user had previously set a value
 """
-from butter.timerfd import Timer
+from butter.timerfd import Timer, TimerVal
+from butter.utils import TimeoutError
 from select import select
+from pytest import raises, fail
 
-def test_f468afef89dTEST_PERIOD():
+def test_f468afef89d():
     TEST_PERIOD = 1
     TIMEOUT = TEST_PERIOD * 2
     
@@ -21,17 +23,21 @@ def test_f468afef89dTEST_PERIOD():
     timer.update()
 
     # ensure it fires
-    r_fd, _, _ = select([timer], [], [])
+    try:
+        timer.wait(TIMEOUT)
+    except TimeoutError:
+        fail("Timer did not fire")
+    
+    # drain the event list
+    timer.read_event()
 
     # reset and update the timer
-    timer.offset(seconds=0, nano_seconds=0)
-    timer.repeats(seconds=0, nano_seconds=0)
+    timer.disable()
     timer.update()
-    # we set this twice to get the value we set the timer to
-    new_val = timer.update()
-    
+
+    new_val = timer.get_current()
     assert new_val.next_event == (0, 0), 'Timer offset did not get reset'
-    assert new_val.period == (0, 0), 'Timer period did not get reset'
     
-    # ensure it does not fire
-    select([timer], [], [], TIMEOUT)
+    with raises(TimeoutError):
+        "Timer fired when is should have been disabled"
+        timer.wait(TIMEOUT)
