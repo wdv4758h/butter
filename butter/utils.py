@@ -23,6 +23,7 @@ else:
     CLOEXEC_DEFAULT = False
 
 PermissionError = PermissionError
+TimeoutError = TimeoutError
 
 class InternalError(Exception):
     """This Error occured due to an internal bug or OS misconfiguration"""
