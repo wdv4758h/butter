@@ -19,6 +19,7 @@ Release History
 
 - 'blocking' on Inotify objects was an internal flag and is now prefixed with '_' to denote its status
 - Timerfd was created by default as CLOCK_MONOTONIC in contrast to other functions in butter
+- Fixed bug that prevented compilation on 64bit machines with signalfd
 
 0.10 (2015-03-20)
 +++++++++++++++++
