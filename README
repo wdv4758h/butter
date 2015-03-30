@@ -60,6 +60,29 @@ Butter currently supported the following python interpreters
 Butter may work on older versions however it has not been tested on anything 
 except the above interpreters and may break without warning
 
+Installing
+-----------
+butter makes use of several C libraries to provide low level functionality. most
+of the compilation is taken care of by setup.py and cffi at install time however 
+you will need to ensure that some header files are available on the machine doing 
+the compilation (which may be different to the machine butter is being packaged 
+for and Finally installed on)
+
+Dev packages required:
+ * libseccomp
+ * kernel headers for a fairly recent kernel (3.x recommended)
+
+to install butter use the following command:
+
+    $ pip install butter
+
+this will pull in all the required dependencies and compile the required C 
+extensions
+
+for asyncio support, python 3.4 or newer is required. importing the asyncio 
+modules on older versions of python will throw a syntax error. Hence why these
+are namespaced under butter.asyncio rather than in the base modules
+
 Design
 -------
 The 'fd' apis have been designed first as thin wrappers around the underlying
