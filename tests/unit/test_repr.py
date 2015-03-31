@@ -7,9 +7,13 @@ import pytest
 
 
 @pytest.fixture(params=[Eventfd, Fanotify, Inotify, Signalfd, Timer])
-def obj(request):
+def obj(mocker, request):
+    # fanotify needs root to run, mock it so it just fakes it
+    m = mocker.patch('butter._fanotify.C.fanotify_init')
+    m.return_value = 5
+    
     Obj = request.param
-    o = Obj.__new__(Obj)
+    o = Obj(flags=0)
     
     return o
 
