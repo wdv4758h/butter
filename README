@@ -124,3 +124,8 @@ guide of what exceptions you can expect to receive
    be hit but is tested for just in case. Please consider filing a bug report
  * UnknownError: The Error is not specifically handled and unexpected, see 
    exception.errno for the Error code that generated this exception
+
+Projects using Butter
+---------------------
+ * https://pypi.python.org/pypi/icheck/1.4 (Written by the author, inotify)
+ * https://pypi.python.org/pypi/igor-inotify/ (Written by the author, inotify)
