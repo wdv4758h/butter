@@ -47,6 +47,9 @@ to use cffi for speed and compatibility with pypy
 
  * posix/linux aio (scatter/gather read writes with a completion based API 
    instead of a 'ready' based interface, eg similar to IOCP on windows)
+ * Sphinx documentation
+ * Example code
+ * More unit tests
 
 Supported Python
 -----------------
@@ -129,3 +132,9 @@ Projects using Butter
 ---------------------
  * https://pypi.python.org/pypi/icheck/1.4 (Written by the author, inotify)
  * https://pypi.python.org/pypi/igor-inotify/ (Written by the author, inotify)
+
+Contact Details
+---------------
+ * For pull requests, patches, feature requests and support
+   please email the author (code@pocketnix.org)
+ * xmpp: dablitz@pocketnix or code@conference.pocketnix.org
