@@ -130,7 +130,7 @@ guide of what exceptions you can expect to receive
 
 Projects using Butter
 ---------------------
- * https://pypi.python.org/pypi/icheck/1.4 (Written by the author, inotify)
+ * https://pypi.python.org/pypi/icheck/ (Written by the author, inotify)
  * https://pypi.python.org/pypi/igor-inotify/ (Written by the author, inotify)
 
 Contact Details
