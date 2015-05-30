@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+0.12 (2015-05-31)
++++++++++++++++++
+
+**Bug Fixes**
+
+- Older linux distros do not provide setns via libc, a 'weak' dummy implementation is now provided to allow compliation to work
+
 0.11 (2015-05-02)
 +++++++++++++++++
 
