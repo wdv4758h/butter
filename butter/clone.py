@@ -20,6 +20,7 @@ long __clone(unsigned long flags, void *child_stack,
              void *ptid, void *ctid, void *regs);
 
 int unshare(int flags);
+#pragma weak setns
 int setns(int fd, int nstype);
 """)
   
@@ -35,6 +36,10 @@ C = ffi.verify("""
 long __clone(unsigned long flags, void *child_stack,
              void *ptid, void *ctid,
              void *regs);
+
+int setns(int fd, int nstype) {
+    return -1;
+};
 """, libraries=[], ext_package="butter")
 
 CLONE_ALL = C.CLONE_NEWIPC  | \
