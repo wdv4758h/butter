@@ -9,7 +9,7 @@ name = 'butter'
 path = 'butter'
 
 ## Automatically determine project version ##
-from setuptools import setup, find_packages
+from setuptools import setup
 try:
     from hgdistver import get_version
 except ImportError:
