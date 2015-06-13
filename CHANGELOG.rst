@@ -3,12 +3,18 @@
 Release History
 ---------------
 
-0.12 (2015-05-31)
-+++++++++++++++++
+0.11.1 (2015-06-14)
++++++++++++++++++++
+
+- Misc fixups to setup.py
+
+**API Changes**
+
+- Older Linux distros (debian < Jessie) to not provide libseccomp, disable this at setup.py time
 
 **Bug Fixes**
 
-- Older linux distros do not provide setns via libc, a 'weak' dummy implementation is now provided to allow compliation to work
+- Older Linux distros do not provide setns via libc, a 'weak' dummy implementation is now provided to allow compliation to work
 
 0.11 (2015-05-02)
 +++++++++++++++++
