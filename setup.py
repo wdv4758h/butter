@@ -3,7 +3,6 @@
 from butter import clone, _eventfd, _fanotify, _inotify, seccomp
 from butter import _signalfd, splice, system, _timerfd, utils
 
-import sys
 
 name = 'butter'
 path = 'butter'
