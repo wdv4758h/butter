@@ -1,14 +1,38 @@
 #!/usr/bin/env python
 
-from butter import clone, _eventfd, _fanotify, _inotify, seccomp
-from butter import _signalfd, splice, system, _timerfd, utils
+# This must be at the top to force cffi to use setuptools instead od distools
+from setuptools import setup
 
+import platform
+
+from butter import clone, _eventfd, _fanotify, _inotify
+from butter import _signalfd, splice, system, _timerfd, utils
 
 name = 'butter'
 path = 'butter'
 
+ext_modules = [
+    clone.ffi.verifier.get_extension(),
+    _eventfd.ffi.verifier.get_extension(),
+    _fanotify.ffi.verifier.get_extension(),
+    _inotify.ffi.verifier.get_extension(),
+#    seccomp._ffi.verifier.get_extension(),
+    _signalfd.ffi.verifier.get_extension(),
+    splice._ffi.verifier.get_extension(),
+    system._ffi.verifier.get_extension(),
+    _timerfd.ffi.verifier.get_extension(),
+    utils._ffi.verifier.get_extension(),
+    ]
+
+if platform.linux_distribution()[0] == 'debian' and \
+   platform.linux_distribution()[1] < '8.0':
+    # no seccomp.h in debian wheezy by default
+    pass
+else:
+    from butter import seccomp
+    ext_modules.append(seccomp._ffi.verifier.get_extension())
+
 ## Automatically determine project version ##
-from setuptools import setup
 try:
     from hgdistver import get_version
 except ImportError:
@@ -88,18 +112,7 @@ setup(
 #    scripts = ['scripts/dosomthing'],
     zip_safe = False,
     ext_package = name,
-    ext_modules = [
-        clone.ffi.verifier.get_extension(),
-        _eventfd.ffi.verifier.get_extension(),
-        _fanotify.ffi.verifier.get_extension(),
-        _inotify.ffi.verifier.get_extension(),
-        seccomp._ffi.verifier.get_extension(),
-        _signalfd.ffi.verifier.get_extension(),
-        splice._ffi.verifier.get_extension(),
-        system._ffi.verifier.get_extension(),
-        _timerfd.ffi.verifier.get_extension(),
-        utils._ffi.verifier.get_extension(),
-        ],
+    ext_modules = ext_modules,
     setup_requires = [],
     install_requires = ['cffi>=0.7.2'],
     tests_require = ['tox', 'pytest', 'pytest-cov', 'pytest-mock', 'mock'],
